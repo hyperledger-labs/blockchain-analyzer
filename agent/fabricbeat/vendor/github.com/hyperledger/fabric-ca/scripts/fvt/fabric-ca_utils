@@ -1,0 +1,1069 @@
+#!/bin/bash
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+export FABRIC_CA="$GOPATH/src/github.com/hyperledger/fabric-ca"
+export FABRIC_CA_CLIENTEXEC="/usr/local/bin/fabric-ca-client"
+export FABRIC_CA_SERVEREXEC="/usr/local/bin/fabric-ca-server"
+export TESTDATA="$FABRIC_CA/testdata"
+export SCRIPTDIR="$FABRIC_CA/scripts/fvt"
+export MYSQL_PORT="3306"
+export LDAP_PORT="389"
+export LDAP_PROTO="ldap://"
+export LDAP_TLS_PROTO="ldaps://"
+export POSTGRES_PORT="5432"
+export PGPASSWORD='postgres'
+export MSP_KEY_DIR='msp/keystore'
+export MSP_CERT_DIR='msp/signcerts'
+export FABRIC_CA_DATA="/etc/hyperledger/fabric-ca"
+export TLS_ROOTCERT="$FABRIC_CA_DATA/FabricTlsPkiBundle.pem"
+export TLS_SUBCACERT="$FABRIC_CA_DATA/FabricTlsSubCa-cert.pem"
+export TLS_RACERT="$FABRIC_CA_DATA/FabricTlsRa-cert.pem"
+export TLS_SERVERCERT="$FABRIC_CA_DATA/FabricTlsServerEEcert.pem"
+export TLS_SERVERKEY="$FABRIC_CA_DATA/FabricTlsServerEEkey.pem"
+export TLS_CLIENTCERT="$FABRIC_CA_DATA/FabricTlsClientEEcert.pem"
+export TLS_CLIENTKEY="$FABRIC_CA_DATA/FabricTlsClientEEkey.pem"
+export CA_HOST_ADDRESS="localhost"
+export PROXY_PORT="7054"
+export CA_DEFAULT_PORT="1${PROXY_PORT}"
+export PROFILING_PORT="2${PROXY_PORT}"
+export DEFAULT_TIMEOUT="180"
+export DEFAULT_CA_TIMEOUT="150"
+export DEFAULT_HTTP_TIMEOUT="30"
+export DEFAULT_MSG_TIMEOUT="30"
+export DEFAULT_DB_TIMEOUT="30"
+export INTERMEDIATE_PROXY_PORT="8054"
+export INTERMEDIATE_CA_DEFAULT_PORT="1${INTERMEDIATE_PROXY_PORT}"
+export LDAPHOST="-h localhost"
+export LDAPAUTH="-D "cn=$LDAPUSER,dc=example,dc=com" -w $LDAPPASWD"
+export LDAPBASE="-b "dc=example,dc=com""
+export LDAPUSERBASE="-b ou=users,ou=fabric,dc=hyperledeger,dc=example,dc=com"
+export DEFAULT_RUN_CONFIG_FILE_NAME="runFabricCaFvt.yaml"
+
+DATE='date +%Y-%m-%d'
+TIME='date +%I:%M:%S%p'
+
+stripBlank() {
+   # delete comments and blanks lines
+   egrep -v "^ *#|^$"
+}
+
+listUser(){
+   local user="$1"
+   : ${user:="$LDAPUSER"}
+   shift
+   ldapsearch $LDAPHOST $LDAPAUTH $LDAPUSERBASE -s sub "(uid=$user)" $@ | stripBlank
+}
+
+listUsers() {
+   ldapsearch $LDAPHOST $LDAPAUTH $LDAPUSERBASE dn | stripBlank
+}
+
+listGroups() {
+   group="$1"
+   test -z "$group" &&
+   ldapsearch $LDAPHOST $LDAPAUTH $LDAPBASE \
+             -s sub "(|(objectclass=posixGroup) (objectclass=groupOfNames))" dn | stripBlank ||
+   ldapsearch $LDAPHOST $LDAPAUTH $LDAPBASE \
+             -s sub "(memberOf=cn=$group,ou=groups,dc=example,dc=com)" dn | stripBlank
+}
+
+changeAttr() {
+   local entry="$1"
+   local attr="$2"
+   local val="$3"
+   if test $# -ne 3; then
+      echo "Usage: changeAttr <entry> <attr> <value>"
+      return
+   fi
+   ldapmodify $LDAPHOST $LDAPAUTH <<EOF
+dn: $entry
+changetype: modify
+replace: $attr
+$attr: $val
+EOF
+}
+
+delUser() {
+   local user="$1"
+   if test $# -ne 1; then
+      echo "Usage: delUser <userName>"
+      return
+   fi
+   ldapdelete $LDAPHOST -p $LDAPPORT $LDAPAUTH \
+               "uid=$user,ou=users,ou=fabric,dc=hyperledeger,dc=example,dc=com"
+}
+
+addUser () {
+   # Add the eqivalent of a top-level fabric-ca administrator
+   local user="$1"
+   if test $# -ne 1; then
+      echo "Usage: delUser <userName>"
+      return
+   fi
+   # Get the next sequential UID
+   uidN=$(ldapsearch $LDAPHOST -p $LDAPPORT $LDAPAUTH $LDAPUSERBASE |
+          awk '/uidNumber:/ {print $2}' | sort -n | tail -n1)
+   ldapadd -h localhost -p $LDAPPORT \
+           -D cn=$LDAPUSER,dc=example,dc=com -w $LDAPPASWD <<EOF
+# User account
+dn: uid=$user,ou=users,ou=fabric,dc=hyperledeger,dc=example,dc=com
+objectClass: posixAccount
+objectClass: shadowAccount
+objectClass: inetOrgPerson
+uid: $user
+cn: $user
+sn: Hyperledeger
+givenName: $user
+o: Hyperledger
+ou: Fabric
+st: North Carolina
+uidNumber: $((uidN+1))
+gidNumber: $((uidN+1))
+mail: $user@hyperledeger.example.com
+loginShell: /bin/bash
+homeDirectory: /home/$user
+userPassword: $userpw
+EOF
+}
+
+TimeStamp() {
+   printf "TIMESTAMP--%s %s\n" $($DATE) $($TIME)
+}
+
+tolower() {
+  echo "$1" | tr [:upper:] [:lower:]
+}
+
+runPSQL() {
+   local cmd="$1"
+   local opts="$2"
+   local wrk_dir="$(pwd)"
+   cd /tmp
+   /usr/bin/psql "$opts" -U postgres -h localhost -c "$cmd"
+   local rc=$?
+   cd $wrk_dir
+   return $rc
+}
+
+setTLS() {
+   PROTO="http://"
+   TLSOPT=""
+   # if not set, default to OFF
+   if test -n "$FABRIC_TLS"; then
+     # otherwise, set TLS-related stuff
+     if $($FABRIC_TLS); then
+        PROTO="https://"
+        LDAP_PROTO="ldaps://"
+        LDAP_PORT=636
+        TLSOPT="--tls.certfiles $TLS_ROOTCERT"
+        INTTLSOPT="--intermediate.tls.certfiles $TLS_ROOTCERT"
+     fi
+   fi
+}
+
+ErrorMsg() {
+   local msg="$1"
+   local rc="$2"
+   : ${rc:="RC"}
+   echo -e "\033[31m ****** ERROR ****** $msg \033[0m"
+   let $rc+=1
+}
+
+ErrorExit() {
+   $SCRIPTDIR/fabric-ca_setup.sh -R -x $CA_CFG_PATH
+   local msg="$1"
+   local rc="$2"
+   : ${rc:="RC"}
+   ErrorMsg "$msg" "$rc"
+   CleanUp $(eval echo \$$rc)
+   exit $(eval echo \$$rc)
+}
+
+isReachable() {
+   # a test to see if there is a listener on
+   # specified host:port
+   # netcat would be *far* simpler:
+   #    nc -nzvt host port
+   # but not guaranteed to be installed
+   # so use python, since it is ubiquitious
+   local host="$1"
+   local port="$2"
+   test -z "$host" -o -z "$port" && return 1
+
+   python - <<END
+import socket
+import sys
+import os
+remoteServer =  "$host"
+port         = int("$port");
+remoteServerIP  = socket.gethostbyname(remoteServer)
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+result = sock.connect_ex((remoteServerIP, port))
+sock.close()
+os._exit(result)
+END
+}
+
+pollServer() {
+   local app="$1"
+   local host="$2"
+   local port="$3"
+   local timeout="$4"
+   : ${timeout:=$DEFAULT_TIMEOUT}
+   local action="$5"
+   : ${action:="start"}
+   local rc=1
+   local starttime=$(date +%s)
+   local searcHost=$host
+   test host = "0.0.0.0" && searcHost='*'
+
+   # continue to poll host:port until
+   # we either get a response, or reach timeout
+   while test "$(($(date +%s)-starttime))" -lt "$timeout" -a $rc -ne 0
+   do
+      printf "\r%s%03d" "Waiting for $app to $action on $host:$port... " "$(($(date +%s)-starttime))"
+      # ss -lpnt "src $searchHost:$port"
+      isReachable "$host" "$port"
+      rc=$?
+      # invert the normal sense of 'success' for stop
+      if test "$action" == "stop"; then
+         test $rc -ne 0 && rc=0 || rc=1
+      fi
+      test $rc -eq 0 && break
+   done
+   return $rc
+}
+
+pollLogForMsg() {
+   local msg="$1"
+   local log="$2"
+   local timeout="$3"
+   : ${timeout:=$DEFAULT_MSG_TIMEOUT}
+   local rc=1
+   local starttime=$(date +%s)
+
+   # continue to poll until
+   # we find $msg in $log, or reach timeout
+   while test "$(($(date +%s)-starttime))" -lt "$timeout" -a $rc -ne 0
+   do
+      egrep "$msg" "$log"
+      rc=$?
+      test $rc -eq 0 && break
+      sleep .1
+   done
+   return $rc
+}
+
+pollFabricCa() {
+   local app="$1"
+   local host="$2"
+   local port="$3"
+   local action="$4"
+   local timeout="$5"
+   : ${app:="$FABRIC_CA_SERVEREXEC"}
+   : ${host:="$CA_HOST_ADDRESS"}
+   : ${port:="$PROXY_PORT"}
+   : ${action:="start"}
+   : ${timeout:=$DEFAULT_CA_TIMEOUT}
+
+   pollServer "$app" "$host" "$port" "$timeout" "$action"
+   return $?
+}
+
+pollSimpleHttp() {
+   local app="$1"
+   local host="$2"
+   local port="$3"
+   local action="$4"
+   local timeout="$5"
+   : ${app:="python"}
+   : ${host:="localhost"}
+   : ${port:="3755"}
+   : ${action:="start"}
+   : ${timeout:=$DEFAULT_HTTP_TIMEOUT}
+
+   pollServer "$app" "$host" "$port" "$timeout" "$action"
+   return $?
+}
+
+pollMySql() {
+   local app="$1"
+   local host="$2"
+   local port="$3"
+   local action="$4"
+   local timeout="$5"
+   : ${app:="/usr/sbin/mysqld"}
+   : ${host:="localhost"}
+   : ${port:="$MYSQL_PORT"}
+   : ${action:="start"}
+   : ${timeout:=$DEFAULT_DB_TIMEOUT}
+
+   pollServer "$app" "$host" "$port" "$timeout" "$action"
+   return $?
+}
+
+pollPostgres() {
+   local app="$1"
+   local host="$2"
+   local port="$3"
+   local action="$4"
+   local timeout="$5"
+   : ${app:="postgres -D /usr/local/pgsql/data"}
+   : ${host:="localhost"}
+   : ${port:="$POSTGRES_PORT"}
+   : ${action:="start"}
+   : ${timeout:=$DEFAULT_DB_TIMEOUT}
+
+   pollServer "$app" "$host" "$port" "$timeout" "$action"
+   return $?
+}
+
+CleanUp() {
+   local RC=$1
+   : ${RC:=0}
+   ###############################################################################
+   # Summary
+   ###############################################################################
+   echo ""
+   echo "#########################################################################"
+   printf "RC: $RC, $TESTCASE "
+
+   if test "$RC" -eq 0; then
+      RESULT="PASSED"
+   else
+      RESULT="FAILED"
+   fi
+
+   printf "%s\n" $RESULT
+   RUNTIME_S="$((SECONDS-STARTIME))"
+   echo "$((RUNTIME_S/60)) minutes, $((RUNTIME_S%60)) seconds runtime"
+   printf "$(TimeStamp) $TESTCASE ENDED\n"
+   echo "#########################################################################"
+
+   TimeStamp
+   printf "%s test ended.\n" $TESTCASE
+}
+
+verifyServerTraffic() {
+   # verifyServerTraffic
+   # validate that backend <server_name>
+   # got at least <num_requests> requests from client
+   # with a minimum of <percent> HTTP status code <code>
+   local haproxy_addr="$1"
+   local server_name="$2"
+   local num_requests="$3"
+   local percent="$4"
+   local code="$5"
+   local op="$6"
+   local rc=0
+
+    # default
+    #  server got at least one request
+    #  all received requests were successfully served
+    : ${haproxy_addr:="localhost:10888"}
+    : ${server_name:="server1"}
+    : ${num_requests:="1"}
+    : ${percent:="100"}
+    : ${code:="HTTP 2xx"}
+    : ${op:="eq"}
+
+   result=$(curl -s http://${haproxy_addr}/ |
+     awk -v s="$server_name\"" '$0~s'|html2text|
+        awk -v c="$code" '
+           /Cum. sessions:/ {sessions=$NF}
+           $0~c {gsub(/[(%)]/,"",$NF);status=$NF}
+           END {print sessions" "status}')
+   eval test "${result%% *}" -$op "$num_requests" 2>/dev/null; rc=$((rc+$?))
+   eval test "${result##* }" -$op "$percent" 2>/dev/null; rc=$((rc+$?))
+   return $rc
+}
+
+printAuth() {
+   test "$#" -eq 2 || return 1
+   local CLIENTCERT="$1"
+   local CLIENTKEY="$2"
+
+   echo CERT:
+   openssl x509 -in $CLIENTCERT -text 2>&1 | sed 's/^/    /'
+   type=$(cat $CLIENTKEY | head -n1 | awk '{print tolower($2)}')
+   test "$type" = "private" && type=ec
+   echo KEY:
+   openssl $type -in $CLIENTKEY -text 2>/dev/null| sed 's/^/    /'
+}
+
+startHttp() {
+   local port="$1"
+   local rootdir="$2"
+   cd $rootdir
+   python -m SimpleHTTPServer $port &
+   HTTP_PID=$!
+   pollSimpleHttp
+}
+
+keyCheck() {
+   local cert="$1"
+   local key="$2"
+   local alg="$3"
+   : ${alg:="rsa"}
+   test -f "$cert" -a -f "$key" || return 1
+
+   # check to see that the public/private key pair match
+   case "$alg" in
+   rsa|dsa)
+       k_hash=$(openssl $alg -noout -modulus -in $key  2>&1| awk -F'=' '/=/ {print $2}' | openssl md5 | awk '{print $NF}')
+       c_hash=$(openssl x509 -noout -modulus -in $cert 2>&1| awk -F'=' '/=/ {print $2}' | openssl md5 | awk '{print $NF}')
+   ;;
+   *)
+       k_hash=$(openssl $alg        -pubout -in $key  2>/dev/null| openssl md5 | awk '{print $NF}')
+       c_hash=$(openssl x509 -noout -pubkey -in $cert            | openssl md5 | awk '{print $NF}')
+   ;;
+   esac
+
+   test -z "$k_hash" -o -z "$c_hash" && return 1
+   test "$k_hash" == "$c_hash" || return 1
+
+   return 0
+}
+
+enroll() {
+   # Input : username, password
+   # Output: cert to filename1, key to filename2
+   local username="$1"
+   : ${username:="admin"}
+   local userpswd="$2"
+   : ${userpswd:="adminpw"}
+   if [ $# -gt 2 ]; then
+      ATTRS="--enrollment.attrs $3"
+   fi
+   local FABRIC_CA_ENROLLMENT_DIR="$CA_CFG_PATH/$username"
+   local FABRIC_CA_CERT_FILE="$FABRIC_CA_ENROLLMENT_DIR/$MSP_CERT_DIR/cert.pem"
+   local FABRIC_CA_KEY_FILE="$FABRIC_CA_ENROLLMENT_DIR/$MSP_KEY_DIR/key.pem"
+   local FABRIC_CA_CLIENT_HOME=$FABRIC_CA_ENROLLMENT_DIR
+   local HOST="localhost"
+   local PORT="$PROXY_PORT"
+   local RC=0
+   export FABRIC_CA_CLIENT_HOME
+   export FABRIC_CA_ENROLLMENT_DIR
+
+   test -d "$FABRIC_CA_ENROLLMENT_DIR" || mkdir -p "$FABRIC_CA_ENROLLMENT_DIR"
+   ENROLLCONFIG="$FABRIC_CA_ENROLLMENT_DIR/enroll.yaml"
+
+   # Determines the PROTO and TLSOPT values based on FABRIC_TLS setting
+   setTLS
+   $FABRIC_CA_CLIENTEXEC enroll -u "${PROTO}${username}:${userpswd}@${CA_HOST_ADDRESS}:$PROXY_PORT" $TLSOPT \
+                         -c $ENROLLCONFIG $ATTRS \
+                         --csr.hosts "$username@fab-client.raleigh.ibm.com" \
+                         --csr.hosts "$username.fabric.raleigh.ibm.com,127.0.0.2"
+   RC=$?
+   if test -n "$FABRIC_CA_DEBUG"; then
+      $(test "$RC" -eq 0 && $($FABRIC_CA_DEBUG)) && printAuth $FABRIC_CA_CERT_FILE $FABRIC_CA_KEY_FILE
+   fi
+   return $RC
+}
+
+reenroll() {
+   local USERNAME="$1"
+   : ${USERNAME:="admin"}
+   local FABRIC_CA_ENROLLMENT_DIR="$CA_CFG_PATH/$USERNAME"
+   local FABRIC_CA_CERT_FILE="$FABRIC_CA_ENROLLMENT_DIR/$MSP_CERT_DIR/cert.pem"
+   local FABRIC_CA_KEY_FILE="$FABRIC_CA_ENROLLMENT_DIR/$MSP_KEY_DIR/key.pem"
+   local FABRIC_CA_CLIENT_HOME=$FABRIC_CA_ENROLLMENT_DIR
+   local HOST="localhost"
+   local PORT="$PROXY_PORT"
+   local RC=0
+   export FABRIC_CA_CLIENT_HOME
+   export FABRIC_CA_ENROLLMENT_DIR
+
+   test -d "$FABRIC_CA_ENROLLMENT_DIR" || mkdir -p "$FABRIC_CA_ENROLLMENT_DIR"
+   FABRIC_CA_CERT_FILE="$FABRIC_CA_CLIENT_HOME/$MSP_CERT_DIR/cert.pem"
+   FABRIC_CA_KEY_FILE="$FABRIC_CA_CLIENT_HOME/$MSP_KEY_DIR/key.pem"
+
+   : ${KEYTYPE="ecdsa"}
+   : ${KEYLEN="256"}
+   test -d "$FABRIC_CA_CLIENT_HOME" || mkdir -p "$FABRIC_CA_CLIENT_HOME"
+   ENROLLCONFIG="$FABRIC_CA_CLIENT_HOME/enroll.yaml"
+   export FABRIC_CA_CLIENT_HOME
+   setTLS
+   $FABRIC_CA_CLIENTEXEC reenroll -u $PROTO${CA_HOST_ADDRESS}:$PROXY_PORT $TLSOPT -c $ENROLLCONFIG
+   RC=$?
+   $($FABRIC_CA_DEBUG) && printAuth $FABRIC_CA_CERT_FILE $FABRIC_CA_KEY_FILE
+   $SCRIPTDIR/fabric-ca_setup.sh -L -d $driver
+   return $RC
+}
+
+register() {
+   local REGISTRAR="$1"
+   : ${REGISTRAR:="admin"}
+   local USERNAME="$2"
+   : ${USERNAME:="testuser"}
+   local USERTYPE="$3"
+   : ${USERTYPE:="client"}
+   local USERGRP="$4"
+   : ${USERGRP:="bank_a"}
+   test "$USERGRP" = '[]' && USERGRP_OPT="" || USERGRP_OPT="--id.affiliation $USERGRP"
+   local USERATTR="$5"
+   : ${USERATTR:='test=testValue'}
+   local FABRIC_CA_ENROLLMENT_DIR="$6"
+
+   : ${FABRIC_CA_ENROLLMENT_DIR:="$CA_CFG_PATH/$REGISTRAR"}
+   : ${FABRIC_CA_CLIENT_HOME:="$CA_CFG_PATH/$REGISTRAR"}
+
+   export FABRIC_CA_ENROLLMENT_DIR
+   setTLS
+   $FABRIC_CA_CLIENTEXEC register -d -u "$PROTO${CA_HOST_ADDRESS}:$PROXY_PORT" $TLSOPT \
+                           --id.name "$USERNAME" \
+                           --id.type "$USERTYPE" \
+                           --id.maxenrollments 1 \
+                           $USERGRP_OPT \
+                           --id.attrs "$USERATTR" \
+                           -c $FABRIC_CA_CLIENT_HOME/fabric-ca-client-config.yaml
+   local rc=$?
+   return $rc
+}
+
+function genRunconfig() {
+   local runconfig="$1"
+   local driver="$2"
+   local datasrc="$3"
+   local serverCert="$4"
+   local serverKey="$5"
+   local maxEnroll="$6"
+   local version="$7"
+   : ${FABRIC_TLS:='false'}
+   : ${FABRIC_CA_DEBUG:='false'}
+   local registry=""
+   local converters=""
+   setTLS
+
+   case ${version:-"yaml"} in
+      json) if ! $($LDAP_ENABLE); then registry="
+   \"registry\": {
+      \"maxEnrollments\": \"$maxEnroll\",
+      \"identities\": [
+         {
+            \"name\": \"admin\",
+            \"pass\": \"adminpw\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": {
+               \"hf.Registrar.Roles\": \"client,user,peer,validator,auditor,ca\",
+               \"hf.Registrar.DelegateRoles\": \"client,user,validator,auditor\",
+               \"hf.Revoker\": true,
+               \"hf.GenCRL\": true
+            }
+         },
+         {
+            \"name\": \"admin2\",
+            \"pass\": \"adminpw2\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": {
+               \"hf.Registrar.Roles\": \"client,user,peer,validator,auditor,ca\",
+               \"hf.Registrar.DelegateRoles\": \"client,user,validator,auditor\",
+               \"hf.Revoker\": true,
+               \"hf.GenCRL\": true
+            }
+         },
+         {
+            \"name\": \"revoker\",
+            \"pass\": \"revokerpw\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": {
+               \"hf.Revoker\": true
+            }
+         },
+         {
+            \"name\": \"revoker2\",
+            \"pass\": \"revokerpw2\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": {
+               \"hf.Revoker\": true
+            }
+         },
+         {
+            \"name\": \"nonrevoker\",
+            \"pass\": \"nonrevokerpw\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\"
+         },
+         {
+            \"name\": \"nonrevoker2\",
+            \"pass\": \"nonrevokerpw2\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\"
+         },
+         {
+            \"name\": \"notadmin\",
+            \"pass\": \"pass\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": {
+               \"hf.Registrar.Roles\": \"client,user,peer,validator,auditor,ca\",
+               \"hf.Registrar.DelegateRoles\": \"client\"
+            }
+         },
+         {
+            \"name\": \"expiryUser\",
+            \"pass\": \"expirypw\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\"
+         },
+         {
+            \"name\": \"testUser\",
+            \"pass\": \"user1\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_b\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": []
+         },
+         {
+            \"name\": \"testUser2\",
+            \"pass\": \"user2\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_c\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": []
+         },
+         {
+            \"name\": \"testUser3\",
+            \"pass\": \"user3\",
+            \"type\": \"client\",
+            \"affiliation\": \"bank_a\",
+            \"maxEnrollments\": \"$maxEnroll\",
+            \"attrs\": []
+         }
+      ]
+   },
+"
+fi
+cat > $runconfig <<EOF
+{
+   "address": "$CA_HOST_ADDRESS",
+   "port": $CA_DEFAULT_PORT,
+   "debug": "$FABRIC_CA_DEBUG",
+   "db": {
+      "type": "$driver",
+      "datasource": "$datasrc",
+       "tls": {
+          "enabled": "$TLS_ON",
+          "certfiles": [ "$TLS_ROOTCERT", $TLS_RACERT, $TLS_SUBCACERT ],
+          "client": {
+             "certfile": "$TLS_CLIENTCERT",
+             "keyfile": "$TLS_CLIENTKEY"
+          }
+       }
+   },
+   "tls": {
+      "enabled": "$TLS_ON",
+      "certfile": "$TLS_SERVERCERT",
+      "keyfile": "$TLS_SERVERKEY"
+   },
+   "ca": {
+      "certfile": "$serverCert",
+      "keyfile": "$serverKey"
+   },
+   $registry
+   "ldap": {
+      "enabled": $LDAP_ENABLE,
+      "url": "${LDAP_PROTO}CN=admin,dc=example,dc=com:adminpw@localhost:$LDAP_PORT/dc=example,dc=com",
+      "tls": {
+         "certfiles": [ "$TLS_ROOTCERT", $TLS_RACERT, $TLS_SUBCACERT ],
+         "client": {
+            "certfile": "$TLS_CLIENTCERT",
+            "keyfile": "$TLS_CLIENTKEY"
+         }
+      }
+   },
+   "affiliations": {
+      "bank_a": [
+         "department1"
+      ],
+      "bank_b": [
+         "department1"
+      ],
+      "bank_c": [
+         "department1"
+      ],
+      "org1": [
+         "department1",
+         "department2"
+      ],
+      "org2": [
+         "department1",
+         "department2"
+      ],
+      "org3": [
+         "department1",
+         "department2"
+      ]
+   },
+   "signing": {
+      "profiles": null,
+      "default": {
+         "usage": [
+            "cert sign",
+            "crl sign",
+            "digital signature",
+            "key encipherment",
+            "timestamping"
+         ],
+         "expiry": "8000h",
+         "crlurl": "http://localhost:3755/TestCRL.crl",
+         "caconstraint": {
+            "isca": true,
+            "maxpathlen": 1,
+            "ocspnocheck": true,
+            "notbefore": "2016-12-30T00:00:00.000Z"
+         }
+      }
+   },
+   "csr": {
+      "cn": "fabric-ca-server",
+      "names": [
+         {
+            "C": "US",
+            "ST": "North Carolina",
+            "L": null,
+            "O": "Hyperledger",
+            "OU": "Fabric"
+         }
+      ],
+      "hosts": [
+         "fabricCa.hyperledger.example.com"
+      ],
+      "ca": {
+         "pathlen": null,
+         "pathlenzero": null,
+         "expiry": null
+      }
+   },
+   "crypto": {
+      "software": {
+         "hash_family": "SHA2",
+         "security_level": 256,
+         "ephemeral": false,
+         "key_store_dir": "keys"
+      }
+   }
+}
+EOF
+   ;;
+      yaml) if ! $($LDAP_ENABLE); then registry="
+registry:
+  maxEnrollments: $maxEnroll
+  identities:
+$(for i in {1..16}; do
+echo "    - name: intermediateCa$i
+      pass: intermediateCa${i}pw
+      type: client
+      affiliation: \"\"
+      maxenrollments: $maxEnroll
+      attrs:
+         hf.Registrar.Roles: \"client,user,peer,validator,auditor\"
+         hf.Registrar.DelegateRoles: \"client,user,validator,auditor\"
+         hf.Revoker: true
+         hf.IntermediateCA: true
+         hf.AffiliationMgr: true"
+done)
+    - name: admin
+      pass: adminpw
+      type: client
+      affiliation:
+      maxEnrollments: $maxEnroll
+      attrs:
+        hf.Registrar.Roles: \"client,user,peer,validator,auditor,ca\"
+        hf.Registrar.DelegateRoles: \"client,user,validator,auditor\"
+        hf.Revoker: true
+        hf.IntermediateCA: true
+        hf.Registrar.Attributes: \"*\"
+        hf.GenCRL: true
+        hf.AffiliationMgr: true
+    - name: admin2
+      pass: adminpw2
+      type: client
+      affiliation:
+      maxEnrollments: $maxEnroll
+      attrs:
+        hf.Registrar.Roles: \"client,user,peer,validator,auditor,ca\"
+        hf.Registrar.DelegateRoles: \"client,user,validator,auditor\"
+        hf.Revoker: true
+        hf.IntermediateCA: true
+        hf.Registrar.Attributes: \"*\"
+        hf.GenCRL: true
+    - name: revoker
+      pass: revokerpw
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+      attrs:
+        hf.Revoker: true
+    - name: revoker2
+      pass: revokerpw2
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+      attrs:
+        hf.Revoker: true
+    - name: nonrevoker
+      pass: nonrevokerpw
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+    - name: nonrevoker2
+      pass: nonrevokerpw2
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+    - name: notadmin
+      pass: pass
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+      attrs:
+        hf.Registrar.Roles: \"client,user,peer,validator,auditor,ca\"
+        hf.Registrar.DelegateRoles: \"client\"
+    - name: expiryUser
+      pass: expirypw
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+    - name: testUser
+      pass: user1
+      type: client
+      affiliation: bank_b
+      maxEnrollments: $maxEnroll
+      attrs: []
+    - name: testUser2
+      pass: user2
+      type: client
+      affiliation: bank_c
+      maxEnrollments: $maxEnroll
+      attrs: []
+    - name: testUser3
+      pass: user3
+      type: client
+      affiliation: bank_a
+      maxEnrollments: $maxEnroll
+      attrs: []"
+fi
+
+converters='
+    converters:
+      - name: hf.GenCRL
+        value: attr("memberOf") =~ "cn=Gencrl,ou=groups,dc=example,dc=com" || attr("memberOf") =~ "cn=pkiAdmin,ou=groups,dc=example,dc=com"
+      - name: hf.Revoker
+        value: attr("memberOf") =~ "cn=Revoker,ou=groups,dc=example,dc=com" || attr("memberOf") =~ "cn=pkiAdmin,ou=groups,dc=example,dc=com"
+      - name: hf.IntermediateCA
+        value: attr("memberOf") =~ "cn=Ca,ou=groups,dc=example,dc=com"
+      - name: hf.Registrar.Roles
+        value: map(attr("memberOf"),"roles")'
+
+if [ "$LDAP_ERROR" == "true" ]; then converters='
+    converters:
+      - name: hf.GenCRL
+        value: attr("memberOf") =~ "cn=Gencrl,ou=groups,dc=example,dc=com" || attr("memberOf") =~ "cn=pkiAdmin,ou=groups,dc=example,dc=com"
+      - name: hf.Type
+        value: client'
+fi
+
+cat > $runconfig <<EOF
+address: $CA_HOST_ADDRESS
+port: $CA_DEFAULT_PORT
+debug: $FABRIC_CA_DEBUG
+db:
+  type: $driver
+  datasource: $datasrc
+  tls:
+     enabled: $TLS_ON
+     certfiles:
+       - $TLS_ROOTCERT
+     client:
+       certfile: $TLS_CLIENTCERT
+       keyfile: $TLS_CLIENTKEY
+tls:
+  enabled: $TLS_ON
+  certfile: $TLS_SERVERCERT
+  keyfile: $TLS_SERVERKEY
+ca:
+  name:
+  certfile: $serverCert
+  keyfile: $serverKey
+$registry
+ldap:
+  enabled: $LDAP_ENABLE
+  url: ${LDAP_PROTO}CN=admin,dc=example,dc=com:adminpw@localhost:$LDAP_PORT/dc=example,dc=com
+  userfilter: "(uid=%s)"
+  attribute:
+    names: [
+             "cn",
+             "gidNumber",
+             "givenName",
+             "homeDirectory",
+             "loginShell",
+             "mail",
+             "o",
+             "objectClass",
+             "ou",
+             "sn",
+             "st",
+             "uid",
+             "uidNumber",
+             "memberOf"
+           ]
+    $converters
+    maps:
+      ROLES:
+         - name: cn=Client,ou=groups,dc=example,dc=com
+           value: client
+         - name: cn=User,ou=groups,dc=example,dc=com
+           value: user
+         - name: cn=Peer,ou=groups,dc=example,dc=com
+           value: peer
+         - name: cn=App,ou=groups,dc=example,dc=com
+           value: app
+         - name: cn=Auditor,ou=groups,dc=example,dc=com
+           value: auditor
+         - name: cn=Validator,ou=groups,dc=example,dc=com
+           value: validator
+         - name: cn=pkiAdmin,ou=groups,dc=example,dc=com
+           value: pkiadmin
+  tls:
+    certfiles:
+      - $TLS_ROOTCERT
+    client:
+      certfile: $TLS_CLIENTCERT
+      keyfile: $TLS_CLIENTKEY
+affiliations:
+  bank_a:
+    - department1
+  bank_b:
+    - department1
+  bank_c:
+    - department1
+  org1:
+    - department1
+    - department2
+  org2:
+    - department1
+    - department2
+signing:
+  default:
+    usage:
+      - digital signature
+    expiry: 17520h
+    backdate: 30s
+    ocspnocheck: true
+    caconstraint:
+       isca: false
+  profiles:
+    ca:
+      usage:
+        - cert sign
+        - crl sign
+      expiry: 43800h
+      caconstraint:
+        isca: true
+        maxpathlen: 0
+        ocspnocheck: true
+    tls:
+      usage:
+        - server auth
+        - client auth
+      expiry: 8760h
+      caconstraint:
+         isca: false
+csr:
+  keyrequest:
+    algo: $KEYTYPE
+    size: $KEYLEN 
+  names:
+    - C: US
+      ST: "North Carolina"
+      L:
+      O: Hyperledger
+      OU: Fabric
+  hosts:
+    - fabricCa.hyperledger.example.com
+    - localhost
+  ca:
+    expiry: 131400h
+    pathlength: 1
+bccsp:
+  default: SW
+  sw:
+    hash: SHA2
+    security: 256
+    filekeystore:
+      keystore:
+cacount: $CACOUNT
+cafiles:
+intermediate:
+  parentserver:
+    url:
+    caname:
+  enrollment:
+    hosts:
+    profile:
+    label:
+  tls:
+    certfiles:
+      - $TLS_ROOTCERT
+    client:
+      certfile: $TLS_CLIENTCERT
+      keyfile: $TLS_CLIENTKEY
+EOF
+   ;;
+   esac
+}
+
+function testStatus() {
+   local user="$1"
+   local driver="$2"
+   local ca_cfg_path="$3"
+   local dbname="$4"
+   : ${driver:="sqlite3"}
+   : ${ca_cfg_path:="$CA_CFG_PATH"}
+   : ${dbname:="fabric_ca"}
+   case $driver in
+      sqlite3)
+         user_status="$(sqlite3 $ca_cfg_path/$dbname "SELECT * FROM users WHERE (id=\"$user\");")"
+         cert_status="$(sqlite3 $ca_cfg_path/$dbname "SELECT * FROM certificates WHERE (id=\"$user\");")"
+
+         user_status_code="$(printf "$user_status" | awk -F'|' -v s=$user '$1~s {print $6}')"
+         cert_status_code="$(printf "$cert_status" | awk -F'|' -v s=$user '$1~s {print $5}')"
+      ;;
+      mysql)
+         user_status_code=$(mysql --host=localhost --user=root --password=mysql -e "SELECT * FROM users WHERE (id=\"$user\");" $dbname| awk -F'\t' -v u=$user '$1==u {print $6}')
+         cert_status_code=$(mysql --host=localhost --user=root --password=mysql -e "SELECT * FROM certificates WHERE (id=\"$user\") order by revoked_at;" $dbname| awk -F'\t' -v u=$user '$1==u {print $5}')
+      ;;
+      postgres)
+         user_status_code=$(/usr/bin/psql -U postgres -h localhost -c "SELECT id,state FROM users WHERE id='$user';" --dbname=$dbname | awk -v u=$user -F'|' '$1~u {gsub(/ /,"");print $2}')
+         cert_status_code=$(/usr/bin/psql -U postgres -h localhost -c "SELECT id,encode(status,'escape') FROM certificates WHERE id='$user' order by revoked_at;" --dbname=$dbname | awk -v u=$user -F'|' '$1~u {gsub(/ /,"");print $2}')
+      ;;
+    esac
+    echo "$user_status_code $cert_status_code"
+}
+
+function killserver {
+    echo "killing server $1"
+    kill -9 $1
+    pollFabricCa "" "" "$CA_DEFAULT_PORT" stop 30
+    return $?
+}
+
+function grepPrint() {
+   tee /dev/stderr| egrep "$1"
+}

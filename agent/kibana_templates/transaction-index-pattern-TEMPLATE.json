@@ -1,0 +1,6 @@
+{
+    "attributes": {
+    "title": "INDEX_PATTERN_TEMPLATE_TITLE",
+    "timeFieldName": "created_at",
+    "fieldFormatMap": "{\"tx_id\":{\"id\":\"url\",\"params\":{\"urlTemplate\":\"http://localhost:5601/app/kibana#/dashboard/TRANSACTION_DASHBOARD_TEMPLATE_ID?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-1d,to:now))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!f,useMargins:!t),panels:!((embeddableConfig:(),gridData:(h:27,i:'1',w:48,x:0,y:0),id:'TRANSACTION_SEARCH_TEMPLATE_ID',panelIndex:'1',type:search,version:'7.1.1')),query:(language:kuery,query:'tx_id:%20%22{{value}}%22'),timeRestore:!f,title:'Fabricbeat%20Individual%20Transaction%20Dashboard',viewMode:view)\",\"labelTemplate\":\"{{value}}\"}},\"key\":{\"id\":\"url\",\"params\":{\"urlTemplate\":\"http://localhost:5601/app/kibana#/dashboard/KEY_DASHBOARD_TEMPLATE_ID?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-1d,to:now))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!f,useMargins:!t),panels:!((embeddableConfig:(),gridData:(h:27,i:'1',w:48,x:0,y:0),id:KEY_SEARCH_TEMPLATE_ID,panelIndex:'1',type:search,version:'7.1.1')),query:(language:kuery,query:'key:%20%22{{value}}%22'),timeRestore:!f,title:'Fabricbeat%20Individual%20Key%20Dashboard',viewMode:view)\",\"labelTemplate\":\"{{value}}\"}}}"  }
+}

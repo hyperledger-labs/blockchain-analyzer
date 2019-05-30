@@ -1,0 +1,60 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Generated crypto material
+crypto-config/
+
+# Generated channel artifacts
+channel-artifacts/
+channel-artifacts-fourchannel/
+channel-artifacts-twochannel/
+
+# Generated connection profiles
+connection-profile-*.yaml
+!connection-profile-TEMPLATE.yaml
+connectionProfile.json
+
+# Generated docker-compose.yaml
+network/*/docker-compose.yaml
+
+# Generated dashboards
+dashboards/
+
+# Node modules
+node_modules
+
+# Wallet
+wallet/*
+
+# Fabricbeat
+.idea
+build
+
+.DS_Store
+
+fabricbeat/_meta/dashboards.yml
+fabricbeat
+!fabricbeat/
+
+*.pyc
+
+*.log
+logs
+
+# Visual Studio
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
