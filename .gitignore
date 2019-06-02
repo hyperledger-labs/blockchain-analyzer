@@ -10,3 +10,9 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Generated crypto material
+crypto-config/*
+
+# Generated channel artifacts
+/channel-artifacts
