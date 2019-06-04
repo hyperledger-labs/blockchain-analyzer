@@ -120,7 +120,7 @@ services:
     depends_on:
       - orderer.el-network.com
     ports:
-      - 7052:7051
+      - 8051:7051
     networks:
       - elastic-network
 
@@ -162,7 +162,7 @@ services:
     depends_on:
       - orderer.el-network.com
     ports:
-      - 7053:7051
+      - 9051:7051
     networks:
       - elastic-network
 
@@ -204,7 +204,7 @@ services:
     depends_on:
       - orderer.el-network.com
     ports:
-      - 7054:7051
+      - 10051:7051
     networks:
       - elastic-network
 
