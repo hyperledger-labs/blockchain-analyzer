@@ -27,4 +27,13 @@ Kibana dashboards
 Dashboards similar to Hyperledger Explorer
 Create a setup for generating various dummy data in various configurations
 One peer / CA / order, single user for initial testing
-A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key. 
+A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
+
+## Fabric network
+
+It is a simple test network with 4 organizations, 1 peer each, a solo orderer communicating over TLS and the basic Fabcar chaincode extended with a `getHistoryForCar()` function. Hyperledger Explorer can be connected using the `connectionProfile.json` file.
+
+To generate crypto and setup the network, simply run `start-network.sh`
+To stop the network and delete all the generated data (crypto material and channel artifacts), run `destroy-network.sh`
+
+Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode.
