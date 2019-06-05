@@ -52,7 +52,6 @@ services:
       # https://docs.docker.com/compose/networking/
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_elastic-network
       - FABRIC_LOGGING_SPEC=grpc=DEBUG
-      # - FABRIC_LOGGING_SPEC=DEBUG
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
@@ -68,6 +67,11 @@ services:
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
       - CORE_PEER_CHAINCODEADDRESS=peer0.org1.el-network.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org1.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org1
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org1pass
     volumes:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp:/etc/hyperledger/fabric/msp
@@ -110,6 +114,11 @@ services:
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
       - CORE_PEER_CHAINCODEADDRESS=peer0.org2.el-network.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org2.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org2
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org2pass
     volumes:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp:/etc/hyperledger/fabric/msp
@@ -152,6 +161,11 @@ services:
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
       - CORE_PEER_CHAINCODEADDRESS=peer0.org3.el-network.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org3.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org3
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org3pass
     volumes:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp:/etc/hyperledger/fabric/msp
@@ -194,6 +208,11 @@ services:
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
       - CORE_PEER_CHAINCODEADDRESS=peer0.org4.el-network.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org4.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org4
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org4pass
     volumes:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp:/etc/hyperledger/fabric/msp
@@ -207,7 +226,55 @@ services:
       - 10051:7051
     networks:
       - elastic-network
+  
+  ###########
+  # CouchDB #
+  ###########
 
+  couchdb.org1.el-network.com:
+    container_name: couchdb.org1.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org1
+      - COUCHDB_PASSWORD=org1pass
+    ports:
+      - 5984:5984
+    networks:
+      - elastic-network
+
+  couchdb.org2.el-network.com:
+    container_name: couchdb.org2.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org2
+      - COUCHDB_PASSWORD=org2pass
+    ports:
+      - 6984:5984
+    networks:
+      - elastic-network
+
+  couchdb.org3.el-network.com:
+    container_name: couchdb.org3.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org3
+      - COUCHDB_PASSWORD=org3pass
+    ports:
+      - 7984:5984
+    networks:
+      - elastic-network
+
+  couchdb.org4.el-network.com:
+    container_name: couchdb.org4.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org4
+      - COUCHDB_PASSWORD=org4pass
+    ports:
+      - 8984:5984
+    networks:
+      - elastic-network
+  
   #######
   # cli #
   #######
@@ -243,5 +310,9 @@ services:
       - peer0.org2.el-network.com
       - peer0.org3.el-network.com
       - peer0.org4.el-network.com
+      - couchdb.org1.el-network.com
+      - couchdb.org2.el-network.com
+      - couchdb.org3.el-network.com
+      - couchdb.org4.el-network.com
     networks:
       - elastic-network
