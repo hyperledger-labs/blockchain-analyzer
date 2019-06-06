@@ -10,7 +10,7 @@ services:
 
   orderer.el-network.com:
     container_name: orderer.el-network.com
-    image: hyperledger/fabric-orderer:latest
+    image: hyperledger/fabric-orderer:1.4
     environment:
       - GOPATH=$HOME/go
       - FABRIC_LOGGING_SPEC=debug
