@@ -68,7 +68,7 @@ func (s *SimpleAsset) setData(stub shim.ChaincodeStubInterface, args []string) s
 	}
 
 	buf := make([]byte, binary.MaxVarintLen64)
-	binary.PutVarint(buf, []byte(args[1]))
+	binary.PutVarint(buf, v)
 
 	// We store the key and the value on the ledger
 	err1 := stub.PutState(args[0], buf)
