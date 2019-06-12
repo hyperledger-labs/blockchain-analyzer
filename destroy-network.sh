@@ -8,6 +8,6 @@ echo "Channel artifacts and crypto material removed"
 
 echo "Stopping all containers"
 
-sudo docker rm -f $(docker ps -aq)
+docker rm -f $(docker ps -aq)
 
 echo "All containers stopped"
