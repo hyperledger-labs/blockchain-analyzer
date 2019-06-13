@@ -8,6 +8,6 @@ export CHANNEL_NAME=mychannel
 
 source ./generate-artifacts.sh
 
-COMPOSE_PROJECT_NAME=$CHANNEL_NAME docker-compose -f docker-compose-cli.yaml up -d
+COMPOSE_PROJECT_NAME=$CHANNEL_NAME docker-compose -f docker-compose.yaml up -d
 
 docker exec -it cli bash

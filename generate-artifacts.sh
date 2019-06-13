@@ -23,7 +23,7 @@ fi
 #Generate crypto material using crypto-config.yaml as config file
 ${CRYPTOGEN} generate --config=./crypto-config.yaml
 
-#Rename admin private key files so that their names are always the same (no need to change Hyperledger Explorer configuration after restarting the network)
+#Rename admin private key files so their names are always the same (no need to change Hyperledger Explorer configuration after restarting the network)
 for ORG_NUM in 1 2 3 4
 do
 	mv ./crypto-config/peerOrganizations/org$ORG_NUM.el-network.com/users/Admin@org$ORG_NUM.el-network.com/msp/keystore/*_sk ./crypto-config/peerOrganizations/org$ORG_NUM.el-network.com/users/Admin@org$ORG_NUM.el-network.com/msp/keystore/adminKey$ORG_NUM

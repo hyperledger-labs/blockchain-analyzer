@@ -1,13 +1,16 @@
 #!/bin/bash
 
-echo "Removing channel artifacts and generated crypto material..."
-
-source ./destroy-artifacts.sh
-
-echo "Channel artifacts and crypto material removed"
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOBIN
+export FABRIC_CFG_PATH=$PWD
+export CHANNEL_NAME=mychannel
 
 echo "Stopping all containers"
 
-docker rm -f $(docker ps -aq)
+#docker rm -f $(docker ps -aq)
+COMPOSE_PROJECT_NAME=$CHANNEL_NAME docker-compose down
 
-echo "All containers stopped"
+echo "Removing channel artifacts and generated crypto material..."
+
+source ./destroy-artifacts.sh
