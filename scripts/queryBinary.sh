@@ -7,9 +7,7 @@ export CACERT_ORDERER=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
 
 if [ $# == 1 ];
     then
-        echo "Querying $1..."
         peer chaincode query -o orderer.el-network.com:7050 -C $CHANNEL_NAME -n mycc -c "{\"Args\":[\"get\",\"$1\"]}" --tls --cafile $CACERT_ORDERER
-        echo "Query complete"
     else
         echo "Wrong number of arguments! Usage: queryBinary.sh <key>"
 fi

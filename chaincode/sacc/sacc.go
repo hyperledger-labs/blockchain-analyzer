@@ -57,18 +57,21 @@ func (s *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 
 func (s *SimpleAsset) setData(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 2 {
-		return shim.Error("Incorrect number of arguments. Expecting 2")
+	if len(args) < 1 {
+		return shim.Error("Incorrect number of arguments. Expecting at least 1")
 	}
 
-	v, err0 := strconv.ParseInt(args[1], 10, 64)
+	buf := make([]byte, binary.MaxVarintLen64*len(args))
 
-	if err0 != nil {
-		return shim.Error(fmt.Sprintf("Failed to parse args[1]: %s", args[1]))
+	for i, element := range args {
+		if i != 0 {
+			v, err := strconv.ParseInt(element, 10, 64)
+			if err != nil {
+				return shim.Error(fmt.Sprintf("Failed to parse arg: %s", element))
+			}
+			binary.PutVarint(buf, v) // Not working, only 1st argument is written (or so it seems).
+		}
 	}
-
-	buf := make([]byte, binary.MaxVarintLen64)
-	binary.PutVarint(buf, v)
 
 	// We store the key and the value on the ledger
 	err1 := stub.PutState(args[0], buf)
