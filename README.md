@@ -83,7 +83,7 @@ To connect HL Explorer to `hyperledger-elastic` network, you should make the fol
 }
 ```
 
-...where `project-location` is the absolute path to the `hyperledger-elastic` network location on disk.
+...where `project-location` is the absolute path to the `hyperledger-elastic` project location on disk.
 
 3. Also make sure you have setup the database correctly! (Follow [these](https://github.com/hyperledger/blockchain-explorer#50-database-setup----) instructions.)
 
