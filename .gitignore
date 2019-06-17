@@ -16,3 +16,6 @@ crypto-config/*
 
 # Generated channel artifacts
 /channel-artifacts
+
+# Node modules
+node_modules
