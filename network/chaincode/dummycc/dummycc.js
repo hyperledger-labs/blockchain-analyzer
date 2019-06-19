@@ -5,7 +5,7 @@
 'use strict';
 
 const { Contract } = require('fabric-contract-api');
-const md5 = require('md5');
+const crypto = require('crypto');
 var counter = 1;
 
 class DummyCC extends Contract {
@@ -15,8 +15,9 @@ class DummyCC extends Contract {
         console.info('============= START : Initialize Ledger ===========');
 
         for (var i = 1; i <= 10; i++) {
-            await ctx.stub.putState('Key' + i, Buffer.from(md5(i)));
-            console.info('Added <--> ', 'Key' + i + ': ' + md5(i));
+            var hash = crypto.createHash('sha256').update(Buffer.from(i.toString())).digest('hex');
+            await ctx.stub.putState('Key' + i, Buffer.from(hash));
+            console.info('Added <--> ', 'Key' + i + ': ' + hash);
         }
         counter = i;
         console.info('============= END : Initialize Ledger ===========');
@@ -33,9 +34,11 @@ class DummyCC extends Contract {
 
     async setValue(ctx, key) {
         console.info('============= START : Set Value ===========');
-        await ctx.stub.putState(key, Buffer.from(md5(counter++)));
-        console.info('Added <--> ', key.toString() + ': ' + md5(counter-1));
+        var hash = crypto.createHash('sha256').update(Buffer.from(counter.toString())).digest('hex');
+        await ctx.stub.putState(key, Buffer.from(hash));
+        console.info('Added <--> ', key.toString() + ': ' + hash);
         console.info('============= END : Set Value ===========');
+        counter++;
     }
 
     async queryAllValues(ctx) {

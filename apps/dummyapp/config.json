@@ -1,4 +1,8 @@
 {
+    "channel": {
+        "channelName": "mychannel",
+        "contract": "dummycc"
+    },
     "organizations": {
         "Org1": {
             "MSP": "Org1MSP"
@@ -34,43 +38,53 @@
     "transactions": [
         {
             "user": "user1",
-            "key": "Key11"
+            "txFunction": "setValue",
+            "key": "Key1"
         },
         {
             "user": "user2",
-            "key": "Key12"
+            "txFunction": "setValue",
+            "key": "Key2"
         },
         {
             "user": "user3",
-            "key": "Key13"
+            "txFunction": "setValue",
+            "key": "Key3"
         },
         {
             "user": "user4",
-            "key": "Key14"
+            "txFunction": "setValue",
+            "key": "Key4"
         },
         {
             "user": "user1",
-            "key": "Key12"
+            "txFunction": "setValue",
+            "key": "Key2"
         },
         {
             "user": "user1",
-            "key": "Key13"
+            "txFunction": "setValue",
+            "key": "Key3"
         },
         {
             "user": "user2",
-            "key": "Key12"
+            "txFunction": "setValue",
+            "key": "Key2"
         },
         {
             "user": "user3",
-            "key": "Key12"
+            "txFunction": "setValue",
+            "key": "Key2"
         },
         {
             "user": "user4",
-            "key": "Key14"
+            "txFunction": "setValue",
+            "key": "Key4"
         },
         {
             "user": "user2",
-            "key": "Key14"
+            "txFunction": "setValue",
+            "key": "Key4"
         }
     ]
 }

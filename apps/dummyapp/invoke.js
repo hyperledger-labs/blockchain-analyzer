@@ -35,20 +35,28 @@ async function main() {
         }
         
         for (let i = 0; i < config.transactions.length; i++) {
+
+            let tx = config.transactions[i];
             // Create a new gateway for connecting to our peer node.
             const gateway = new Gateway();
-            await gateway.connect(ccp, { wallet, identity: config.transactions[i].user, discovery: { enabled: false } });
+            await gateway.connect(ccp, { wallet, identity: tx.user, discovery: { enabled: false } });
 
             // Get the network (channel) our contract is deployed to.
-            const network = await gateway.getNetwork('mychannel');
+            const network = await gateway.getNetwork(config.channel.channelName);
 
             // Get the contract from the network.
-            const contract = network.getContract('dummycc');
+            const contract = network.getContract(config.channel.contract);
 
             // Submit the transaction.
-            await contract.submitTransaction('setValue', config.transactions[i].key);
-            console.log('Transaction has been submitted');
-
+            if (tx.key){
+                await contract.submitTransaction(tx.txFunction, tx.key);
+                console.log(`Transaction has been submitted: ${tx.user}\t${tx.txFunction}\t${tx.key}`);
+            }
+            else {
+                await contract.submitTransaction(tx.txFunction);
+                console.log(`Transaction has been submitted: ${tx.user}\t${tx.txFunction}`);
+            }
+            
             // Disconnect from the gateway.
             await gateway.disconnect();
         }

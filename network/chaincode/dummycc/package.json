@@ -16,6 +16,6 @@
     "dependencies": {
         "fabric-contract-api": "~1.4.0",
         "fabric-shim": "~1.4.0",
-        "md5": "^2.2.1"
+        "crypto": "^1.0.1"
     }
 }
