@@ -10,6 +10,7 @@ echo "Stopping all containers"
 
 #docker rm -f $(docker ps -aq)
 COMPOSE_PROJECT_NAME=$CHANNEL_NAME docker-compose down
+docker rm -f $(docker ps -aq)
 
 echo "Removing channel artifacts and generated crypto material..."
 

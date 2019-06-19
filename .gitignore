@@ -12,10 +12,13 @@
 *.out
 
 # Generated crypto material
-crypto-config/*
+crypto-config/
 
 # Generated channel artifacts
-/channel-artifacts
+channel-artifacts/
 
 # Node modules
 node_modules
+
+# Wallet
+wallet/*
