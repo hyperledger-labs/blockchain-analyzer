@@ -12,6 +12,10 @@ const ccpPath = path.resolve(__dirname, '..', '..', 'network', 'connectionProfil
 const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
 const ccp = JSON.parse(ccpJSON);
 
+const configPath = path.resolve(__dirname, 'config.json');
+const configJSON = fs.readFileSync(configPath, 'utf8');
+const config = JSON.parse(configJSON);
+
 async function main() {
     try {
 
@@ -43,15 +47,31 @@ async function main() {
         const ca = gateway.getClient().getCertificateAuthority();
         const adminIdentity = gateway.getCurrentIdentity();
 
-        // Register the user, enroll the user, and import the new identity into the wallet.
-        const secret = await ca.register({ affiliation: 'org1.department1', enrollmentID: 'user1', role: 'client' }, adminIdentity);
-        const enrollment = await ca.enroll({ enrollmentID: 'user1', enrollmentSecret: secret });
-        const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
-        wallet.import('user1', userIdentity);
-        console.log('Successfully registered and enrolled admin user "user1" and imported it into the wallet');
+        let affiliationService = ca.newAffiliationService();
+
+        let registeredAffiliations = await affiliationService.getAll(adminIdentity);
+
+        for (let i = 0; i < config.users.length; i++) {
+            // Register the user, enroll the user, and import the new identity into the wallet.
+
+            if (!registeredAffiliations.result.affiliations.some(
+                x => x.name == config.users[i].organization.toLowerCase())) {
+                let affiliation = config.users[i].organization.toLowerCase() + '.department1';
+                await affiliationService.create({
+                    name: affiliation,
+                    force: true
+                }, adminIdentity);
+            }
+
+            const secret = await ca.register({ affiliation: config.users[i].organization.toLowerCase() + '.department1', enrollmentID: config.users[i].name, role: 'client' }, adminIdentity);
+            const enrollment = await ca.enroll({ enrollmentID: config.users[i].name, enrollmentSecret: secret });
+            const userIdentity = X509WalletMixin.createIdentity(config.organizations[config.users[i].organization].MSP, enrollment.certificate, enrollment.key.toBytes());
+            wallet.import(config.users[i].name, userIdentity);
+            console.log('Successfully registered and enrolled user and imported it into the wallet: ', config.users[i].name);
+        }
 
     } catch (error) {
-        console.error(`Failed to register user "user1": ${error}`);
+        console.error(`Failed to register user: ${error}`);
         process.exit(1);
     }
 }

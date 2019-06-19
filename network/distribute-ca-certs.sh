@@ -5,8 +5,7 @@ export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
 # Get CA certificate for every peer and orderer
-
-fabric-ca-client getcainfo -u http://localhost:7054 -M $PWD/../../crypto-config/ordererOrganizations/el-network.com/orderers/orderer.el-network.com/msp
+fabric-ca-client getcainfo -u http://localhost:7054 -M $PWD/crypto-config/ordererOrganizations/el-network.com/orderers/orderer.el-network.com/msp
 
 for ORG_NUM in 1 2 3 4
 do
@@ -21,6 +20,5 @@ if [ $ORG_NUM == 1 ]; then
         fi
     fi
 fi
-    eval "TARGET=./../../crypto-config/peerOrganizations/org${ORG_NUM}.el-network.com/peers/peer0.org${ORG_NUM}.el-network.com"
-    fabric-ca-client getcainfo -u http://localhost:7054 -M $TARGET/msp
+    fabric-ca-client getcainfo -u http://localhost:7054 -M $PWD/crypto-config/peerOrganizations/org${ORG_NUM}.el-network.com/peers/peer0.org${ORG_NUM}.el-network.com/msp
 done

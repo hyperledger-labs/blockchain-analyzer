@@ -1,0 +1,76 @@
+{
+    "organizations": {
+        "Org1": {
+            "MSP": "Org1MSP"
+        },
+        "Org2": {
+            "MSP": "Org2MSP"
+        },
+        "Org3": {
+            "MSP": "Org3MSP"
+        },
+        "Org4": {
+            "MSP": "Org4MSP"
+        }
+    },
+    "users": [
+        {
+            "name": "user1",
+            "organization": "Org1"
+        },
+        {
+            "name": "user2",
+            "organization": "Org2"
+        },
+        {
+            "name": "user3",
+            "organization": "Org3"
+        },
+        {
+            "name": "user4",
+            "organization": "Org4"
+        }
+    ],
+    "transactions": [
+        {
+            "user": "user1",
+            "key": "Key11"
+        },
+        {
+            "user": "user2",
+            "key": "Key12"
+        },
+        {
+            "user": "user3",
+            "key": "Key13"
+        },
+        {
+            "user": "user4",
+            "key": "Key14"
+        },
+        {
+            "user": "user1",
+            "key": "Key12"
+        },
+        {
+            "user": "user1",
+            "key": "Key13"
+        },
+        {
+            "user": "user2",
+            "key": "Key12"
+        },
+        {
+            "user": "user3",
+            "key": "Key12"
+        },
+        {
+            "user": "user4",
+            "key": "Key14"
+        },
+        {
+            "user": "user2",
+            "key": "Key14"
+        }
+    ]
+}
