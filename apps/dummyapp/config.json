@@ -3,6 +3,7 @@
         "channelName": "mychannel",
         "contract": "dummycc"
     },
+    "connection_profile": "../../network/connectionProfile.json",
     "organizations": {
         "Org1": {
             "MSP": "Org1MSP"
