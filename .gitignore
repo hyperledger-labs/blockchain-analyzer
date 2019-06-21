@@ -22,3 +22,17 @@ node_modules
 
 # Wallet
 wallet/*
+
+/.idea
+/build
+
+.DS_Store
+
+/keystore
+
+/fabricbeat
+!/fabricbeat/
+/fabricbeat.test
+!/fabricbeat.test/
+
+*.pyc

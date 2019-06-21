@@ -1,0 +1,13 @@
+################### Fabricbeat Configuration Example #########################
+
+############################# Fabricbeat ######################################
+
+fabricbeat:
+  # Defines how often an event is sent to the output
+  period: 1s
+  # Defines in which organization the beats agent's user should be enrolled
+  organization: Org1
+  # Defines the location of the connection profile of the Fabric network
+  connection_profile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile.yaml
+  # Defines channel name
+  channel: mychannel
