@@ -193,3 +193,52 @@ certificateAuthorities:
       enrollSecret: adminpw
     tlsCACerts:
       path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
+
+entityMatchers:
+  peer:
+    - pattern: (\w*)peer0.org1.el-network.com(\w*)
+      urlSubstitutionExp: localhost:7051
+      eventUrlSubstitutionExp: localhost:7053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.el-network.com
+      mappedHost: peer0.org1.el-network.com
+
+    - pattern: (\w*)peer0.org2.el-network.com(\w*)
+      urlSubstitutionExp: localhost:8051
+      eventUrlSubstitutionExp: localhost:8053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org2.el-network.com
+      mappedHost: peer0.org2.el-network.com
+
+    - pattern: (\w*)peer0.org3.el-network.com(\w*)
+      urlSubstitutionExp: localhost:9051
+      eventUrlSubstitutionExp: localhost:9053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org3.el-network.com
+      mappedHost: peer0.org3.el-network.com
+  
+    - pattern: (\w*)peer0.org4.el-network.com(\w*)
+      urlSubstitutionExp: localhost:10051
+      eventUrlSubstitutionExp: localhost:10053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org4.el-network.com
+      mappedHost: peer0.org4.el-network.com
+
+  orderer:
+    - pattern: (\w*)orderer.el-network.com(\w*)
+      urlSubstitutionExp: localhost:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer.el-network.com
+      mappedHost: orderer.el-network.com
+
+  certificateAuthorities:
+    - pattern: (\w*)ca.org1.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:7054
+      mappedHost: ca.org1.el-network.com
+
+    - pattern: (\w*)ca.org2.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:8054
+      mappedHost: ca.org2.el-network.com
+
+    - pattern: (\w*)ca.org3.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:9054
+      mappedHost: ca.org3.el-network.com
+
+    - pattern: (\w*)ca.org4.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:10054
+      mappedHost: ca.org4.el-network.com
