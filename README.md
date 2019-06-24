@@ -38,6 +38,24 @@ To stop the network and delete all the generated data (crypto material and chann
 
 Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode.
 
+
+### Optional. generate makefile configuration
+```
+make generate ABSPATH=/Users/default/code
+```
+
+### Start the network
+```
+make start #or
+make start ABSPATH=/Users/default/code
+
+```
+
+### Stop the network
+```
+make destroy
+```
+
 ## Hyperledger Explorer Configuration
 
 Configuring HL Explorer: https://github.com/hyperledger/blockchain-explorer  
