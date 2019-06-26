@@ -11,6 +11,7 @@ import (
 
 	fabricbeatConfig "github.com/balazsprehoda/fabricbeat/config"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
 	providerMSP "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
@@ -21,10 +22,11 @@ import (
 
 // Fabricbeat configuration.
 type Fabricbeat struct {
-	done   chan struct{}
-	config fabricbeatConfig.Config
-	client beat.Client
-	fSetup FabricSetup
+	done          chan struct{}
+	config        fabricbeatConfig.Config
+	client        beat.Client
+	fSetup        *FabricSetup
+	lastBlockNums map[*ledger.Client]uint64
 }
 
 // New creates an instance of fabricbeat.
@@ -35,11 +37,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	bt := &Fabricbeat{
-		done:   make(chan struct{}),
-		config: c,
+		done:          make(chan struct{}),
+		config:        c,
+		lastBlockNums: make(map[*ledger.Client]uint64),
 	}
 
-	fSetup := FabricSetup{
+	fSetup := &FabricSetup{
 		OrgName:       bt.config.Organization,
 		ConfigFile:    bt.config.ConnectionProfile,
 		Peer:          bt.config.Peer,
@@ -61,9 +64,22 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err2 != nil {
 		return nil, err2
 	}
+
+	// Initialize the ledger client for each channel
 	for _, channel := range channelsResponse.Channels {
 		logp.Info(channel.ChannelId)
+		channelContext := fSetup.sdk.ChannelContext(channel.ChannelId, fabsdk.WithIdentity(fSetup.adminIdentity))
+		if channelContext == nil {
+			logp.Warn("Channel context creation failed, ChannelContext() returned nil for channel " + channel.ChannelId)
+		}
+		ledgerClient, err4 := ledger.New(channelContext)
+		if err4 != nil {
+			return nil, err4
+		}
+		fSetup.ledgerClients = append(fSetup.ledgerClients, ledgerClient)
+		logp.Info("Ledger client initialized for channel " + channel.ChannelId)
 	}
+	logp.Info("Channel clients initialized")
 
 	// Get installed chaincodes of the peer
 	chaincodeResponse, err3 := fSetup.resClient.QueryInstalledChaincodes(resmgmt.WithTargetEndpoints(fSetup.Peer))
@@ -97,6 +113,23 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
+		logp.Info("Start event loop")
+		for _, channelClient := range bt.fSetup.ledgerClients {
+			infoResponse, err1 := channelClient.QueryInfo()
+			if err1 != nil {
+				logp.Warn("QueryInfo returned error: " + err1.Error())
+			}
+			queriedBlockNum := infoResponse.BCI.Height
+			for bt.lastBlockNums[channelClient] != queriedBlockNum {
+				bt.lastBlockNums[channelClient]++
+				blockResponse, blockError := channelClient.QueryBlock(bt.lastBlockNums[channelClient])
+				if blockError != nil {
+					logp.Warn("QueryBlock returned error: " + blockError.Error())
+				}
+				logp.Info("Block queried: " + blockResponse.String())
+			}
+		}
+
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
@@ -114,6 +147,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 func (bt *Fabricbeat) Stop() {
 	bt.client.Close()
 	close(bt.done)
+	defer bt.fSetup.CloseSDK()
 }
 
 // FabricSetup implementation
@@ -125,11 +159,13 @@ type FabricSetup struct {
 	mspClient     *msp.Client
 	AdminCertPath string
 	AdminKeyPath  string
+	adminIdentity providerMSP.SigningIdentity
 	resClient     *resmgmt.Client
+	ledgerClients []*ledger.Client
 	sdk           *fabsdk.FabricSDK
 }
 
-// Initialize reads the configuration file and sets up the client, chain and event hub
+// Initialize reads the configuration file and sets up FabricSetup
 func (setup *FabricSetup) Initialize() error {
 
 	logp.Info("Initializing SDK")
@@ -172,6 +208,7 @@ func (setup *FabricSetup) Initialize() error {
 		return err2
 	}
 
+	setup.adminIdentity = id
 	resContext := setup.sdk.Context(fabsdk.WithIdentity(id))
 	var err7 error
 	setup.resClient, err7 = resmgmt.New(resContext)
@@ -185,6 +222,7 @@ func (setup *FabricSetup) Initialize() error {
 	return nil
 }
 
+// Closes SDK
 func (setup *FabricSetup) CloseSDK() {
 	setup.sdk.Close()
 }
