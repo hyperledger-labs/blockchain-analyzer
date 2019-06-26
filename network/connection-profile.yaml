@@ -12,9 +12,8 @@ client:
      peer:
        endorser: '300'
      orderer: '300'
-
-cryptoconfig:
-  path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config"
+  cryptoconfig:
+    path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config"
 
 BCCSP:
     security:

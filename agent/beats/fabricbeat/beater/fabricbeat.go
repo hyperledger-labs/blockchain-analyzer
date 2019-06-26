@@ -1,24 +1,8 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package beater
 
 import (
 	"fmt"
+	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -28,7 +12,8 @@ import (
 	fabricbeatConfig "github.com/balazsprehoda/fabricbeat/config"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
-	mspclient "github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
+	providerMSP "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/pkg/errors"
@@ -39,6 +24,7 @@ type Fabricbeat struct {
 	done   chan struct{}
 	config fabricbeatConfig.Config
 	client beat.Client
+	fSetup FabricSetup
 }
 
 // New creates an instance of fabricbeat.
@@ -54,16 +40,38 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	fSetup := FabricSetup{
-		OrgName:    bt.config.Organization,
-		ConfigFile: bt.config.ConnectionProfile,
-		ChannelID:  bt.config.Channel,
+		OrgName:       bt.config.Organization,
+		ConfigFile:    bt.config.ConnectionProfile,
+		Peer:          bt.config.Peer,
+		AdminCertPath: bt.config.AdminCertPath,
+		AdminKeyPath:  bt.config.AdminKeyPath,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
-	err := fSetup.Initialize()
-	if err != nil {
-		logp.Error(err)
-		return nil, err
+	err1 := fSetup.Initialize()
+	if err1 != nil {
+		logp.Error(err1)
+		return nil, err1
+	}
+
+	bt.fSetup = fSetup
+
+	// Get all channels the peer is part of
+	channelsResponse, err2 := fSetup.resClient.QueryChannels(resmgmt.WithTargetEndpoints(fSetup.Peer))
+	if err2 != nil {
+		return nil, err2
+	}
+	for _, channel := range channelsResponse.Channels {
+		logp.Info(channel.ChannelId)
+	}
+
+	// Get installed chaincodes of the peer
+	chaincodeResponse, err3 := fSetup.resClient.QueryInstalledChaincodes(resmgmt.WithTargetEndpoints(fSetup.Peer))
+	if err3 != nil {
+		return nil, err3
+	}
+	for _, chaincode := range chaincodeResponse.Chaincodes {
+		logp.Info(chaincode.Name)
 	}
 
 	return bt, nil
@@ -110,11 +118,15 @@ func (bt *Fabricbeat) Stop() {
 
 // FabricSetup implementation
 type FabricSetup struct {
-	ConfigFile  string
-	ChannelID   string
-	initialized bool
-	OrgName     string
-	sdk         *fabsdk.FabricSDK
+	ConfigFile    string
+	initialized   bool
+	OrgName       string
+	Peer          string
+	mspClient     *msp.Client
+	AdminCertPath string
+	AdminKeyPath  string
+	resClient     *resmgmt.Client
+	sdk           *fabsdk.FabricSDK
 }
 
 // Initialize reads the configuration file and sets up the client, chain and event hub
@@ -123,7 +135,7 @@ func (setup *FabricSetup) Initialize() error {
 	logp.Info("Initializing SDK")
 	// Add parameters for the initialization
 	if setup.initialized {
-		return errors.New("sdk already initialized")
+		return errors.New("SDK already initialized")
 	}
 
 	// Initialize the SDK with the configuration file
@@ -135,38 +147,38 @@ func (setup *FabricSetup) Initialize() error {
 	setup.sdk = sdk
 	logp.Info("SDK created")
 
-	// The MSP client allow us to retrieve user information from their identity, like its signing identity
-	mspClient, err1 := mspclient.New(sdk.Context(), mspclient.WithOrg(setup.OrgName))
-	if err1 != nil {
-		return errors.WithMessage(err1, "failed to create MSP client")
+	mspContext := setup.sdk.Context(fabsdk.WithOrg(setup.OrgName))
+	if mspContext == nil {
+		logp.Warn("setup.sdk.Context() returned nil")
 	}
 
-	enrollmentSecret, err2 := mspClient.Register(&msp.RegistrationRequest{Name: "fabricbeatUser"})
+	cert, err := ioutil.ReadFile(setup.AdminCertPath)
+	if err != nil {
+		return err
+	}
+	pk, err := ioutil.ReadFile(setup.AdminKeyPath)
+	if err != nil {
+		return err
+	}
+
+	var err1 error
+	setup.mspClient, err1 = msp.New(mspContext)
+	if err1 != nil {
+		return err1
+	}
+
+	id, err2 := setup.mspClient.CreateSigningIdentity(providerMSP.WithCert(cert), providerMSP.WithPrivateKey(pk))
 	if err2 != nil {
-		logp.Info("Register returned error %s\n", err2)
 		return err2
 	}
-	logp.Info("Successfully registered user")
 
-	err3 := mspClient.Enroll("fabricbeatUser", msp.WithSecret(enrollmentSecret))
-	if err3 != nil {
-		logp.Warn("Failed to enroll user\n")
-		logp.Error(err3)
-		return err3
+	resContext := setup.sdk.Context(fabsdk.WithIdentity(id))
+	var err7 error
+	setup.resClient, err7 = resmgmt.New(resContext)
+	if err7 != nil {
+		return errors.WithMessage(err7, "failed to create new resmgmt client")
 	}
-	logp.Info("Successfully enrolled user")
-
-	adminIdentity, err4 := mspClient.GetSigningIdentity("fabricbeatUser")
-	if err4 != nil {
-		logp.Warn("User not found %s\n", err4)
-		logp.Error(err4)
-		return err3
-	}
-
-	if adminIdentity.Identifier().ID != "fabricbeatUser" {
-		logp.Warn("Enrolled user name doesn't match")
-		return nil
-	}
+	logp.Info("Resmgmt client created")
 
 	logp.Info("Initialization Successful")
 	setup.initialized = true

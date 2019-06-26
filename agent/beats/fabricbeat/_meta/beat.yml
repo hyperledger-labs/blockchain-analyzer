@@ -6,8 +6,10 @@ fabricbeat:
   # Defines how often an event is sent to the output
   period: 1s
   # Defines in which organization the beats agent's user should be enrolled
-  organization: Org1
+  organization: org1
+  # Defines the peer which fabricbeat should query
+  peer: peer0.org1.el-network.com
   # Defines the location of the connection profile of the Fabric network
-  connection_profile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile.yaml
-  # Defines channel name
-  channel: mychannel
+  connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile.yaml
+  adminCertPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
+  adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
