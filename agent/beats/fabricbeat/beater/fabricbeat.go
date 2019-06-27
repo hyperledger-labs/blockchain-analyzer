@@ -120,13 +120,14 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 				logp.Warn("QueryInfo returned error: " + err1.Error())
 			}
 			queriedBlockNum := infoResponse.BCI.Height
-			for bt.lastBlockNums[channelClient] != queriedBlockNum {
-				bt.lastBlockNums[channelClient]++
+			logp.Info("Block height: %d", queriedBlockNum)
+			for bt.lastBlockNums[channelClient] < queriedBlockNum {
 				blockResponse, blockError := channelClient.QueryBlock(bt.lastBlockNums[channelClient])
 				if blockError != nil {
 					logp.Warn("QueryBlock returned error: " + blockError.Error())
 				}
 				logp.Info("Block queried: " + blockResponse.String())
+				bt.lastBlockNums[channelClient]++
 			}
 		}
 
