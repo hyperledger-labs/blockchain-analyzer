@@ -3435,15 +3435,25 @@ Version of the user agent.
 None
 
 
-*`counter`*::
+
+*`block.blockNumber`*::
 +
 --
 type: long
 
-required: True
+--
 
-PLEASE UPDATE DOCUMENTATION
+*`block.previousHash`*::
++
+--
+type: keyword
 
+--
+
+*`block.dataHash`*::
++
+--
+type: keyword
 
 --
 

@@ -1,6 +1,7 @@
 package beater
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -126,21 +127,30 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 				if blockError != nil {
 					logp.Warn("QueryBlock returned error: " + blockError.Error())
 				}
-				logp.Info("Block queried: " + blockResponse.String())
+
+				logp.Info("Block queried: " + /*string(blockAsJSON)*/ blockResponse.String())
 				bt.lastBlockNums[channelClient]++
+
+				header := blockResponse.GetHeader()
+				// transactions := blockResponse.GetData().
+				// firstTx := blockResponse.Data.Data[0]
+				// channelHeader := firstTx
+
+				event := beat.Event{
+					Timestamp: time.Now(),
+					Fields: common.MapStr{
+						"type":         b.Info.Name,
+						"blockNumber":  header.Number,
+						"previousHash": hex.EncodeToString(header.PreviousHash),
+						"dataHash":     hex.EncodeToString(header.DataHash),
+					},
+				}
+				bt.client.Publish(event)
+				logp.Info("Event sent")
+				counter++
 			}
 		}
 
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"type":    b.Info.Name,
-				"counter": counter,
-			},
-		}
-		bt.client.Publish(event)
-		logp.Info("Event sent")
-		counter++
 	}
 }
 

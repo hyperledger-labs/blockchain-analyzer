@@ -2,8 +2,12 @@
   title: fabricbeat
   description:
   fields:
-    - name: counter
-      type: long
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION
+    - name: block
+      type: group
+      fields:
+      - name: blockNumber
+        type: long
+      - name: previousHash
+        type: keyword
+      - name: dataHash
+        type: keyword
