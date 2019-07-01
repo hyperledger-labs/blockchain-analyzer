@@ -87,3 +87,9 @@ To connect HL Explorer to `hyperledger-elastic` network, you should make the fol
 
 3. Also make sure you have setup the database correctly! (Follow [these](https://github.com/hyperledger/blockchain-explorer#50-database-setup----) instructions.)
 
+
+## Beats Agent
+
+1. Make sure that the `fabricbeat` folder is inside your `GOPATH`
+2. Run `make`
+3. Run `./fabricbeat -e -d "*"` from the `fabricbeat/` folder
