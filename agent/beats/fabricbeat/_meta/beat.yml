@@ -13,3 +13,10 @@ fabricbeat:
   connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile.yaml
   adminCertPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
   adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+
+#-------------------------- Elasticsearch output ------------------------------
+setup.ilm.enabled: false
+output.elasticsearch.index: fabricbeat-%{[agent.version]}-%{+yyyy.MM.dd}
+output.elasticsearch.hosts: ["localhost:9200"]
+setup.template.name: fabricbeat-%{[agent.version]}
+setup.template.pattern: fabricbeat-%{[agent.version]}-*

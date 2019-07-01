@@ -2422,12 +2422,53 @@
   title: fabricbeat
   description:
   fields:
-    - name: block
-      type: group
+    - name: block_number
+      type: long
+
+    - name: previous_hash
+      type: keyword
+
+    - name: data_hash
+      type: keyword
+
+    - name: created_at
+      type: date
+
+    - name: index_name
+      type: keyword
+
+    - name: channel_id
+      type: keyword
+
+    - name: chaincode_name
+      type: keyword
+
+    - name: chaincode_version
+      type: keyword
+
+    - name: readset
+      type: nested
       fields:
-      - name: blockNumber
-        type: long
-      - name: previousHash
-        type: keyword
-      - name: dataHash
-        type: keyword
+        - name: namespace
+          type: keyword
+
+        - name: key
+          type: keyword
+
+    - name: writeset
+      type: nested
+      fields:
+        - name: namespace
+          type: keyword
+
+        - name: key
+          type: keyword
+
+        - name: value
+          type: keyword
+
+        - name: isDelete
+          type: boolean
+
+    - name: transaction_type
+      type: keyword

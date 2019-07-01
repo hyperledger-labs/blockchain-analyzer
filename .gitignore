@@ -36,3 +36,6 @@ wallet/*
 !/fabricbeat.test/
 
 *.pyc
+
+*.log
+*logs/

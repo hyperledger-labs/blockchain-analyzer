@@ -3435,22 +3435,77 @@ Version of the user agent.
 None
 
 
-
-*`block.blockNumber`*::
+*`block_number`*::
 +
 --
 type: long
 
 --
 
-*`block.previousHash`*::
+*`previous_hash`*::
 +
 --
 type: keyword
 
 --
 
-*`block.dataHash`*::
+*`data_hash`*::
++
+--
+type: keyword
+
+--
+
+*`created_at`*::
++
+--
+type: date
+
+--
+
+*`index_name`*::
++
+--
+type: keyword
+
+--
+
+*`channel_id`*::
++
+--
+type: keyword
+
+--
+
+*`chaincode_name`*::
++
+--
+type: keyword
+
+--
+
+*`chaincode_version`*::
++
+--
+type: keyword
+
+--
+
+*`readset`*::
++
+--
+type: nested
+
+--
+
+*`writeset`*::
++
+--
+type: nested
+
+--
+
+*`transaction_type`*::
 +
 --
 type: keyword

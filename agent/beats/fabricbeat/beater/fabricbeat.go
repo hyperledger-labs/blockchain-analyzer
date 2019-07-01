@@ -1,14 +1,20 @@
 package beater
 
 import (
+	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	libbeatCommon "github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/gogo/protobuf/proto"
 
 	fabricbeatConfig "github.com/balazsprehoda/fabricbeat/config"
 
@@ -18,6 +24,12 @@ import (
 	providerMSP "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
+	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
+	"github.com/hyperledger/fabric/core/ledger/util"
+	protoMSP "github.com/hyperledger/fabric/protos/msp"
+
+	"github.com/hyperledger/fabric/protos/utils"
 	"github.com/pkg/errors"
 )
 
@@ -31,7 +43,7 @@ type Fabricbeat struct {
 }
 
 // New creates an instance of fabricbeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 	c := fabricbeatConfig.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
@@ -105,7 +117,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 	}
 
 	ticker := time.NewTicker(bt.config.Period)
-	counter := 1
 
 	for {
 		select {
@@ -115,39 +126,211 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		}
 
 		logp.Info("Start event loop")
-		for _, channelClient := range bt.fSetup.ledgerClients {
-			infoResponse, err1 := channelClient.QueryInfo()
+		for _, ledgerClient := range bt.fSetup.ledgerClients {
+			infoResponse, err1 := ledgerClient.QueryInfo()
 			if err1 != nil {
 				logp.Warn("QueryInfo returned error: " + err1.Error())
 			}
 			queriedBlockNum := infoResponse.BCI.Height
 			logp.Info("Block height: %d", queriedBlockNum)
-			for bt.lastBlockNums[channelClient] < queriedBlockNum {
-				blockResponse, blockError := channelClient.QueryBlock(bt.lastBlockNums[channelClient])
+			// bt.lastBlockNums[ledgerClient] = 6
+			for bt.lastBlockNums[ledgerClient] < queriedBlockNum {
+				blockResponse, blockError := ledgerClient.QueryBlock(bt.lastBlockNums[ledgerClient])
 				if blockError != nil {
 					logp.Warn("QueryBlock returned error: " + blockError.Error())
 				}
+				bt.lastBlockNums[ledgerClient]++
 
-				logp.Info("Block queried: " + /*string(blockAsJSON)*/ blockResponse.String())
-				bt.lastBlockNums[channelClient]++
+				// Getting block creation timestamp
+				env, err := utils.GetEnvelopeFromBlock(blockResponse.Data.Data[0])
+				if err != nil {
+					fmt.Printf("GetEnvelopeFromBlock returned error: %s", err)
+				}
+				channelHeader, err := utils.ChannelHeader(env)
+				if err != nil {
+					fmt.Printf("ChannelHeader returned error: %s", err)
+				}
+				typeCode := channelHeader.GetType()
+				var typeInfo string
+				switch typeCode {
+				case 0:
+					typeInfo = "MESSAGE"
+				case 1:
+					typeInfo = "CONFIG"
+				case 2:
+					typeInfo = "CONFIG_UPDATE"
+				case 3:
+					typeInfo = "ENDORSER_TRANSACTION"
+				case 4:
+					typeInfo = "ORDERER_TRANSACTION"
+				case 5:
+					typeInfo = "DELIVER_SEEK_INFO"
+				case 6:
+					typeInfo = "CHAINCODE_PACKAGE"
+				case 8:
+					typeInfo = "PEER_ADMIN_OPERATION"
+				case 9:
+					typeInfo = "TOKEN_TRANSACTION"
+				}
+				createdAt := time.Unix(channelHeader.GetTimestamp().Seconds, int64(channelHeader.GetTimestamp().Nanos))
+				fmt.Printf("--------------------- Timestamp: %s", createdAt)
 
-				header := blockResponse.GetHeader()
-				// transactions := blockResponse.GetData().
-				// firstTx := blockResponse.Data.Data[0]
-				// channelHeader := firstTx
+				fmt.Printf("There are %d transactions in this block\n", len(blockResponse.Data.Data))
+
+				// Checking validity
+				txsFltr := util.TxValidationFlags(blockResponse.Metadata.Metadata[common.BlockMetadataIndex_TRANSACTIONS_FILTER])
+
+				// Processing transactions
+				for i, d := range blockResponse.Data.Data {
+					fmt.Printf("tx %d (validation status: %s):\n", i, txsFltr.Flag(i).String())
+
+					env, err := utils.GetEnvelopeFromBlock(d)
+					if err != nil {
+						fmt.Printf("Error getting tx from block(%s)", err)
+						os.Exit(-1)
+					}
+
+					// GetPayload can only handle endorsement transactions
+					payload, err := utils.GetPayload(env)
+					if err != nil {
+						fmt.Printf("GetPayload returns err %s", err)
+						os.Exit(-1)
+					}
+					chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
+					if err != nil {
+						fmt.Printf("UnmarshalChannelHeader returns err %s", err)
+						os.Exit(-1)
+					}
+
+					shdr, err := utils.GetSignatureHeader(payload.Header.SignatureHeader)
+					if err != nil {
+						fmt.Printf("GetSignatureHeader returns err %s", err)
+						os.Exit(-1)
+					}
+
+					tx, err := utils.GetTransaction(payload.Data)
+					if err != nil {
+						fmt.Printf("GetTransaction returns err %s", err)
+						os.Exit(-1)
+					}
+
+					_, respPayload, err := utils.GetPayloads(tx.Actions[0])
+					if err != nil {
+						fmt.Printf("GetPayloads returns err %s This is not an endorsement transaction, it must be config!", err)
+					}
+
+					if err == nil {
+						fmt.Printf("\tCH: %s\n", chdr.ChannelId)
+						fmt.Printf("\tCC: %+v\n", respPayload.ChaincodeId)
+						fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
+
+						txRWSet := &rwsetutil.TxRwSet{}
+						err = txRWSet.FromProtoBytes(respPayload.Results)
+						if err != nil {
+							fmt.Printf("FromProtoBytes returns err %s", err)
+							os.Exit(-1)
+						}
+
+						readset := []*Readset{}
+						writeset := []*Writeset{}
+						fmt.Printf("\tRead-Write set:\n")
+						readIndex := 0
+						writeIndex := 0
+						for _, ns := range txRWSet.NsRwSets {
+							fmt.Printf("\t\tNamespace: %s\n", ns.NameSpace)
+
+							if len(ns.KvRwSet.Writes) > 0 {
+								fmt.Printf("\t\t\tWrites:\n")
+								for _, w := range ns.KvRwSet.Writes {
+									fmt.Printf("\t\t\t\tK: %s, V:%s\n", w.Key, strings.Replace(string(w.Value), "\n", ".", -1))
+									fmt.Printf("Write as string: %s", w.String())
+									writeset = append(writeset, &Writeset{})
+									writeset[writeIndex].Namespace = ns.NameSpace
+									writeset[writeIndex].Key = w.Key
+									writeset[writeIndex].Value = string(w.Value)
+									writeset[writeIndex].IsDelete = w.IsDelete
+									writeIndex++
+								}
+							}
+
+							if len(ns.KvRwSet.Reads) > 0 {
+								fmt.Printf("\t\t\tReads:\n")
+								for _, w := range ns.KvRwSet.Reads {
+									fmt.Printf("\t\t\t\tK: %s\n", w.Key)
+									readset = append(readset, &Readset{})
+									readset[readIndex].Namespace = ns.NameSpace
+									readset[readIndex].Key = w.Key
+									readIndex++
+								}
+							}
+
+							if len(ns.CollHashedRwSets) > 0 {
+								for _, c := range ns.CollHashedRwSets {
+									fmt.Printf("\t\t\tCollection: %s\n", c.CollectionName)
+
+									if len(c.HashedRwSet.HashedWrites) > 0 {
+										fmt.Printf("\t\t\t\tWrites:\n")
+										for _, ww := range c.HashedRwSet.HashedWrites {
+											fmt.Printf("\t\t\t\t\tK: %s, V:%s\n",
+												base64.StdEncoding.EncodeToString(ww.KeyHash),
+												base64.StdEncoding.EncodeToString(ww.ValueHash))
+										}
+									}
+
+									if len(c.HashedRwSet.HashedReads) > 0 {
+										fmt.Printf("\t\t\t\tReads:\n")
+										for _, ww := range c.HashedRwSet.HashedReads {
+											fmt.Printf("\t\t\t\t\tK: %s\n",
+												base64.StdEncoding.EncodeToString(ww.KeyHash))
+										}
+									}
+								}
+							}
+						}
+						writesetJSON, err := json.Marshal(writeset)
+						if err != nil {
+							logp.Warn("Marshaling JSON failed")
+						}
+
+						fmt.Println(string(writesetJSON))
+						fmt.Println(len(writeset))
+						fmt.Println(writeset[0].Key)
+						fmt.Println(writeset[0].Value)
+						event := beat.Event{
+							Timestamp: time.Now(),
+							Fields: libbeatCommon.MapStr{
+								"type":              b.Info.Name,
+								"block_number":      blockResponse.Header.Number,
+								"channel_id":        chdr.ChannelId,
+								"chaincode_name":    respPayload.ChaincodeId.Name,
+								"chaincode_version": respPayload.ChaincodeId.Version,
+								"index_name":        "transaction",
+								"created_at":        createdAt,
+								"creator":           returnCreatorString(shdr.Creator),
+								"readset":           readset,
+								"writeset":          writeset,
+								"transaction_type":  typeInfo,
+							},
+						}
+						bt.client.Publish(event)
+						logp.Info("Transaction event sent")
+					}
+
+				}
 
 				event := beat.Event{
 					Timestamp: time.Now(),
-					Fields: common.MapStr{
-						"type":         b.Info.Name,
-						"blockNumber":  header.Number,
-						"previousHash": hex.EncodeToString(header.PreviousHash),
-						"dataHash":     hex.EncodeToString(header.DataHash),
+					Fields: libbeatCommon.MapStr{
+						"type":          b.Info.Name,
+						"block_number":  blockResponse.Header.Number,
+						"previous_hash": hex.EncodeToString(blockResponse.Header.PreviousHash),
+						"data_hash":     hex.EncodeToString(blockResponse.Header.DataHash),
+						"created_at":    createdAt,
+						"index_name":    "block",
 					},
 				}
 				bt.client.Publish(event)
-				logp.Info("Event sent")
-				counter++
+				logp.Info("Block event sent")
 			}
 		}
 
@@ -231,6 +414,41 @@ func (setup *FabricSetup) Initialize() error {
 	logp.Info("Initialization Successful")
 	setup.initialized = true
 	return nil
+}
+
+// This function is borrowed from an opensource project: https://github.com/ale-aso/fabric-examples/blob/master/blockparser.go
+func returnCreatorString(bytes []byte) string {
+	defaultString := strings.Replace(string(bytes), "\n", ".", -1)
+
+	sId := &protoMSP.SerializedIdentity{}
+	err := proto.Unmarshal(bytes, sId)
+	if err != nil {
+		return defaultString
+	}
+
+	bl, _ := pem.Decode(sId.IdBytes)
+	if bl == nil {
+		return defaultString
+	}
+
+	/*cert, err := x509.ParseCertificate(bl.Bytes)
+	if err != nil {
+		return defaultString
+	}*/
+
+	return /*cert.Subject.OrganizationalUnit[0] + "@" + */ sId.Mspid
+}
+
+type Readset struct {
+	Namespace string `json:"namespace"`
+	Key       string `json:"key"`
+}
+
+type Writeset struct {
+	Namespace string `json:"namespace"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	IsDelete  bool   `json:"isDelete"`
 }
 
 // Closes SDK
