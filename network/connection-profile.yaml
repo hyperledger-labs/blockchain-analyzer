@@ -1,0 +1,243 @@
+name: elastic-network
+version: 1.0.0
+license: Apache-2.0
+client:
+  tlsEnable: true
+  adminUser: admin
+  adminPassword: adminpw
+  enableAuthentication: false
+  organization: org1
+  connection:
+   timeout:
+     peer:
+       endorser: '300'
+     orderer: '300'
+  cryptoconfig:
+    path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config"
+
+BCCSP:
+    security:
+     enabled: true
+     default:
+      provider: "SW"
+     hashAlgorithm: "SHA2"
+     softVerify: true
+     level: 256
+
+channels:
+  mychannel:
+    peers:
+      peer0.org1.el-network.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.el-network.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org3.el-network.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org4.el-network.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+    orderers:
+    - orderer.el-network.com
+    #connection:
+    #  timeout:
+    #    peer:
+    #      endorser: '6000'
+    #      eventHub: '6000'
+    #      eventReg: '6000'
+    #    orderer: '6000'
+
+organizations:
+  org1:
+    mspid: Org1MSP
+    fullpath: true
+    peers:
+    - peer0.org1.el-network.com
+    certificateAuthorities:
+    - ca.org1.el-network.com
+    cryptopath: peerOrganizations/org1.el-network.com/msp
+    adminPrivateKey:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+    signedCert:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
+  org2:
+    mspid: Org2MSP
+    fullpath: true
+    peers:
+    - peer0.org2.el-network.com
+    certificateAuthorities:
+    - ca.org2.el-network.com
+    cryptopath: peerOrganizations/org2.el-network.com/msp
+    adminPrivateKey:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/keystore/adminKey2"
+    signedCert:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/signcerts/Admin@org2.el-network.com-cert.pem"
+  org3:
+    mspid: Org3MSP
+    fullpath: true
+    peers:
+    - peer0.org3.el-network.com
+    certificateAuthorities:
+    - ca.org3.el-network.com
+    cryptopath: peerOrganizations/org3.el-network.com/msp
+    adminPrivateKey:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/keystore/adminKey3"
+    signedCert:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/signcerts/Admin@org3.el-network.com-cert.pem"
+  org4:
+    mspid: Org4MSP
+    fullpath: true
+    peers:
+    - peer0.org4.el-network.com
+    certificateAuthorities:
+    - ca.org4.el-network.com
+    cryptopath: peerOrganizations/org4.el-network.com/msp
+    adminPrivateKey:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/keystore/adminKey4"
+    signedCert:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/signcerts/Admin@org4.el-network.com-cert.pem"
+  ordererOrg:
+    mspid: OrdererMSP
+    fullpath: true
+    cryptopath: ordererOrganizations/el-network.com/msp
+    adminPrivateKey:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/keystore/ordererAdminKey"
+    signedCert:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/signcerts/Admin@el-network.com-cert.pem"
+peers:
+  peer0.org1.el-network.com:
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.el-network.com
+  peer0.org2.el-network.com:
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
+    url: grpcs://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.el-network.com
+  peer0.org3.el-network.com:
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
+    url: grpcs://localhost:9051
+    grpcOptions:
+      ssl-target-name-override: peer0.org3.el-network.com
+  peer0.org4.el-network.com:
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
+    url: grpcs://localhost:10051
+    grpcOptions:
+      ssl-target-name-override: peer0.org4.el-network.com
+orderers:
+  orderer.el-network.com:
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/ordererOrganizations/el-network.com/msp/tlscacerts/tlsca.el-network.com-cert.pem"
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.el-network.com
+
+certificateAuthorities:
+
+  ca.org1.el-network.com:
+    url: http://localhost:7054
+    caName: ca.org1.el-network.com
+    httpOptions:
+      verify: false
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
+  
+  ca.org2.el-network.com:
+    url: http://localhost:8054
+    caName: ca.org2.el-network.com
+    httpOptions:
+      verify: false
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
+
+  ca.org3.el-network.com:
+    url: http://localhost:9054
+    caName: ca.org3.el-network.com
+    httpOptions:
+      verify: false
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
+
+  ca.org4.el-network.com:
+    url: http://localhost:10054
+    caName: ca.org4.el-network.com
+    httpOptions:
+      verify: false
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    tlsCACerts:
+      path: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
+
+entityMatchers:
+  peer:
+    - pattern: (\w*)peer0.org1.el-network.com(\w*)
+      urlSubstitutionExp: localhost:7051
+      eventUrlSubstitutionExp: localhost:7053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.el-network.com
+      mappedHost: peer0.org1.el-network.com
+
+    - pattern: (\w*)peer0.org2.el-network.com(\w*)
+      urlSubstitutionExp: localhost:8051
+      eventUrlSubstitutionExp: localhost:8053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org2.el-network.com
+      mappedHost: peer0.org2.el-network.com
+
+    - pattern: (\w*)peer0.org3.el-network.com(\w*)
+      urlSubstitutionExp: localhost:9051
+      eventUrlSubstitutionExp: localhost:9053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org3.el-network.com
+      mappedHost: peer0.org3.el-network.com
+  
+    - pattern: (\w*)peer0.org4.el-network.com(\w*)
+      urlSubstitutionExp: localhost:10051
+      eventUrlSubstitutionExp: localhost:10053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org4.el-network.com
+      mappedHost: peer0.org4.el-network.com
+
+  orderer:
+    - pattern: (\w*)orderer.el-network.com(\w*)
+      urlSubstitutionExp: localhost:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer.el-network.com
+      mappedHost: orderer.el-network.com
+
+  certificateAuthorities:
+    - pattern: (\w*)ca.org1.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:7054
+      mappedHost: ca.org1.el-network.com
+
+    - pattern: (\w*)ca.org2.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:8054
+      mappedHost: ca.org2.el-network.com
+
+    - pattern: (\w*)ca.org3.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:9054
+      mappedHost: ca.org3.el-network.com
+
+    - pattern: (\w*)ca.org4.el-network.com(\w*)
+      urlSubstitutionExp: http://localhost:10054
+      mappedHost: ca.org4.el-network.com
