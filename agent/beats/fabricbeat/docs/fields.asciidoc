@@ -3501,11 +3501,32 @@ type: nested
 *`writeset`*::
 +
 --
-type: nested
+type: object
 
 --
 
 *`transaction_type`*::
++
+--
+type: keyword
+
+--
+
+*`transactions`*::
++
+--
+type: array
+
+--
+
+*`tx_id`*::
++
+--
+type: keyword
+
+--
+
+*`block_hash`*::
 +
 --
 type: keyword

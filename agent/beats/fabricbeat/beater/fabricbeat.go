@@ -3,10 +3,10 @@ package beater
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -24,9 +24,11 @@ import (
 	providerMSP "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
+
+	//"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
-	"github.com/hyperledger/fabric/core/ledger/util"
+	"github.com/hyperledger/fabric/core/ledger/util" /*fabricCommon*/
+	"github.com/hyperledger/fabric/protos/common"
 	protoMSP "github.com/hyperledger/fabric/protos/msp"
 
 	"github.com/hyperledger/fabric/protos/utils"
@@ -141,6 +143,9 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 				}
 				bt.lastBlockNums[ledgerClient]++
 
+				// Transaction Ids in this block
+				var transactions []string
+
 				// Getting block creation timestamp
 				env, err := utils.GetEnvelopeFromBlock(blockResponse.Data.Data[0])
 				if err != nil {
@@ -171,6 +176,8 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 					typeInfo = "PEER_ADMIN_OPERATION"
 				case 9:
 					typeInfo = "TOKEN_TRANSACTION"
+				default:
+					typeInfo = "UNRECOGNIZED_TYPE"
 				}
 				createdAt := time.Unix(channelHeader.GetTimestamp().Seconds, int64(channelHeader.GetTimestamp().Nanos))
 				fmt.Printf("--------------------- Timestamp: %s", createdAt)
@@ -214,15 +221,30 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 						os.Exit(-1)
 					}
 
-					_, respPayload, err := utils.GetPayloads(tx.Actions[0])
-					if err != nil {
-						fmt.Printf("GetPayloads returns err %s This is not an endorsement transaction, it must be config!", err)
+					_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
+					if payloadErr != nil {
+						fmt.Printf("GetPayloads returns err %s This is not an endorsement transaction, it must be config!", payloadErr)
+						event := beat.Event{
+							Timestamp: time.Now(),
+							Fields: libbeatCommon.MapStr{
+								"type":             b.Info.Name,
+								"block_number":     blockResponse.Header.Number,
+								"tx_id":            chdr.TxId,
+								"channel_id":       chdr.ChannelId,
+								"index_name":       "transaction",
+								"created_at":       createdAt,
+								"creator":          returnCreatorString(shdr.Creator),
+								"transaction_type": typeInfo,
+							},
+						}
+						bt.client.Publish(event)
+						logp.Info("Config transaction event sent")
 					}
 
-					if err == nil {
-						fmt.Printf("\tCH: %s\n", chdr.ChannelId)
+					fmt.Printf("\tCH: %s\n", chdr.ChannelId)
+					fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
+					if payloadErr == nil {
 						fmt.Printf("\tCC: %+v\n", respPayload.ChaincodeId)
-						fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
 
 						txRWSet := &rwsetutil.TxRwSet{}
 						err = txRWSet.FromProtoBytes(respPayload.Results)
@@ -287,20 +309,13 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								}
 							}
 						}
-						writesetJSON, err := json.Marshal(writeset)
-						if err != nil {
-							logp.Warn("Marshaling JSON failed")
-						}
-
-						fmt.Println(string(writesetJSON))
-						fmt.Println(len(writeset))
-						fmt.Println(writeset[0].Key)
-						fmt.Println(writeset[0].Value)
+						transactions = append(transactions, chdr.TxId)
 						event := beat.Event{
 							Timestamp: time.Now(),
 							Fields: libbeatCommon.MapStr{
 								"type":              b.Info.Name,
 								"block_number":      blockResponse.Header.Number,
+								"tx_id":             chdr.TxId,
 								"channel_id":        chdr.ChannelId,
 								"chaincode_name":    respPayload.ChaincodeId.Name,
 								"chaincode_version": respPayload.ChaincodeId.Version,
@@ -313,20 +328,25 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 							},
 						}
 						bt.client.Publish(event)
-						logp.Info("Transaction event sent")
+						logp.Info("Endorsement transaction event sent")
 					}
 
 				}
 
+				prevHash := hex.EncodeToString(blockResponse.Header.PreviousHash)
+				dataHash := hex.EncodeToString(blockResponse.Header.DataHash)
+				blockHash := generateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
 				event := beat.Event{
 					Timestamp: time.Now(),
 					Fields: libbeatCommon.MapStr{
 						"type":          b.Info.Name,
 						"block_number":  blockResponse.Header.Number,
-						"previous_hash": hex.EncodeToString(blockResponse.Header.PreviousHash),
-						"data_hash":     hex.EncodeToString(blockResponse.Header.DataHash),
+						"block_hash":    blockHash,
+						"previous_hash": prevHash,
+						"data_hash":     dataHash,
 						"created_at":    createdAt,
 						"index_name":    "block",
+						"transactions":  transactions,
 					},
 				}
 				bt.client.Publish(event)
@@ -431,12 +451,7 @@ func returnCreatorString(bytes []byte) string {
 		return defaultString
 	}
 
-	/*cert, err := x509.ParseCertificate(bl.Bytes)
-	if err != nil {
-		return defaultString
-	}*/
-
-	return /*cert.Subject.OrganizationalUnit[0] + "@" + */ sId.Mspid
+	return sId.Mspid
 }
 
 type Readset struct {
@@ -449,6 +464,32 @@ type Writeset struct {
 	Key       string `json:"key"`
 	Value     string `json:"value"`
 	IsDelete  bool   `json:"isDelete"`
+}
+
+// This function is borrowed from an opensource project: https://github.com/denisglotov/fabric-hash-calculator
+func strToHex(str string) []byte {
+	str = strings.TrimPrefix(str, "0x")
+	strBytes := []byte(str)
+	dst := make([]byte, hex.DecodedLen(len(strBytes)))
+	n, err := hex.Decode(dst, strBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dst[:n]
+}
+
+func generateBlockHash(previousHash, dataHash []byte, blockNumber uint64) string {
+
+	//prevHash := strToHex(previousHashStr)
+
+	//dataHash := strToHex(dataHashStr)
+
+	h := common.BlockHeader{
+		Number:       blockNumber,
+		PreviousHash: previousHash,
+		DataHash:     dataHash}
+
+	return hex.EncodeToString(h.Hash())
 }
 
 // Closes SDK

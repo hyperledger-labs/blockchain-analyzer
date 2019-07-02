@@ -155,7 +155,6 @@ services:
       - orderer.el-network.com
     ports:
       - 7051:7051
-      - 7053:7053
     networks:
       - el-network
 
@@ -203,7 +202,6 @@ services:
       - orderer.el-network.com
     ports:
       - 8051:7051
-      - 8053:7053
     networks:
       - el-network
 
@@ -251,7 +249,6 @@ services:
       - orderer.el-network.com
     ports:
       - 9051:7051
-      - 9053:7053
     networks:
       - el-network
 
@@ -299,7 +296,6 @@ services:
       - orderer.el-network.com
     ports:
       - 10051:7051
-      - 10053:7053
     networks:
       - el-network
   
