@@ -23,19 +23,24 @@ node_modules
 # Wallet
 wallet/*
 
-/.idea
-/build
+.idea
+build
+
+fabricbeat
 
 .DS_Store
 
 /keystore
 
-/fabricbeat
-!/fabricbeat/
-/fabricbeat.test
-!/fabricbeat.test/
-
 *.pyc
 
 *.log
-*logs/
+logs
+
+# Visual Studio
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
