@@ -1,12 +1,15 @@
 package beater
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -63,6 +66,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		Peer:          bt.config.Peer,
 		AdminCertPath: bt.config.AdminCertPath,
 		AdminKeyPath:  bt.config.AdminKeyPath,
+		ElasticURL:    bt.config.ElasticURL,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -128,20 +132,61 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		}
 
 		logp.Info("Start event loop")
-		for _, ledgerClient := range bt.fSetup.ledgerClients {
+		// Iterate over the known channels (one ledger client per channel)
+		for index, ledgerClient := range bt.fSetup.ledgerClients {
 			infoResponse, err1 := ledgerClient.QueryInfo()
 			if err1 != nil {
 				logp.Warn("QueryInfo returned error: " + err1.Error())
 			}
-			queriedBlockNum := infoResponse.BCI.Height
-			logp.Info("Block height: %d", queriedBlockNum)
-			// bt.lastBlockNums[ledgerClient] = 6
-			for bt.lastBlockNums[ledgerClient] < queriedBlockNum {
+
+			// Get the last known block from elasticsearch
+			resp, err := http.Get(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%d/_doc/1", index))
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != 200 && resp.StatusCode != 404 {
+				return errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
+			}
+			if resp.StatusCode == 404 {
+				// It is the very first start of the agent, there is no last block yet.
+				bt.lastBlockNums[ledgerClient] = 0
+			}
+
+			// Get the block number info from the response body
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+
+			var lastBlockNumberResponse BlockNumberResponse
+			err = json.Unmarshal(body, &lastBlockNumberResponse)
+			if err != nil {
+				return err
+			}
+			lastBlockNumber := lastBlockNumberResponse.BlockNumber
+			bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
+
+			for bt.lastBlockNums[ledgerClient] < infoResponse.BCI.Height {
 				blockResponse, blockError := ledgerClient.QueryBlock(bt.lastBlockNums[ledgerClient])
 				if blockError != nil {
 					logp.Warn("QueryBlock returned error: " + blockError.Error())
 				}
 				bt.lastBlockNums[ledgerClient]++
+				lastBlockNumber.BlockNumber++
+
+				jsonBlockNumber, err := json.Marshal(lastBlockNumber)
+				if err != nil {
+					return err
+				}
+				resp, err = http.Post(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%d/_doc/1", index), "application/json", bytes.NewBuffer(jsonBlockNumber))
+				if err != nil {
+					return err
+				}
+				defer resp.Body.Close()
+				if resp.StatusCode != 200 && resp.StatusCode != 201 {
+					return errors.New("Sending last block number to Elasticsearch failed!")
+				}
 
 				// Transaction Ids in this block
 				var transactions []string
@@ -370,6 +415,7 @@ type FabricSetup struct {
 	initialized   bool
 	OrgName       string
 	Peer          string
+	ElasticURL    string
 	mspClient     *msp.Client
 	AdminCertPath string
 	AdminKeyPath  string
@@ -464,6 +510,17 @@ type Writeset struct {
 	Key       string `json:"key"`
 	Value     string `json:"value"`
 	IsDelete  bool   `json:"isDelete"`
+}
+
+type BlockNumber struct {
+	BlockNumber uint64 `json:"blockNumber"`
+}
+
+type BlockNumberResponse struct {
+	Index       string      `json:"_index"`
+	Type        string      `json:"_type"`
+	Id          string      `json:"_id"`
+	BlockNumber BlockNumber `json:"_source"`
 }
 
 // This function is borrowed from an opensource project: https://github.com/denisglotov/fabric-hash-calculator

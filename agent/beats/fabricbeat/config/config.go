@@ -12,6 +12,7 @@ type Config struct {
 	ConnectionProfile string        `config:"connectionProfile"`
 	AdminCertPath     string        `config:"adminCertPath"`
 	AdminKeyPath      string        `config:"adminKeyPath"`
+	ElasticURL        string        `config:"elasticURL"`
 }
 
 var DefaultConfig = Config{
@@ -21,4 +22,5 @@ var DefaultConfig = Config{
 	ConnectionProfile: "connection.yaml",
 	AdminCertPath:     "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
 	AdminKeyPath:      "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
+	ElasticURL:        "http://localhost:9200",
 }

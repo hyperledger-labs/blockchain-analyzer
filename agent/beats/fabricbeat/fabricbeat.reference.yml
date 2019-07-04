@@ -12,8 +12,11 @@ fabricbeat:
   peer: ${PEER}
   # Defines the location of the connection profile of the Fabric network
   connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile.yaml
+  # Path to the admin certfile and keyfile
   adminCertPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
   adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+  # URL of Elasticsearch
+  elasticURL: "http://localhost:9200"
 
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
