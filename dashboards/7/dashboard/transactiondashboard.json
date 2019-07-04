@@ -2,50 +2,25 @@
   "version": "7.1.1",
   "objects": [
     {
-      "id": "cb32d5e0-9cb9-11e9-ab98-5952f7778896",
+      "id": "8de18cd0-9cba-11e9-ab98-5952f7778896",
       "type": "dashboard",
-      "updated_at": "2019-07-02T11:09:00.350Z",
-      "version": "WzI5LDRd",
+      "updated_at": "2019-07-02T11:14:26.973Z",
+      "version": "WzM0LDRd",
       "attributes": {
-        "title": "Fabricbeat Overview Dashboard",
+        "title": "Fabricbeat Individual Transaction Dashboard",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":6,\"i\":\"1\"},\"version\":\"7.1.1\",\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"},{\"gridData\":{\"x\":24,\"y\":0,\"w\":24,\"h\":6,\"i\":\"2\"},\"version\":\"7.1.1\",\"panelIndex\":\"2\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"gridData\":{\"x\":0,\"y\":6,\"w\":24,\"h\":15,\"i\":\"3\"},\"version\":\"7.1.1\",\"panelIndex\":\"3\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"},{\"gridData\":{\"x\":24,\"y\":6,\"w\":24,\"h\":15,\"i\":\"4\"},\"version\":\"7.1.1\",\"panelIndex\":\"4\",\"embeddableConfig\":{},\"panelRefName\":\"panel_3\"},{\"gridData\":{\"x\":0,\"y\":21,\"w\":24,\"h\":15,\"i\":\"5\"},\"version\":\"7.1.1\",\"panelIndex\":\"5\",\"embeddableConfig\":{},\"panelRefName\":\"panel_4\"},{\"gridData\":{\"x\":24,\"y\":21,\"w\":24,\"h\":15,\"i\":\"6\"},\"version\":\"7.1.1\",\"panelIndex\":\"6\",\"embeddableConfig\":{},\"panelRefName\":\"panel_5\"}]",
+        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":27,\"i\":\"1\"},\"version\":\"7.1.1\",\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"}]",
         "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}",
         "version": 1,
         "timeRestore": false,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": "{\"query\":{\"query\":\"tx_id: \\\"58ac9b0e2c730b086de4a66ff68e8bf8740c60a6ff02bfbbb803816bfe4e6364\\\"\",\"language\":\"kuery\"},\"filter\":[]}"
         }
       },
       "references": [
         {
           "name": "panel_0",
-          "type": "visualization",
-          "id": "a7977fb0-9cb8-11e9-ab98-5952f7778896"
-        },
-        {
-          "name": "panel_1",
-          "type": "visualization",
-          "id": "bb6dc6c0-9cb8-11e9-ab98-5952f7778896"
-        },
-        {
-          "name": "panel_2",
-          "type": "visualization",
-          "id": "1894f990-9cb9-11e9-ab98-5952f7778896"
-        },
-        {
-          "name": "panel_3",
-          "type": "visualization",
-          "id": "73df5610-9cb9-11e9-ab98-5952f7778896"
-        },
-        {
-          "name": "panel_4",
-          "type": "search",
-          "id": "38b60800-9cb8-11e9-ab98-5952f7778896"
-        },
-        {
-          "name": "panel_5",
           "type": "search",
           "id": "6951b9f0-9cb8-11e9-ab98-5952f7778896"
         }
@@ -55,158 +30,11 @@
       }
     },
     {
-      "id": "a7977fb0-9cb8-11e9-ab98-5952f7778896",
-      "type": "visualization",
-      "updated_at": "2019-07-02T11:00:51.115Z",
-      "version": "WzI1LDRd",
-      "attributes": {
-        "title": "Fabricbeat Blocks Count",
-        "visState": "{\"title\":\"Fabricbeat Blocks Count\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Block Count\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
-        },
-        "savedSearchRefName": "search_0"
-      },
-      "references": [
-        {
-          "name": "search_0",
-          "type": "search",
-          "id": "38b60800-9cb8-11e9-ab98-5952f7778896"
-        }
-      ],
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      }
-    },
-    {
-      "id": "bb6dc6c0-9cb8-11e9-ab98-5952f7778896",
-      "type": "visualization",
-      "updated_at": "2019-07-02T11:01:24.396Z",
-      "version": "WzI2LDRd",
-      "attributes": {
-        "title": "Fabricbeat Transactions Count",
-        "visState": "{\"title\":\"Fabricbeat Transactions Count\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Transaction Count\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
-        },
-        "savedSearchRefName": "search_0"
-      },
-      "references": [
-        {
-          "name": "search_0",
-          "type": "search",
-          "id": "6951b9f0-9cb8-11e9-ab98-5952f7778896"
-        }
-      ],
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      }
-    },
-    {
-      "id": "1894f990-9cb9-11e9-ab98-5952f7778896",
-      "type": "visualization",
-      "updated_at": "2019-07-02T11:04:00.681Z",
-      "version": "WzI3LDRd",
-      "attributes": {
-        "title": "Fabricbeat Transactions Per Organization",
-        "visState": "{\"title\":\"Fabricbeat Transactions Per Organization\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Transactions Per Organization\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"creator\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"\"}}]}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
-        },
-        "savedSearchRefName": "search_0"
-      },
-      "references": [
-        {
-          "name": "search_0",
-          "type": "search",
-          "id": "6951b9f0-9cb8-11e9-ab98-5952f7778896"
-        }
-      ],
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      }
-    },
-    {
-      "id": "73df5610-9cb9-11e9-ab98-5952f7778896",
-      "type": "visualization",
-      "updated_at": "2019-07-02T11:06:33.841Z",
-      "version": "WzI4LDRd",
-      "attributes": {
-        "title": "Transaction Count Timeline",
-        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Transaction Count\",\"customMetric\":{\"enabled\":true,\"id\":\"1-metric\",\"params\":{},\"schema\":{\"aggFilter\":[\"!top_hits\",\"!percentiles\",\"!percentile_ranks\",\"!median\",\"!std_dev\",\"!geo_bounds\",\"!geo_centroid\"],\"deprecate\":false,\"editor\":false,\"group\":\"none\",\"hideCustomLabel\":true,\"max\":null,\"min\":0,\"name\":\"metricAgg\",\"params\":[],\"title\":\"Metric Agg\"},\"type\":\"count\"},\"metricAgg\":\"custom\"},\"schema\":\"metric\",\"type\":\"cumulative_sum\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"customLabel\":\"Time\",\"drop_partials\":false,\"extended_bounds\":{},\"field\":\"created_at\",\"interval\":\"auto\",\"min_doc_count\":0,\"useNormalizedEsInterval\":true},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false},\"legendPosition\":\"right\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Transaction Count\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":\"true\",\"showCircles\":true,\"type\":\"line\",\"valueAxis\":\"ValueAxis-1\"}],\"times\":[],\"type\":\"line\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Transaction Count\"},\"type\":\"value\"}]},\"title\":\"Transaction Count Timeline\",\"type\":\"line\"}",
-        "uiStateJSON": "{}",
-        "description": "",
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
-        },
-        "savedSearchRefName": "search_0"
-      },
-      "references": [
-        {
-          "name": "search_0",
-          "type": "search",
-          "id": "6951b9f0-9cb8-11e9-ab98-5952f7778896"
-        }
-      ],
-      "migrationVersion": {
-        "visualization": "7.0.1"
-      }
-    },
-    {
-      "id": "38b60800-9cb8-11e9-ab98-5952f7778896",
-      "type": "search",
-      "updated_at": "2019-07-02T13:27:33.417Z",
-      "version": "WzYwLDRd",
-      "attributes": {
-        "title": "Fabricbeat Blocks",
-        "description": "",
-        "hits": 0,
-        "columns": [
-          "block_number",
-          "created_at",
-          "block_hash",
-          "previous_hash",
-          "transactions"
-        ],
-        "sort": [
-          "created_at",
-          "desc"
-        ],
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"index_name: \\\"block\\\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
-        }
-      },
-      "references": [
-        {
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern",
-          "id": "1f6a98c0-9ca4-11e9-b43c-3d1d97d865a5"
-        }
-      ],
-      "migrationVersion": {
-        "search": "7.0.0"
-      }
-    },
-    {
       "id": "6951b9f0-9cb8-11e9-ab98-5952f7778896",
       "type": "search",
-      "updated_at": "2019-07-02T10:59:06.639Z",
-      "version": "WzI0LDRd",
+      "updated_at": "2019-07-04T13:12:22.432Z",
+      "version": "WzgxLDEyXQ==",
       "attributes": {
-        "title": "Fabricbeat Transactions",
-        "description": "",
-        "hits": 0,
         "columns": [
           "block_number",
           "chaincode_name",
@@ -219,20 +47,23 @@
           "transaction_type",
           "tx_id"
         ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"index_name: \\\"transaction\\\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
         "sort": [
           "created_at",
           "desc"
         ],
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"index_name: \\\"transaction\\\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
-        }
+        "title": "Fabricbeat Transactions",
+        "version": 1
       },
       "references": [
         {
+          "id": "1f6a98c0-9ca4-11e9-b43c-3d1d97d865a5",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern",
-          "id": "1f6a98c0-9ca4-11e9-b43c-3d1d97d865a5"
+          "type": "index-pattern"
         }
       ],
       "migrationVersion": {

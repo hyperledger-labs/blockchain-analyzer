@@ -27,7 +27,7 @@ output.elasticsearch.hosts: ["localhost:9200"]
 setup.template.name: fabricbeat-%{[agent.version]}
 setup.template.pattern: fabricbeat-%{[agent.version]}-*
 
-# setup.dashboards.directory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards
+setup.dashboards.directory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards
 
 #================================ General ======================================
 
