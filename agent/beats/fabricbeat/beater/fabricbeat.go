@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -237,37 +236,30 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 
 					env, err := utils.GetEnvelopeFromBlock(d)
 					if err != nil {
-						fmt.Printf("Error getting tx from block(%s)", err)
-						os.Exit(-1)
+						return err
 					}
 
 					// GetPayload can only handle endorsement transactions
 					payload, err := utils.GetPayload(env)
 					if err != nil {
-						fmt.Printf("GetPayload returns err %s", err)
-						os.Exit(-1)
+						return err
 					}
 					chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
 					if err != nil {
-						fmt.Printf("UnmarshalChannelHeader returns err %s", err)
-						os.Exit(-1)
+						return err
 					}
 
 					shdr, err := utils.GetSignatureHeader(payload.Header.SignatureHeader)
 					if err != nil {
-						fmt.Printf("GetSignatureHeader returns err %s", err)
-						os.Exit(-1)
+						return err
 					}
 
 					tx, err := utils.GetTransaction(payload.Data)
 					if err != nil {
-						fmt.Printf("GetTransaction returns err %s", err)
-						os.Exit(-1)
+						return err
 					}
 
-					_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
-					if payloadErr != nil {
-						fmt.Printf("GetPayloads returns err %s This is not an endorsement transaction, it must be config!", payloadErr)
+					if typeInfo != "ENDORSER_TRANSACTION" {
 						event := beat.Event{
 							Timestamp: time.Now(),
 							Fields: libbeatCommon.MapStr{
@@ -283,18 +275,20 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 						}
 						bt.client.Publish(event)
 						logp.Info("Config transaction event sent")
-					}
+					} else {
+						_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
+						if payloadErr != nil {
+							return payloadErr
+						}
 
-					fmt.Printf("\tCH: %s\n", chdr.ChannelId)
-					fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
-					if payloadErr == nil {
+						fmt.Printf("\tCH: %s\n", chdr.ChannelId)
+						fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
 						fmt.Printf("\tCC: %+v\n", respPayload.ChaincodeId)
 
 						txRWSet := &rwsetutil.TxRwSet{}
 						err = txRWSet.FromProtoBytes(respPayload.Results)
 						if err != nil {
-							fmt.Printf("FromProtoBytes returns err %s", err)
-							os.Exit(-1)
+							return err
 						}
 
 						readset := []*Readset{}
