@@ -2,7 +2,6 @@ package beater
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"encoding/pem"
@@ -317,6 +316,24 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 									writeset[writeIndex].Value = string(w.Value)
 									writeset[writeIndex].IsDelete = w.IsDelete
 									writeIndex++
+
+									event := beat.Event{
+										Timestamp: time.Now(),
+										Fields: libbeatCommon.MapStr{
+											"type":              b.Info.Name,
+											"tx_id":             chdr.TxId,
+											"channel_id":        chdr.ChannelId,
+											"chaincode_name":    respPayload.ChaincodeId.Name,
+											"chaincode_version": respPayload.ChaincodeId.Version,
+											"index_name":        "key",
+											"key":               w.Key,
+											"value":             string(w.Value),
+											"created_at":        createdAt,
+											"creator":           returnCreatorString(shdr.Creator),
+										},
+									}
+									bt.client.Publish(event)
+									logp.Info("Write event sent")
 								}
 							}
 
@@ -331,7 +348,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								}
 							}
 
-							if len(ns.CollHashedRwSets) > 0 {
+							/*if len(ns.CollHashedRwSets) > 0 {
 								for _, c := range ns.CollHashedRwSets {
 									fmt.Printf("\t\t\tCollection: %s\n", c.CollectionName)
 
@@ -352,7 +369,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 										}
 									}
 								}
-							}
+							}*/
 						}
 						transactions = append(transactions, chdr.TxId)
 						event := beat.Event{

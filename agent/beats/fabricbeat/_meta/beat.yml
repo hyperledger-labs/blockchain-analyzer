@@ -21,10 +21,11 @@ fabricbeat:
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
 
-output.elasticsearch.index: fabricbeat-%{[agent.version]}-${PEER}-%{+yyyy.MM.dd}
+output.elasticsearch.index: fabricbeat-%{[agent.version]}-${PEER}-%{[index_name]}-%{+yyyy.MM.dd}
+# output.elasticsearch.index: fabricbeat-%{[agent.version]}-${PEER}-%{+yyyy.MM.dd}
 output.elasticsearch.hosts: ["localhost:9200"]
 
-setup.template.name: fabricbeat-%{[agent.version]}
-setup.template.pattern: fabricbeat-%{[agent.version]}-*
+setup.template.name: fabricbeat-%{[agent.version]}-${PEER}
+setup.template.pattern: fabricbeat-%{[agent.version]}-${PEER}*
 
 setup.dashboards.directory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards

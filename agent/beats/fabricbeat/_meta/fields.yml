@@ -61,3 +61,9 @@
 
     - name: block_hash
       type: keyword
+
+    - name: key
+      type: keyword
+
+    - name: value
+      type: keyword

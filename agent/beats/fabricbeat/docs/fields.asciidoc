@@ -3533,6 +3533,20 @@ type: keyword
 
 --
 
+*`key`*::
++
+--
+type: keyword
+
+--
+
+*`value`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
