@@ -26,9 +26,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 
-	//"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
-	"github.com/hyperledger/fabric/core/ledger/util" /*fabricCommon*/
+	"github.com/hyperledger/fabric/core/ledger/util"
 	"github.com/hyperledger/fabric/protos/common"
 	protoMSP "github.com/hyperledger/fabric/protos/msp"
 
@@ -59,12 +58,15 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 	}
 
 	fSetup := &FabricSetup{
-		OrgName:       bt.config.Organization,
-		ConfigFile:    bt.config.ConnectionProfile,
-		Peer:          bt.config.Peer,
-		AdminCertPath: bt.config.AdminCertPath,
-		AdminKeyPath:  bt.config.AdminKeyPath,
-		ElasticURL:    bt.config.ElasticURL,
+		OrgName:              bt.config.Organization,
+		ConfigFile:           bt.config.ConnectionProfile,
+		Peer:                 bt.config.Peer,
+		AdminCertPath:        bt.config.AdminCertPath,
+		AdminKeyPath:         bt.config.AdminKeyPath,
+		ElasticURL:           bt.config.ElasticURL,
+		BlockIndexName:       bt.config.BlockIndexName,
+		TransactionIndexName: bt.config.TransactionIndexName,
+		KeyIndexName:         bt.config.KeyIndexName,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -120,6 +122,311 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	// Ramp-up section
+	// Iterate over the known channels (one ledger client per channel)
+	for index, ledgerClient := range bt.fSetup.ledgerClients {
+
+		var lastBlockNumber BlockNumber
+		// Get the last known block number from Elasticsearch
+		resp, err := http.Get(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 && resp.StatusCode != 404 {
+			return errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
+		}
+		if resp.StatusCode == 404 {
+			// It is the very first start of the agent, there is no last block yet.
+			bt.lastBlockNums[ledgerClient] = 0
+			lastBlockNumber.BlockNumber = 0
+			logp.Info("Last known block number not found, setting to 0")
+		} else {
+			// Get the block number info from the response body
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+
+			var lastBlockNumberResponse BlockNumberResponse
+			err = json.Unmarshal(body, &lastBlockNumberResponse)
+			if err != nil {
+				return err
+			}
+			lastBlockNumber := lastBlockNumberResponse.BlockNumber
+			// Save last known block number for this channel
+			bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
+		}
+
+		logp.Info("Last known block number: %d", bt.lastBlockNums[ledgerClient])
+
+		if bt.lastBlockNums[ledgerClient] != 0 {
+
+			// Get the index from which we want to get the last known block
+			resp, err = http.Get(fmt.Sprintf(bt.config.ElasticURL+"/_cat/indices/fabricbeat-*%s*%s*", bt.config.BlockIndexName, bt.config.Peer))
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			// [2] is the name of the index
+			blockIndex := strings.Fields(string(body))[2]
+
+			// Retrieve the last known block from Elasticsearch
+			httpClient := &http.Client{}
+			url := fmt.Sprintf("%s/%s/_search", bt.config.ElasticURL, blockIndex)
+			requestBody := fmt.Sprintf("{\"query\": {\"term\": {\"block_number\": {\"value\":%d}}}}", bt.lastBlockNums[ledgerClient])
+			logp.Debug("URL for last block query: %s", url)
+			request, err := http.NewRequest("GET", url, bytes.NewBufferString(requestBody))
+			if err != nil {
+				return err
+			}
+			request.Header.Add("Content-Type", "application/json")
+			resp, err = httpClient.Do(request)
+			if err != nil {
+				return err
+			}
+			body, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			var lastBlockResponseFromElastic BlockIndexFilterResponse
+			err = json.Unmarshal(body, &lastBlockResponseFromElastic)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(body))
+			if lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit == nil {
+				return errors.New("Could not properly unmarshal the response body to BlockIndexFilterResponse: BlockIndexFilterResponse.BlockIndexFilterHitsObject.BlockIndexFilterHit is nil")
+			}
+
+			blockHashFromElastic := lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit[0].BlockIndexData.BlockHash
+
+			// Retrieve last known block from the ledger
+			blockResponse, blockError := ledgerClient.QueryBlock(bt.lastBlockNums[ledgerClient])
+			if blockError != nil {
+				logp.Warn("QueryBlock returned error: " + blockError.Error())
+			}
+			logp.Info("Querying last known block from ledger successful")
+
+			blockHash := generateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
+			if blockHash != blockHashFromElastic {
+				return errors.New("The hash of the last known block and the same block on the ledger do not match!")
+			} else {
+				logp.Info("The hash of the last known block and the same block on the ledger match.")
+				// Increase last block number, so that the querying starts from the next block
+				bt.lastBlockNums[ledgerClient]++
+			}
+		}
+
+		// Get the block height of this channel
+		infoResponse, err1 := ledgerClient.QueryInfo()
+		if err1 != nil {
+			logp.Warn("QueryInfo returned error: " + err1.Error())
+		}
+
+		// Query all blocks since the last known
+		for bt.lastBlockNums[ledgerClient] < infoResponse.BCI.Height {
+			blockResponse, blockError := ledgerClient.QueryBlock(bt.lastBlockNums[ledgerClient])
+			if blockError != nil {
+				logp.Warn("QueryBlock returned error: " + blockError.Error())
+			}
+
+			// Transaction Ids in this block
+			var transactions []string
+
+			// Getting block creation timestamp
+			env, err := utils.GetEnvelopeFromBlock(blockResponse.Data.Data[0])
+			if err != nil {
+				fmt.Printf("GetEnvelopeFromBlock returned error: %s", err)
+			}
+
+			channelHeader, err := utils.ChannelHeader(env)
+			if err != nil {
+				fmt.Printf("ChannelHeader returned error: %s", err)
+			}
+			typeCode := channelHeader.GetType()
+			typeInfo := TypeCodeToInfo(typeCode)
+			createdAt := time.Unix(channelHeader.GetTimestamp().Seconds, int64(channelHeader.GetTimestamp().Nanos))
+
+			// Checking validity
+			txsFltr := util.TxValidationFlags(blockResponse.Metadata.Metadata[common.BlockMetadataIndex_TRANSACTIONS_FILTER])
+
+			// Processing transactions
+			for i, d := range blockResponse.Data.Data {
+				fmt.Printf("tx %d (validation status: %s):\n", i, txsFltr.Flag(i).String())
+
+				env, err := utils.GetEnvelopeFromBlock(d)
+				if err != nil {
+					return err
+				}
+
+				payload, err := utils.GetPayload(env)
+				if err != nil {
+					return err
+				}
+				chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
+				if err != nil {
+					return err
+				}
+
+				shdr, err := utils.GetSignatureHeader(payload.Header.SignatureHeader)
+				if err != nil {
+					return err
+				}
+
+				tx, err := utils.GetTransaction(payload.Data)
+				if err != nil {
+					return err
+				}
+
+				if typeInfo != "ENDORSER_TRANSACTION" {
+					event := beat.Event{
+						Timestamp: time.Now(),
+						Fields: libbeatCommon.MapStr{
+							"type":             b.Info.Name,
+							"block_number":     blockResponse.Header.Number,
+							"tx_id":            chdr.TxId,
+							"channel_id":       chdr.ChannelId,
+							"index_name":       bt.config.TransactionIndexName,
+							"peer":             bt.config.Peer,
+							"created_at":       createdAt,
+							"creator":          returnCreatorString(shdr.Creator),
+							"transaction_type": typeInfo,
+						},
+					}
+					bt.client.Publish(event)
+					logp.Info("Config transaction event sent")
+				} else {
+					_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
+					if payloadErr != nil {
+						return payloadErr
+					}
+
+					txRWSet := &rwsetutil.TxRwSet{}
+					err = txRWSet.FromProtoBytes(respPayload.Results)
+					if err != nil {
+						return err
+					}
+
+					readset := []*Readset{}
+					writeset := []*Writeset{}
+					// Getting read-write set
+					readIndex := 0
+					writeIndex := 0
+					// For every namespace
+					for _, ns := range txRWSet.NsRwSets {
+
+						if len(ns.KvRwSet.Writes) > 0 {
+							// Getting the writes
+							for _, w := range ns.KvRwSet.Writes {
+								writeset = append(writeset, &Writeset{})
+								writeset[writeIndex].Namespace = ns.NameSpace
+								writeset[writeIndex].Key = w.Key
+								writeset[writeIndex].Value = string(w.Value)
+								writeset[writeIndex].IsDelete = w.IsDelete
+								writeIndex++
+
+								// Sending a new event to the "key" index with the write data
+								event := beat.Event{
+									Timestamp: time.Now(),
+									Fields: libbeatCommon.MapStr{
+										"type":              b.Info.Name,
+										"tx_id":             chdr.TxId,
+										"channel_id":        chdr.ChannelId,
+										"chaincode_name":    respPayload.ChaincodeId.Name,
+										"chaincode_version": respPayload.ChaincodeId.Version,
+										"index_name":        bt.config.KeyIndexName,
+										"peer":              bt.config.Peer,
+										"key":               w.Key,
+										"value":             string(w.Value),
+										"created_at":        createdAt,
+										"creator":           returnCreatorString(shdr.Creator),
+									},
+								}
+								bt.client.Publish(event)
+								logp.Info("Write event sent")
+							}
+						}
+
+						if len(ns.KvRwSet.Reads) > 0 {
+							// Getting the reads
+							for _, w := range ns.KvRwSet.Reads {
+								readset = append(readset, &Readset{})
+								readset[readIndex].Namespace = ns.NameSpace
+								readset[readIndex].Key = w.Key
+								readIndex++
+							}
+						}
+					}
+					transactions = append(transactions, chdr.TxId)
+					// Sending the transaction data to the "transaction" index
+					event := beat.Event{
+						Timestamp: time.Now(),
+						Fields: libbeatCommon.MapStr{
+							"type":              b.Info.Name,
+							"block_number":      blockResponse.Header.Number,
+							"tx_id":             chdr.TxId,
+							"channel_id":        chdr.ChannelId,
+							"chaincode_name":    respPayload.ChaincodeId.Name,
+							"chaincode_version": respPayload.ChaincodeId.Version,
+							"index_name":        bt.config.TransactionIndexName,
+							"peer":              bt.config.Peer,
+							"created_at":        createdAt,
+							"creator":           returnCreatorString(shdr.Creator),
+							"readset":           readset,
+							"writeset":          writeset,
+							"transaction_type":  typeInfo,
+						},
+					}
+					bt.client.Publish(event)
+					logp.Info("Endorsement transaction event sent")
+				}
+
+			}
+
+			prevHash := hex.EncodeToString(blockResponse.Header.PreviousHash)
+			dataHash := hex.EncodeToString(blockResponse.Header.DataHash)
+			blockHash := generateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
+			// Sending the block data to the "block" index
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields: libbeatCommon.MapStr{
+					"type":          b.Info.Name,
+					"block_number":  blockResponse.Header.Number,
+					"block_hash":    blockHash,
+					"previous_hash": prevHash,
+					"data_hash":     dataHash,
+					"created_at":    createdAt,
+					"index_name":    bt.config.BlockIndexName,
+					"peer":          bt.config.Peer,
+					"transactions":  transactions,
+				},
+			}
+			bt.client.Publish(event)
+			logp.Info("Block event sent")
+
+			// Send the latest known block number to Elasticsearch
+			jsonBlockNumber, err := json.Marshal(lastBlockNumber)
+			if err != nil {
+				return err
+			}
+			resp, err = http.Post(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index), "application/json", bytes.NewBuffer(jsonBlockNumber))
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != 200 && resp.StatusCode != 201 {
+				return errors.New("Sending last block number to Elasticsearch failed!")
+			}
+
+			bt.lastBlockNums[ledgerClient]++
+			lastBlockNumber.BlockNumber++
+		}
+	}
+
 	ticker := time.NewTicker(bt.config.Period)
 
 	for {
@@ -132,58 +439,18 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		logp.Info("Start event loop")
 		// Iterate over the known channels (one ledger client per channel)
 		for index, ledgerClient := range bt.fSetup.ledgerClients {
+
+			// Get block height for this channel
 			infoResponse, err1 := ledgerClient.QueryInfo()
 			if err1 != nil {
 				logp.Warn("QueryInfo returned error: " + err1.Error())
 			}
 
-			// Get the last known block from elasticsearch
-			resp, err := http.Get(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%d/_doc/1", index))
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-			if resp.StatusCode != 200 && resp.StatusCode != 404 {
-				return errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
-			}
-			if resp.StatusCode == 404 {
-				// It is the very first start of the agent, there is no last block yet.
-				bt.lastBlockNums[ledgerClient] = 0
-			}
-
-			// Get the block number info from the response body
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return err
-			}
-
-			var lastBlockNumberResponse BlockNumberResponse
-			err = json.Unmarshal(body, &lastBlockNumberResponse)
-			if err != nil {
-				return err
-			}
-			lastBlockNumber := lastBlockNumberResponse.BlockNumber
-			bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
-
+			// Query all blocks since the last known
 			for bt.lastBlockNums[ledgerClient] < infoResponse.BCI.Height {
 				blockResponse, blockError := ledgerClient.QueryBlock(bt.lastBlockNums[ledgerClient])
 				if blockError != nil {
 					logp.Warn("QueryBlock returned error: " + blockError.Error())
-				}
-				bt.lastBlockNums[ledgerClient]++
-				lastBlockNumber.BlockNumber++
-
-				jsonBlockNumber, err := json.Marshal(lastBlockNumber)
-				if err != nil {
-					return err
-				}
-				resp, err = http.Post(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%d/_doc/1", index), "application/json", bytes.NewBuffer(jsonBlockNumber))
-				if err != nil {
-					return err
-				}
-				defer resp.Body.Close()
-				if resp.StatusCode != 200 && resp.StatusCode != 201 {
-					return errors.New("Sending last block number to Elasticsearch failed!")
 				}
 
 				// Transaction Ids in this block
@@ -194,38 +461,15 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 				if err != nil {
 					fmt.Printf("GetEnvelopeFromBlock returned error: %s", err)
 				}
+
 				channelHeader, err := utils.ChannelHeader(env)
 				if err != nil {
 					fmt.Printf("ChannelHeader returned error: %s", err)
 				}
 				typeCode := channelHeader.GetType()
-				var typeInfo string
-				switch typeCode {
-				case 0:
-					typeInfo = "MESSAGE"
-				case 1:
-					typeInfo = "CONFIG"
-				case 2:
-					typeInfo = "CONFIG_UPDATE"
-				case 3:
-					typeInfo = "ENDORSER_TRANSACTION"
-				case 4:
-					typeInfo = "ORDERER_TRANSACTION"
-				case 5:
-					typeInfo = "DELIVER_SEEK_INFO"
-				case 6:
-					typeInfo = "CHAINCODE_PACKAGE"
-				case 8:
-					typeInfo = "PEER_ADMIN_OPERATION"
-				case 9:
-					typeInfo = "TOKEN_TRANSACTION"
-				default:
-					typeInfo = "UNRECOGNIZED_TYPE"
-				}
-				createdAt := time.Unix(channelHeader.GetTimestamp().Seconds, int64(channelHeader.GetTimestamp().Nanos))
-				fmt.Printf("--------------------- Timestamp: %s", createdAt)
+				typeInfo := TypeCodeToInfo(typeCode)
 
-				fmt.Printf("There are %d transactions in this block\n", len(blockResponse.Data.Data))
+				createdAt := time.Unix(channelHeader.GetTimestamp().Seconds, int64(channelHeader.GetTimestamp().Nanos))
 
 				// Checking validity
 				txsFltr := util.TxValidationFlags(blockResponse.Metadata.Metadata[common.BlockMetadataIndex_TRANSACTIONS_FILTER])
@@ -239,7 +483,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 						return err
 					}
 
-					// GetPayload can only handle endorsement transactions
 					payload, err := utils.GetPayload(env)
 					if err != nil {
 						return err
@@ -267,7 +510,8 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								"block_number":     blockResponse.Header.Number,
 								"tx_id":            chdr.TxId,
 								"channel_id":       chdr.ChannelId,
-								"index_name":       "transaction",
+								"index_name":       bt.config.TransactionIndexName,
+								"peer":             bt.config.Peer,
 								"created_at":       createdAt,
 								"creator":          returnCreatorString(shdr.Creator),
 								"transaction_type": typeInfo,
@@ -281,10 +525,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 							return payloadErr
 						}
 
-						fmt.Printf("\tCH: %s\n", chdr.ChannelId)
-						fmt.Printf("\tcreator: %s\n", returnCreatorString(shdr.Creator))
-						fmt.Printf("\tCC: %+v\n", respPayload.ChaincodeId)
-
 						txRWSet := &rwsetutil.TxRwSet{}
 						err = txRWSet.FromProtoBytes(respPayload.Results)
 						if err != nil {
@@ -293,17 +533,15 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 
 						readset := []*Readset{}
 						writeset := []*Writeset{}
-						fmt.Printf("\tRead-Write set:\n")
+						// Getting read-write set
 						readIndex := 0
 						writeIndex := 0
+						// For every namespace
 						for _, ns := range txRWSet.NsRwSets {
-							fmt.Printf("\t\tNamespace: %s\n", ns.NameSpace)
 
 							if len(ns.KvRwSet.Writes) > 0 {
-								fmt.Printf("\t\t\tWrites:\n")
+								// Getting the writes
 								for _, w := range ns.KvRwSet.Writes {
-									fmt.Printf("\t\t\t\tK: %s, V:%s\n", w.Key, strings.Replace(string(w.Value), "\n", ".", -1))
-									fmt.Printf("Write as string: %s", w.String())
 									writeset = append(writeset, &Writeset{})
 									writeset[writeIndex].Namespace = ns.NameSpace
 									writeset[writeIndex].Key = w.Key
@@ -311,6 +549,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 									writeset[writeIndex].IsDelete = w.IsDelete
 									writeIndex++
 
+									// Sending a new event to the "key" index with the write data
 									event := beat.Event{
 										Timestamp: time.Now(),
 										Fields: libbeatCommon.MapStr{
@@ -319,7 +558,8 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 											"channel_id":        chdr.ChannelId,
 											"chaincode_name":    respPayload.ChaincodeId.Name,
 											"chaincode_version": respPayload.ChaincodeId.Version,
-											"index_name":        "key",
+											"index_name":        bt.config.KeyIndexName,
+											"peer":              bt.config.Peer,
 											"key":               w.Key,
 											"value":             string(w.Value),
 											"created_at":        createdAt,
@@ -332,40 +572,17 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 							}
 
 							if len(ns.KvRwSet.Reads) > 0 {
-								fmt.Printf("\t\t\tReads:\n")
+								// Getting the reads
 								for _, w := range ns.KvRwSet.Reads {
-									fmt.Printf("\t\t\t\tK: %s\n", w.Key)
 									readset = append(readset, &Readset{})
 									readset[readIndex].Namespace = ns.NameSpace
 									readset[readIndex].Key = w.Key
 									readIndex++
 								}
 							}
-
-							/*if len(ns.CollHashedRwSets) > 0 {
-								for _, c := range ns.CollHashedRwSets {
-									fmt.Printf("\t\t\tCollection: %s\n", c.CollectionName)
-
-									if len(c.HashedRwSet.HashedWrites) > 0 {
-										fmt.Printf("\t\t\t\tWrites:\n")
-										for _, ww := range c.HashedRwSet.HashedWrites {
-											fmt.Printf("\t\t\t\t\tK: %s, V:%s\n",
-												base64.StdEncoding.EncodeToString(ww.KeyHash),
-												base64.StdEncoding.EncodeToString(ww.ValueHash))
-										}
-									}
-
-									if len(c.HashedRwSet.HashedReads) > 0 {
-										fmt.Printf("\t\t\t\tReads:\n")
-										for _, ww := range c.HashedRwSet.HashedReads {
-											fmt.Printf("\t\t\t\t\tK: %s\n",
-												base64.StdEncoding.EncodeToString(ww.KeyHash))
-										}
-									}
-								}
-							}*/
 						}
 						transactions = append(transactions, chdr.TxId)
+						// Sending the transaction data to the "transaction" index
 						event := beat.Event{
 							Timestamp: time.Now(),
 							Fields: libbeatCommon.MapStr{
@@ -375,7 +592,8 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								"channel_id":        chdr.ChannelId,
 								"chaincode_name":    respPayload.ChaincodeId.Name,
 								"chaincode_version": respPayload.ChaincodeId.Version,
-								"index_name":        "transaction",
+								"index_name":        bt.config.TransactionIndexName,
+								"peer":              bt.config.Peer,
 								"created_at":        createdAt,
 								"creator":           returnCreatorString(shdr.Creator),
 								"readset":           readset,
@@ -392,6 +610,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 				prevHash := hex.EncodeToString(blockResponse.Header.PreviousHash)
 				dataHash := hex.EncodeToString(blockResponse.Header.DataHash)
 				blockHash := generateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
+				// Sending the block data to the "block" index
 				event := beat.Event{
 					Timestamp: time.Now(),
 					Fields: libbeatCommon.MapStr{
@@ -401,12 +620,30 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 						"previous_hash": prevHash,
 						"data_hash":     dataHash,
 						"created_at":    createdAt,
-						"index_name":    "block",
+						"index_name":    bt.config.BlockIndexName,
+						"peer":          bt.config.Peer,
 						"transactions":  transactions,
 					},
 				}
 				bt.client.Publish(event)
 				logp.Info("Block event sent")
+
+				// Send the latest known block number to Elasticsearch
+				var lastBlockNumber BlockNumber
+				lastBlockNumber.BlockNumber = bt.lastBlockNums[ledgerClient]
+				jsonBlockNumber, err := json.Marshal(lastBlockNumber)
+				if err != nil {
+					return err
+				}
+				resp, err := http.Post(fmt.Sprintf(bt.fSetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index), "application/json", bytes.NewBuffer(jsonBlockNumber))
+				if err != nil {
+					return err
+				}
+				defer resp.Body.Close()
+				if resp.StatusCode != 200 && resp.StatusCode != 201 {
+					return errors.New("Sending last block number to Elasticsearch failed!")
+				}
+				bt.lastBlockNums[ledgerClient]++
 			}
 		}
 
@@ -422,18 +659,21 @@ func (bt *Fabricbeat) Stop() {
 
 // FabricSetup implementation
 type FabricSetup struct {
-	ConfigFile    string
-	initialized   bool
-	OrgName       string
-	Peer          string
-	ElasticURL    string
-	mspClient     *msp.Client
-	AdminCertPath string
-	AdminKeyPath  string
-	adminIdentity providerMSP.SigningIdentity
-	resClient     *resmgmt.Client
-	ledgerClients []*ledger.Client
-	sdk           *fabsdk.FabricSDK
+	ConfigFile           string
+	initialized          bool
+	OrgName              string
+	Peer                 string
+	ElasticURL           string
+	mspClient            *msp.Client
+	AdminCertPath        string
+	AdminKeyPath         string
+	adminIdentity        providerMSP.SigningIdentity
+	resClient            *resmgmt.Client
+	ledgerClients        []*ledger.Client
+	sdk                  *fabsdk.FabricSDK
+	BlockIndexName       string
+	TransactionIndexName string
+	KeyIndexName         string
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -534,6 +774,16 @@ type BlockNumberResponse struct {
 	BlockNumber BlockNumber `json:"_source"`
 }
 
+type BlockIndexFilterResponse struct {
+	BlockIndexFilterHitsObject struct {
+		BlockIndexFilterHit []struct {
+			BlockIndexData struct {
+				BlockHash string `json:"block_hash"`
+			} `json:"_source"`
+		} `json:"hits"`
+	} `json:"hits"`
+}
+
 // This function is borrowed from an opensource project: https://github.com/denisglotov/fabric-hash-calculator
 func strToHex(str string) []byte {
 	str = strings.TrimPrefix(str, "0x")
@@ -548,16 +798,40 @@ func strToHex(str string) []byte {
 
 func generateBlockHash(previousHash, dataHash []byte, blockNumber uint64) string {
 
-	//prevHash := strToHex(previousHashStr)
-
-	//dataHash := strToHex(dataHashStr)
-
 	h := common.BlockHeader{
 		Number:       blockNumber,
 		PreviousHash: previousHash,
 		DataHash:     dataHash}
 
 	return hex.EncodeToString(h.Hash())
+}
+
+// Decodes the type of the transaction into string
+func TypeCodeToInfo(typeCode int32) string {
+	var typeInfo string
+	switch typeCode {
+	case 0:
+		typeInfo = "MESSAGE"
+	case 1:
+		typeInfo = "CONFIG"
+	case 2:
+		typeInfo = "CONFIG_UPDATE"
+	case 3:
+		typeInfo = "ENDORSER_TRANSACTION"
+	case 4:
+		typeInfo = "ORDERER_TRANSACTION"
+	case 5:
+		typeInfo = "DELIVER_SEEK_INFO"
+	case 6:
+		typeInfo = "CHAINCODE_PACKAGE"
+	case 8:
+		typeInfo = "PEER_ADMIN_OPERATION"
+	case 9:
+		typeInfo = "TOKEN_TRANSACTION"
+	default:
+		typeInfo = "UNRECOGNIZED_TYPE"
+	}
+	return typeInfo
 }
 
 // Closes SDK
