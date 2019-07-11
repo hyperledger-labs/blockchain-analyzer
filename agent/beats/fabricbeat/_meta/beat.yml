@@ -7,7 +7,7 @@ fabricbeat:
   # Defines how often an event is sent to the output
   period: 1s
   # Defines in which organization the beats agent's user should be enrolled
-  organization: org3
+  organization: org${ORG_NUMBER}
   # Defines the peer which fabricbeat should query
   peer: peer0.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
@@ -17,6 +17,8 @@ fabricbeat:
   adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
   # URL of Elasticsearch
   elasticURL: "http://localhost:9200"
+  # URL of Kibana
+  kibanaURL: "http://localhost:5601"
   # Indices are created from a template (see output.elasticsearch.index). The following settings are to replace the index_name in the template.
   # Name of index to which the agent should send the block data
   blockIndexName: block
@@ -29,11 +31,9 @@ fabricbeat:
 setup.ilm.enabled: false
 
 output.elasticsearch.index: fabricbeat-%{[agent.version]}-%{[index_name]}-peer0.org${ORG_NUMBER}.el-network.com
-# output.elasticsearch.index: fabricbeat-%{[agent.version]}-${PEER}-%{+yyyy.MM.dd}
 output.elasticsearch.hosts: ["localhost:9200"]
 
 setup.template.name: fabricbeat-%{[agent.version]}
 setup.template.pattern: fabricbeat-%{[agent.version]}*
 
 setup.dashboards.directory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards
-setup.dashboards.index: fabricbeat-%{[agent.version]}-%{[index_name]}*

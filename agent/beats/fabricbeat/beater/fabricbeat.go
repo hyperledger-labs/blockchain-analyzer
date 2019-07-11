@@ -64,6 +64,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		AdminCertPath:        bt.config.AdminCertPath,
 		AdminKeyPath:         bt.config.AdminKeyPath,
 		ElasticURL:           bt.config.ElasticURL,
+		KibanaURL:            bt.config.KibanaURL,
 		BlockIndexName:       bt.config.BlockIndexName,
 		TransactionIndexName: bt.config.TransactionIndexName,
 		KeyIndexName:         bt.config.KeyIndexName,
@@ -107,6 +108,53 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 	}
 	for _, chaincode := range chaincodeResponse.Chaincodes {
 		logp.Info(chaincode.Name)
+	}
+
+	// Create index patterns for the peer the agent connects to
+	templates := []string{"block", "transaction", "key"}
+	for _, templateName := range templates {
+		// Load index pattern template and replace title
+		logp.Info("Creating %s index pattern for connected peer", templateName)
+
+		indexPatternJSON, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/index_patterns/%s-index-pattern-TEMPLATE.json", templateName))
+		if err != nil {
+			return nil, err
+		}
+		var indexPattern IndexPattern
+		err = json.Unmarshal(indexPatternJSON, &indexPattern)
+		if err != nil {
+			return nil, err
+		}
+		indexPattern.IndexPatternAttributes.Title = fmt.Sprintf("fabricbeat*%s*%s*", templateName, fSetup.Peer)
+		indexPatternJSON, err = json.Marshal(indexPattern)
+		if err != nil {
+			return nil, err
+		}
+		// Send index pattern to Kibana via Kibana Saved Objects API
+		logp.Info("Persisting %s index pattern for connected peer", templateName)
+
+		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/fabricbeat-%s-%s", fSetup.KibanaURL, templateName, fSetup.Peer), bytes.NewBuffer(indexPatternJSON))
+		if err != nil {
+			return nil, err
+		}
+		request.Header.Add("Content-Type", "application/json")
+		request.Header.Add("kbn-xsrf", "true")
+		httpClient := http.Client{}
+		resp, err := httpClient.Do(request)
+		if err != nil {
+			return nil, err
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		// Check if the index pattern exists. 409 is for version conflict, it means that this index pattern has already been created.
+		// TODO check for existing index pattern and replace it.
+		if resp.StatusCode != 200 && resp.StatusCode != 409 {
+			return nil, errors.New(fmt.Sprintf("Failed to create %s index pattern:\nResponse status code: %d\nResponse body: %s", templateName, resp.StatusCode, string(body)))
+		}
+		logp.Info("%s index pattern created", templateName)
 	}
 
 	return bt, nil
@@ -664,6 +712,7 @@ type FabricSetup struct {
 	OrgName              string
 	Peer                 string
 	ElasticURL           string
+	KibanaURL            string
 	mspClient            *msp.Client
 	AdminCertPath        string
 	AdminKeyPath         string
@@ -782,6 +831,14 @@ type BlockIndexFilterResponse struct {
 			} `json:"_source"`
 		} `json:"hits"`
 	} `json:"hits"`
+}
+
+// This struct is for parsing index pattern template and replacing title
+type IndexPattern struct {
+	IndexPatternAttributes struct {
+		Title          string      `json:"title"`
+		FieldFormatMap interface{} `json:"fieldFormatMap"`
+	} `json:"attributes"`
 }
 
 // This function is borrowed from an opensource project: https://github.com/denisglotov/fabric-hash-calculator

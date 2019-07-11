@@ -1,9 +1,0 @@
-/.idea
-/build
-
-.DS_Store
-/fabricbeat
-/fabricbeat.test
-*.pyc
-
-/keystore

@@ -23,13 +23,16 @@ node_modules
 # Wallet
 wallet/*
 
+# Fabricbeat
 .idea
 build
 
-fabricbeat
-
 .DS_Store
 
+keystore/
+fabricbeat/_meta/dashboards.yml
+fabricbeat
+!fabricbeat/
 /keystore
 
 *.pyc
