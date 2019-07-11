@@ -17,6 +17,7 @@ type Config struct {
 	BlockIndexName       string        `config:"blockIndexName"`
 	TransactionIndexName string        `config:"transactionIndexName"`
 	KeyIndexName         string        `config:"keyIndexName"`
+	DashboardDirectory   string        `config:"dashboardDirectory"`
 }
 
 var DefaultConfig = Config{
@@ -31,4 +32,5 @@ var DefaultConfig = Config{
 	BlockIndexName:       "block",
 	TransactionIndexName: "transaction",
 	KeyIndexName:         "key",
+	DashboardDirectory:   "/home/prehi/internship/testNetwork/hyperledger-elastic/dashboards",
 }

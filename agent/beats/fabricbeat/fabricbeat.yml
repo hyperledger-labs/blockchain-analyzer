@@ -26,6 +26,8 @@ fabricbeat:
   transactionIndexName: transaction
   # Name of index to which the agent should send the key data
   keyIndexName: key
+  # Directory which should contain the generated dashboards.
+  dashboardDirectory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards/7/dashboard
 
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false

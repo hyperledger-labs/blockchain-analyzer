@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -68,6 +69,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		BlockIndexName:       bt.config.BlockIndexName,
 		TransactionIndexName: bt.config.TransactionIndexName,
 		KeyIndexName:         bt.config.KeyIndexName,
+		DashboardDirectory:   bt.config.DashboardDirectory,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -111,12 +113,17 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 	}
 
 	// Create index patterns for the peer the agent connects to
+	dashboardBytes, err5 := ioutil.ReadFile("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/overview-TEMPLATE.json")
+	if err5 != nil {
+		return nil, err5
+	}
+	dashboard := string(dashboardBytes)
 	templates := []string{"block", "transaction", "key"}
 	for _, templateName := range templates {
 		// Load index pattern template and replace title
 		logp.Info("Creating %s index pattern for connected peer", templateName)
 
-		indexPatternJSON, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/index_patterns/%s-index-pattern-TEMPLATE.json", templateName))
+		indexPatternJSON, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/%s-index-pattern-TEMPLATE.json", templateName))
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +140,8 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		// Send index pattern to Kibana via Kibana Saved Objects API
 		logp.Info("Persisting %s index pattern for connected peer", templateName)
 
-		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/fabricbeat-%s-%s", fSetup.KibanaURL, templateName, fSetup.Peer), bytes.NewBuffer(indexPatternJSON))
+		id := fmt.Sprintf("fabricbeat-%s-%s", templateName, fSetup.Peer)
+		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", fSetup.KibanaURL, id), bytes.NewBuffer(indexPatternJSON))
 		if err != nil {
 			return nil, err
 		}
@@ -155,6 +163,27 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 			return nil, errors.New(fmt.Sprintf("Failed to create %s index pattern:\nResponse status code: %d\nResponse body: %s", templateName, resp.StatusCode, string(body)))
 		}
 		logp.Info("%s index pattern created", templateName)
+
+		// Create overview dashboard from template
+		patternExpression := fmt.Sprintf("%s_PATTERN", strings.ToUpper(templateName))
+		re := regexp.MustCompile(patternExpression)
+		dashboard = re.ReplaceAllString(string(dashboard), id)
+	}
+
+	// Replace dashboard id
+	idExpression := "OVERVIEW_DASHBOARD_TEMPLATE_ID"
+	re := regexp.MustCompile(idExpression)
+	dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("overview-dashboard-%s-%s", fSetup.Peer, fSetup.OrgName))
+
+	// Replace dashboard title
+	titleExpression := "OVERVIEW_DASHBOARD_TEMPLATE_TITLE"
+	re = regexp.MustCompile(titleExpression)
+	dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("Overview Dashboard %s (%s)", fSetup.Peer, fSetup.OrgName))
+
+	// Persist the created dashboard in the configured directory
+	err := ioutil.WriteFile(fSetup.DashboardDirectory+"/overview-"+fSetup.Peer+"-"+fSetup.OrgName+".json", []byte(dashboard), 0664)
+	if err != nil {
+		return nil, err
 	}
 
 	return bt, nil
@@ -261,9 +290,9 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 
 			blockHash := generateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
 			if blockHash != blockHashFromElastic {
-				return errors.New("The hash of the last known block and the same block on the ledger do not match!")
+				return errors.New(fmt.Sprintf("The hash of the last known block (block number: %d) and the same block on the ledger do not match!", blockResponse.Header.Number))
 			} else {
-				logp.Info("The hash of the last known block and the same block on the ledger match.")
+				logp.Info(fmt.Sprintf("The hash of the last known block (block number: %d) and the same block on the ledger match.", blockResponse.Header.Number))
 				// Increase last block number, so that the querying starts from the next block
 				bt.lastBlockNums[ledgerClient]++
 			}
@@ -723,6 +752,7 @@ type FabricSetup struct {
 	BlockIndexName       string
 	TransactionIndexName string
 	KeyIndexName         string
+	DashboardDirectory   string
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -823,6 +853,7 @@ type BlockNumberResponse struct {
 	BlockNumber BlockNumber `json:"_source"`
 }
 
+// This struct is for parsing block filter query response from Elasticsearch
 type BlockIndexFilterResponse struct {
 	BlockIndexFilterHitsObject struct {
 		BlockIndexFilterHit []struct {
@@ -837,6 +868,7 @@ type BlockIndexFilterResponse struct {
 type IndexPattern struct {
 	IndexPatternAttributes struct {
 		Title          string      `json:"title"`
+		TimeFieldName  string      `json:"timeFieldName"`
 		FieldFormatMap interface{} `json:"fieldFormatMap"`
 	} `json:"attributes"`
 }
