@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -809,16 +808,6 @@ func (setup *FabricSetup) GenerateDashboards() error {
 			return errors.New(fmt.Sprintf("Failed to create %s index pattern:\nResponse status code: %d\nResponse body: %s", templateName, resp.StatusCode, string(body)))
 		}
 		logp.Info("%s index pattern created", templateName)
-	}
-
-	// Make sure that dashboard directory is empty
-	err := os.RemoveAll(setup.DashboardDirectory)
-	if err != nil {
-		return err
-	}
-	err = os.Mkdir(setup.DashboardDirectory, os.ModePerm)
-	if err != nil {
-		return err
 	}
 
 	for _, dashboardName := range dashboardNames {
