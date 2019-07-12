@@ -67,6 +67,3 @@
 
     - name: value
       type: keyword
-
-    - name: keyword
-      value: keyword

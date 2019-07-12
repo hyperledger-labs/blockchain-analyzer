@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -70,6 +71,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		TransactionIndexName: bt.config.TransactionIndexName,
 		KeyIndexName:         bt.config.KeyIndexName,
 		DashboardDirectory:   bt.config.DashboardDirectory,
+		TemplateDirectory:    bt.config.TemplateDirectory,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -112,76 +114,8 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		logp.Info(chaincode.Name)
 	}
 
-	// Create index patterns for the peer the agent connects to
-	dashboardBytes, err5 := ioutil.ReadFile("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/overview-TEMPLATE.json")
-	if err5 != nil {
-		return nil, err5
-	}
-	dashboard := string(dashboardBytes)
-	templates := []string{"block", "transaction", "key"}
-	for _, templateName := range templates {
-		// Load index pattern template and replace title
-		logp.Info("Creating %s index pattern for connected peer", templateName)
-
-		indexPatternJSON, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/%s-index-pattern-TEMPLATE.json", templateName))
-		if err != nil {
-			return nil, err
-		}
-		var indexPattern IndexPattern
-		err = json.Unmarshal(indexPatternJSON, &indexPattern)
-		if err != nil {
-			return nil, err
-		}
-		indexPattern.IndexPatternAttributes.Title = fmt.Sprintf("fabricbeat*%s*%s*", templateName, fSetup.Peer)
-		indexPatternJSON, err = json.Marshal(indexPattern)
-		if err != nil {
-			return nil, err
-		}
-		// Send index pattern to Kibana via Kibana Saved Objects API
-		logp.Info("Persisting %s index pattern for connected peer", templateName)
-
-		id := fmt.Sprintf("fabricbeat-%s-%s", templateName, fSetup.Peer)
-		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", fSetup.KibanaURL, id), bytes.NewBuffer(indexPatternJSON))
-		if err != nil {
-			return nil, err
-		}
-		request.Header.Add("Content-Type", "application/json")
-		request.Header.Add("kbn-xsrf", "true")
-		httpClient := http.Client{}
-		resp, err := httpClient.Do(request)
-		if err != nil {
-			return nil, err
-		}
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-		// Check if the index pattern exists. 409 is for version conflict, it means that this index pattern has already been created.
-		// TODO check for existing index pattern and replace it.
-		if resp.StatusCode != 200 && resp.StatusCode != 409 {
-			return nil, errors.New(fmt.Sprintf("Failed to create %s index pattern:\nResponse status code: %d\nResponse body: %s", templateName, resp.StatusCode, string(body)))
-		}
-		logp.Info("%s index pattern created", templateName)
-
-		// Create overview dashboard from template
-		patternExpression := fmt.Sprintf("%s_PATTERN", strings.ToUpper(templateName))
-		re := regexp.MustCompile(patternExpression)
-		dashboard = re.ReplaceAllString(string(dashboard), id)
-	}
-
-	// Replace dashboard id
-	idExpression := "OVERVIEW_DASHBOARD_TEMPLATE_ID"
-	re := regexp.MustCompile(idExpression)
-	dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("overview-dashboard-%s-%s", fSetup.Peer, fSetup.OrgName))
-
-	// Replace dashboard title
-	titleExpression := "OVERVIEW_DASHBOARD_TEMPLATE_TITLE"
-	re = regexp.MustCompile(titleExpression)
-	dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("Overview Dashboard %s (%s)", fSetup.Peer, fSetup.OrgName))
-
-	// Persist the created dashboard in the configured directory
-	err := ioutil.WriteFile(fSetup.DashboardDirectory+"/overview-"+fSetup.Peer+"-"+fSetup.OrgName+".json", []byte(dashboard), 0664)
+	// Generate the index patterns and dashboards for the connected peer from templates in the kibana_templates folder
+	err := fSetup.GenerateDashboards()
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +302,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 							"tx_id":            chdr.TxId,
 							"channel_id":       chdr.ChannelId,
 							"index_name":       bt.config.TransactionIndexName,
-							"peer":             bt.config.Peer,
 							"created_at":       createdAt,
 							"creator":          returnCreatorString(shdr.Creator),
 							"transaction_type": typeInfo,
@@ -416,7 +349,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 										"chaincode_name":    respPayload.ChaincodeId.Name,
 										"chaincode_version": respPayload.ChaincodeId.Version,
 										"index_name":        bt.config.KeyIndexName,
-										"peer":              bt.config.Peer,
 										"key":               w.Key,
 										"value":             string(w.Value),
 										"created_at":        createdAt,
@@ -450,7 +382,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 							"chaincode_name":    respPayload.ChaincodeId.Name,
 							"chaincode_version": respPayload.ChaincodeId.Version,
 							"index_name":        bt.config.TransactionIndexName,
-							"peer":              bt.config.Peer,
 							"created_at":        createdAt,
 							"creator":           returnCreatorString(shdr.Creator),
 							"readset":           readset,
@@ -478,7 +409,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 					"data_hash":     dataHash,
 					"created_at":    createdAt,
 					"index_name":    bt.config.BlockIndexName,
-					"peer":          bt.config.Peer,
 					"transactions":  transactions,
 				},
 			}
@@ -588,7 +518,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								"tx_id":            chdr.TxId,
 								"channel_id":       chdr.ChannelId,
 								"index_name":       bt.config.TransactionIndexName,
-								"peer":             bt.config.Peer,
 								"created_at":       createdAt,
 								"creator":          returnCreatorString(shdr.Creator),
 								"transaction_type": typeInfo,
@@ -636,7 +565,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 											"chaincode_name":    respPayload.ChaincodeId.Name,
 											"chaincode_version": respPayload.ChaincodeId.Version,
 											"index_name":        bt.config.KeyIndexName,
-											"peer":              bt.config.Peer,
 											"key":               w.Key,
 											"value":             string(w.Value),
 											"created_at":        createdAt,
@@ -670,7 +598,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 								"chaincode_name":    respPayload.ChaincodeId.Name,
 								"chaincode_version": respPayload.ChaincodeId.Version,
 								"index_name":        bt.config.TransactionIndexName,
-								"peer":              bt.config.Peer,
 								"created_at":        createdAt,
 								"creator":           returnCreatorString(shdr.Creator),
 								"readset":           readset,
@@ -698,7 +625,6 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 						"data_hash":     dataHash,
 						"created_at":    createdAt,
 						"index_name":    bt.config.BlockIndexName,
-						"peer":          bt.config.Peer,
 						"transactions":  transactions,
 					},
 				}
@@ -753,6 +679,7 @@ type FabricSetup struct {
 	TransactionIndexName string
 	KeyIndexName         string
 	DashboardDirectory   string
+	TemplateDirectory    string
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -812,6 +739,152 @@ func (setup *FabricSetup) Initialize() error {
 	return nil
 }
 
+// Generates the index patterns and dashboards for the connected peer from templates in the kibana_templates folder.
+func (setup *FabricSetup) GenerateDashboards() error {
+
+	// The beginnings of the dashboard template names (i.e. overview-dashboard-TEMPLATE.json -> overview)
+	dashboardNames := []string{"overview", "block", "key", "transaction"}
+	visualizationNames := []string{"block_count", "transaction_count", "transaction_per_organization", "transaction_count_timeline"}
+	templates := []string{"block", "transaction", "key"}
+	var patternId string
+	// Create index patterns for the peer the agent connects to
+	for _, templateName := range templates {
+		// Load index pattern template and replace title
+		logp.Info("Creating %s index pattern for connected peer", templateName)
+
+		indexPatternJSON, err := ioutil.ReadFile(fmt.Sprintf("%s/%s-index-pattern-TEMPLATE.json", setup.TemplateDirectory, templateName))
+		if err != nil {
+			return err
+		}
+
+		indexPatternJSONstring := string(indexPatternJSON)
+		// Replace id placeholders (in URL formatted fields)
+		for _, dashboardName := range dashboardNames {
+
+			// Replace dashboard id placeholders
+			idExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_ID", strings.ToUpper(dashboardName))
+			re := regexp.MustCompile(idExpression)
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-dashboard-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+
+			// Replace search id placeholders
+			idExpression = fmt.Sprintf("%s_SEARCH_TEMPLATE_ID", strings.ToUpper(dashboardName))
+			re = regexp.MustCompile(idExpression)
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-search-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+
+			// Replace visualization id placeholders
+			idExpression = fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(dashboardName))
+			re = regexp.MustCompile(idExpression)
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+		}
+
+		// Replace title placeholders
+		titleExpression := fmt.Sprintf("INDEX_PATTERN_TEMPLATE_TITLE")
+		re := regexp.MustCompile(titleExpression)
+		indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("fabricbeat*%s*%s", templateName, setup.Peer))
+
+		indexPatternJSON = []byte(indexPatternJSONstring)
+		// Send index pattern to Kibana via Kibana Saved Objects API
+		logp.Info("Persisting %s index pattern for connected peer", templateName)
+
+		patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.Peer)
+		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", setup.KibanaURL, patternId), bytes.NewBuffer(indexPatternJSON))
+		if err != nil {
+			return err
+		}
+		request.Header.Add("Content-Type", "application/json")
+		request.Header.Add("kbn-xsrf", "true")
+		httpClient := http.Client{}
+		resp, err := httpClient.Do(request)
+		if err != nil {
+			return err
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		// Check if the index pattern exists. 409 is for version conflict, it means that this index pattern has already been created.
+		// TODO check for existing index pattern and replace it.
+		if resp.StatusCode != 200 && resp.StatusCode != 409 {
+			return errors.New(fmt.Sprintf("Failed to create %s index pattern:\nResponse status code: %d\nResponse body: %s", templateName, resp.StatusCode, string(body)))
+		}
+		logp.Info("%s index pattern created", templateName)
+	}
+
+	// Make sure that dashboard directory is empty
+	err := os.RemoveAll(setup.DashboardDirectory)
+	if err != nil {
+		return err
+	}
+	err = os.Mkdir(setup.DashboardDirectory, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	for _, dashboardName := range dashboardNames {
+
+		// Load dashboard template
+		logp.Info("Creating %s dashboard from template", dashboardName)
+		dashboardBytes, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/%s-dashboard-TEMPLATE.json", dashboardName))
+		if err != nil {
+			return err
+		}
+		dashboard := string(dashboardBytes)
+
+		for _, templateName := range templates {
+			// Replace index pattern id placeholders
+			patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.Peer)
+			patternExpression := fmt.Sprintf("%s_PATTERN", strings.ToUpper(templateName))
+			re := regexp.MustCompile(patternExpression)
+			dashboard = re.ReplaceAllString(string(dashboard), patternId)
+
+			// Replace search id placeholders
+			searchId := fmt.Sprintf("%s-search-%s-%s", templateName, setup.Peer, setup.OrgName)
+			searchIdExpression := fmt.Sprintf("%s_SEARCH_TEMPLATE_ID", strings.ToUpper(templateName))
+			re = regexp.MustCompile(searchIdExpression)
+			dashboard = re.ReplaceAllString(dashboard, searchId)
+
+			// Replace search title placeholders
+			searchTitle := fmt.Sprintf("%s Search %s (%s)", strings.Title(templateName), setup.Peer, setup.OrgName)
+			searchTitleExpression := fmt.Sprintf("%s_SEARCH_TEMPLATE_TITLE", strings.ToUpper(templateName))
+			re = regexp.MustCompile(searchTitleExpression)
+			dashboard = re.ReplaceAllString(dashboard, searchTitle)
+		}
+
+		for _, visualizationName := range visualizationNames {
+			// Replace visualization id placeholders
+			visualizationId := fmt.Sprintf("%s-visualization-%s-%s", visualizationName, setup.Peer, setup.OrgName)
+			visualizationIdExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(visualizationName))
+			re := regexp.MustCompile(visualizationIdExpression)
+			dashboard = re.ReplaceAllString(dashboard, visualizationId)
+
+			// Replace visualization title placeholders
+			visualizationTitle := fmt.Sprintf("%s Visualization %s (%s)", strings.Title(visualizationName), setup.Peer, setup.OrgName)
+			visualizationTitleExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_TITLE", strings.ToUpper(visualizationName))
+			re = regexp.MustCompile(visualizationTitleExpression)
+			dashboard = re.ReplaceAllString(dashboard, visualizationTitle)
+		}
+
+		// Replace dashboard id
+		idExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_ID", strings.ToUpper(dashboardName))
+		re := regexp.MustCompile(idExpression)
+		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s-dashboard-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+
+		// Replace dashboard title
+		titleExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_TITLE", strings.ToUpper(dashboardName))
+		re = regexp.MustCompile(titleExpression)
+		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s Dashboard %s (%s)", strings.Title(dashboardName), setup.Peer, setup.OrgName))
+
+		// Persist the created dashboard in the configured directory, from where it is going to be loaded
+		err = ioutil.WriteFile(fmt.Sprintf("%s/%s-%s-%s.json", setup.DashboardDirectory, dashboardName, setup.Peer, setup.OrgName), []byte(dashboard), 0664)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // This function is borrowed from an opensource project: https://github.com/ale-aso/fabric-examples/blob/master/blockparser.go
 func returnCreatorString(bytes []byte) string {
 	defaultString := strings.Replace(string(bytes), "\n", ".", -1)
@@ -862,15 +935,6 @@ type BlockIndexFilterResponse struct {
 			} `json:"_source"`
 		} `json:"hits"`
 	} `json:"hits"`
-}
-
-// This struct is for parsing index pattern template and replacing title
-type IndexPattern struct {
-	IndexPatternAttributes struct {
-		Title          string      `json:"title"`
-		TimeFieldName  string      `json:"timeFieldName"`
-		FieldFormatMap interface{} `json:"fieldFormatMap"`
-	} `json:"attributes"`
 }
 
 // This function is borrowed from an opensource project: https://github.com/denisglotov/fabric-hash-calculator

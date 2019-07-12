@@ -18,6 +18,7 @@ type Config struct {
 	TransactionIndexName string        `config:"transactionIndexName"`
 	KeyIndexName         string        `config:"keyIndexName"`
 	DashboardDirectory   string        `config:"dashboardDirectory"`
+	TemplateDirectory    string        `config:"templateDirectory"`
 }
 
 var DefaultConfig = Config{
@@ -33,4 +34,5 @@ var DefaultConfig = Config{
 	TransactionIndexName: "transaction",
 	KeyIndexName:         "key",
 	DashboardDirectory:   "/home/prehi/internship/testNetwork/hyperledger-elastic/dashboards",
+	TemplateDirectory:    "/home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates",
 }
