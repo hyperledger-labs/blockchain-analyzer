@@ -1,13 +1,8 @@
 package beater
 
 import (
-	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
 	"time"
 
 	"github.com/balazsprehoda/fabricbeat/modules/ledgerutils"
@@ -19,11 +14,10 @@ import (
 	fabricbeatConfig "github.com/balazsprehoda/fabricbeat/config"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 
 	"github.com/pkg/errors"
 
+	"github.com/balazsprehoda/fabricbeat/modules/elastic"
 	"github.com/balazsprehoda/fabricbeat/modules/fabricbeatsetup"
 	"github.com/balazsprehoda/fabricbeat/modules/fabricutils"
 	"github.com/balazsprehoda/fabricbeat/modules/templates"
@@ -72,38 +66,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		logp.Error(err1)
 		return nil, err1
 	}
-
 	bt.Fsetup = fSetup
-
-	// Get all channels the peer is part of
-	channelsResponse, err2 := fSetup.ResClient.QueryChannels(resmgmt.WithTargetEndpoints(fSetup.Peer))
-	if err2 != nil {
-		return nil, err2
-	}
-
-	// Initialize the ledger client for each channel
-	for _, channel := range channelsResponse.Channels {
-		channelContext := fSetup.SDK.ChannelContext(channel.ChannelId, fabsdk.WithIdentity(fSetup.AdminIdentity))
-		if channelContext == nil {
-			logp.Warn("Channel context creation failed, ChannelContext() returned nil for channel " + channel.ChannelId)
-		}
-		ledgerClient, err4 := ledger.New(channelContext)
-		if err4 != nil {
-			return nil, err4
-		}
-		fSetup.LedgerClients = append(fSetup.LedgerClients, ledgerClient)
-		logp.Info("Ledger client initialized for channel " + channel.ChannelId)
-	}
-	logp.Info("Channel clients initialized")
-
-	// Get installed chaincodes of the peer
-	chaincodeResponse, err3 := fSetup.ResClient.QueryInstalledChaincodes(resmgmt.WithTargetEndpoints(fSetup.Peer))
-	if err3 != nil {
-		return nil, err3
-	}
-	for _, chaincode := range chaincodeResponse.Chaincodes {
-		logp.Info(chaincode.Name)
-	}
 
 	// Generate the index patterns and dashboards for the connected peer from templates in the kibana_templates folder
 	err := templates.GenerateDashboards(fSetup)
@@ -143,7 +106,7 @@ func (bt *Fabricbeat) Run(b *beat.Beat) error {
 		logp.Info("Start event loop")
 		// Iterate over the known channels (one ledger client per channel)
 		for index, ledgerClient := range bt.Fsetup.LedgerClients {
-			var lastBlockNumber BlockNumber
+			var lastBlockNumber elastic.BlockNumber
 			lastBlockNumber.BlockNumber = bt.lastBlockNums[ledgerClient]
 			err = bt.ProcessNewBlocks(b, ledgerClient, index)
 			if err != nil {
@@ -161,156 +124,31 @@ func (bt *Fabricbeat) Stop() {
 	defer bt.Fsetup.CloseSDK()
 }
 
-// This struct is for parsing block filter query response from Elasticsearch
-type BlockIndexFilterResponse struct {
-	BlockIndexFilterHitsObject struct {
-		BlockIndexFilterHit []struct {
-			BlockIndexData struct {
-				BlockHash string `json:"block_hash"`
-			} `json:"_source"`
-		} `json:"hits"`
-	} `json:"hits"`
-}
-
-type BlockNumber struct {
-	BlockNumber uint64 `json:"blockNumber"`
-}
-
-type BlockNumberResponse struct {
-	Index       string      `json:"_index"`
-	Type        string      `json:"_type"`
-	Id          string      `json:"_id"`
-	BlockNumber BlockNumber `json:"_source"`
-}
-
-type SearchRequest struct {
-	Size        int `json:"size"`
-	QueryObject struct {
-		Bool struct {
-			FilterObject []struct {
-				Term struct {
-				}
-			} `json:"filter"`
-		} `json:"bool"`
-	} `json:"query"`
-}
-
 // Helps the Fabricbeat agent to continue where it left off: Gets the last known block from Elasticsearch, compares it to the ledger,
 // and if the two match, it queries every block since the last known block, and sends their data to Elasticsearch. If the block retrieved from Elasticsearch
 // and the block from the ledger do not match, it returns an error.
 func (bt *Fabricbeat) rampUp(b *beat.Beat) error {
 	for index, ledgerClient := range bt.Fsetup.LedgerClients {
 
-		var lastBlockNumber BlockNumber
-		// Get the last known block number from Elasticsearch
-		resp, err := http.Get(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index))
+		var lastBlockNumber elastic.BlockNumber
+		var err error
+		// Get the last known block's number from Elasticsearch.
+		lastBlockNumber.BlockNumber, err = elastic.GetBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index))
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 && resp.StatusCode != 404 {
-			return errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
-		}
-		if resp.StatusCode == 404 {
-			// It is the very first start of the agent, there is no last block yet.
-			bt.lastBlockNums[ledgerClient] = 0
-			lastBlockNumber.BlockNumber = 0
-			logp.Info("Last known block number not found, setting to 0")
-		} else {
-			// Get the block number info from the response body
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-
-			var lastBlockNumberResponse BlockNumberResponse
-			err = json.Unmarshal(body, &lastBlockNumberResponse)
-			if err != nil {
-				return err
-			}
-			lastBlockNumber = lastBlockNumberResponse.BlockNumber
-			// Save last known block number locally for this channel
-			bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
-		}
+		// Save last known block number locally for this channel
+		bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
 
 		logp.Info("Last known block number: %d", bt.lastBlockNums[ledgerClient])
 
 		if bt.lastBlockNums[ledgerClient] != 0 {
 
-			// Get the index from which we want to get the last known block
-			resp, err = http.Get(fmt.Sprintf(bt.config.ElasticURL+"/_cat/indices/fabricbeat-*%s*%s*", bt.config.BlockIndexName, bt.config.Organization))
-			body, err := ioutil.ReadAll(resp.Body)
+			// Get block hash of the last known block
+			blockHashFromElastic, err := elastic.GetBlockHash(bt.config.ElasticURL, bt.config.BlockIndexName, bt.config.Organization, bt.config.Peer, bt.lastBlockNums[ledgerClient])
 			if err != nil {
 				return err
 			}
-			defer resp.Body.Close()
-			// [2] is the name of the index
-			blockIndex := strings.Fields(string(body))[2]
-
-			// Retrieve the last known block from Elasticsearch
-			httpClient := &http.Client{}
-			url := fmt.Sprintf("%s/%s/_search", bt.config.ElasticURL, blockIndex)
-			//requestBody := fmt.Sprintf("{\"query\": {\"term\": {\"block_number\": {\"value\":%d}}}", bt.lastBlockNums[ledgerClient])
-			requestBody := fmt.Sprintf(`{
-				"size": 1,
-				"query": {
-				  "bool": {
-					"filter": [
-					  {
-						"term": {
-						  "block_number": {
-							"value": "%d"
-						  }
-						}
-					  },
-					  {
-						"term": {
-						  "peer": {
-							"value": "%s"
-						  }
-						}
-					  }
-					]
-				  }
-				},
-				"sort": [
-				  {
-					"value": {
-					  "order": "desc"
-					}
-				  }
-				]
-			}`, bt.lastBlockNums[ledgerClient], bt.config.Peer)
-			logp.Debug("URL for last block query: ", url)
-			request, err := http.NewRequest("GET", url, bytes.NewBufferString(requestBody))
-			if err != nil {
-				return err
-			}
-			request.Header.Add("Content-Type", "application/json")
-			resp, err = httpClient.Do(request)
-			if err != nil {
-				return err
-			}
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return err
-			}
-			defer resp.Body.Close()
-			if resp.StatusCode != 200 {
-				return errors.New("Failed to get last block from Elasticsearch: " + string(body))
-			}
-			var lastBlockResponseFromElastic BlockIndexFilterResponse
-			err = json.Unmarshal(body, &lastBlockResponseFromElastic)
-			if err != nil {
-				return err
-			}
-			fmt.Println(string(body))
-			if lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit == nil {
-				return errors.New("Could not properly unmarshal the response body to BlockIndexFilterResponse: BlockIndexFilterResponse.BlockIndexFilterHitsObject.BlockIndexFilterHit is nil")
-			}
-
-			blockHashFromElastic := lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit[0].BlockIndexData.BlockHash
 
 			// Retrieve last known block from the ledger
 			blockHash, err := ledgerutils.GetBlockHash(bt.lastBlockNums[ledgerClient], ledgerClient)
@@ -334,9 +172,10 @@ func (bt *Fabricbeat) rampUp(b *beat.Beat) error {
 	return nil
 }
 
+// Gets the blocks from the ledger and sends their data to Elasticsearch.
 func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client, index int) error {
 
-	var lastBlockNumber BlockNumber
+	var lastBlockNumber elastic.BlockNumber
 	lastBlockNumber.BlockNumber = bt.lastBlockNums[ledgerClient]
 
 	blockHeight, err := ledgerutils.GetBlockHeight(ledgerClient)
@@ -470,17 +309,9 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		logp.Info("Block event sent")
 
 		// Send the latest known block number to Elasticsearch
-		jsonBlockNumber, err := json.Marshal(lastBlockNumber)
+		err = elastic.SendBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index), lastBlockNumber)
 		if err != nil {
 			return err
-		}
-		resp, err := http.Post(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index), "application/json", bytes.NewBuffer(jsonBlockNumber))
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 && resp.StatusCode != 201 {
-			return errors.New("Sending last block number to Elasticsearch failed!")
 		}
 		bt.lastBlockNums[ledgerClient]++
 		lastBlockNumber.BlockNumber++

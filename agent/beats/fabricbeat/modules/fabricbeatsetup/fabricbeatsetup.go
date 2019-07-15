@@ -45,10 +45,10 @@ func (setup *FabricbeatSetup) Initialize() error {
 	}
 
 	// Initialize the SDK with the configuration file
-	sdk, err0 := fabsdk.New(config.FromFile(setup.ConfigFile))
-	if err0 != nil {
+	sdk, err := fabsdk.New(config.FromFile(setup.ConfigFile))
+	if err != nil {
 		logp.Warn("SDK initialization failed!")
-		return errors.WithMessage(err0, "failed to create SDK")
+		return errors.WithMessage(err, "failed to create SDK")
 	}
 	setup.SDK = sdk
 	logp.Info("SDK created")
@@ -58,6 +58,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 		logp.Warn("setup.sdk.Context() returned nil")
 	}
 
+	// Retrieving admin identity (key + cert)
 	cert, err := ioutil.ReadFile(setup.AdminCertPath)
 	if err != nil {
 		return err
@@ -67,25 +68,55 @@ func (setup *FabricbeatSetup) Initialize() error {
 		return err
 	}
 
-	var err1 error
-	setup.MspClient, err1 = msp.New(mspContext)
-	if err1 != nil {
-		return err1
+	// Setting up msp client
+	setup.MspClient, err = msp.New(mspContext)
+	if err != nil {
+		return err
 	}
 
-	id, err2 := setup.MspClient.CreateSigningIdentity(providerMSP.WithCert(cert), providerMSP.WithPrivateKey(pk))
-	if err2 != nil {
-		return err2
+	// Creating signing identity
+	id, err := setup.MspClient.CreateSigningIdentity(providerMSP.WithCert(cert), providerMSP.WithPrivateKey(pk))
+	if err != nil {
+		return err
 	}
 
 	setup.AdminIdentity = id
 	resContext := setup.SDK.Context(fabsdk.WithIdentity(id))
-	var err7 error
-	setup.ResClient, err7 = resmgmt.New(resContext)
-	if err7 != nil {
-		return errors.WithMessage(err7, "failed to create new resmgmt client")
+	setup.ResClient, err = resmgmt.New(resContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new resmgmt client")
 	}
 	logp.Info("Resmgmt client created")
+
+	// Get all channels the peer is part of
+	channelsResponse, err := setup.ResClient.QueryChannels(resmgmt.WithTargetEndpoints(setup.Peer))
+	if err != nil {
+		return err
+	}
+
+	// Initialize the ledger client for each channel
+	for _, channel := range channelsResponse.Channels {
+		channelContext := setup.SDK.ChannelContext(channel.ChannelId, fabsdk.WithIdentity(setup.AdminIdentity))
+		if channelContext == nil {
+			logp.Warn("Channel context creation failed, ChannelContext() returned nil for channel " + channel.ChannelId)
+		}
+		ledgerClient, err := ledger.New(channelContext)
+		if err != nil {
+			return err
+		}
+		setup.LedgerClients = append(setup.LedgerClients, ledgerClient)
+		logp.Info("Ledger client initialized for channel " + channel.ChannelId)
+	}
+	logp.Info("Channel clients initialized")
+
+	// Get installed chaincodes of the peer
+	chaincodeResponse, err := setup.ResClient.QueryInstalledChaincodes(resmgmt.WithTargetEndpoints(setup.Peer))
+	if err != nil {
+		return err
+	}
+	for _, chaincode := range chaincodeResponse.Chaincodes {
+		logp.Info(chaincode.Name)
+	}
 
 	logp.Info("Initialization Successful")
 	setup.initialized = true
