@@ -34,7 +34,7 @@ fabricbeat:
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
 
-output.elasticsearch.index: fabricbeat-%{[agent.version]}-%{[index_name]}-peer0.org${ORG_NUMBER}.el-network.com
+output.elasticsearch.index: fabricbeat-%{[agent.version]}-%{[index_name]}-org${ORG_NUMBER}
 output.elasticsearch.hosts: ["localhost:9200"]
 
 setup.template.name: fabricbeat-%{[agent.version]}

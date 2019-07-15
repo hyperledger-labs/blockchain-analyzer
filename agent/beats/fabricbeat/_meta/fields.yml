@@ -67,3 +67,6 @@
 
     - name: value
       type: keyword
+
+    - name: peer
+      type: keyword
