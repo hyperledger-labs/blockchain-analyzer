@@ -5,6 +5,8 @@ import (
 	"encoding/pem"
 	"strings"
 
+	"github.com/balazsprehoda/fabricbeat/config"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/protos/msp"
@@ -50,7 +52,25 @@ func TypeCodeToInfo(typeCode int32) string {
 }
 
 // This function is borrowed from an opensource project: https://github.com/ale-aso/fabric-examples/blob/master/blockparser.go
+// It returns the creator certificate for the specified transaction.
 func ReturnCreatorString(bytes []byte) string {
+	defaultString := strings.Replace(string(bytes), "\n", ".", -1)
+
+	sId := &msp.SerializedIdentity{}
+	err := proto.Unmarshal(bytes, sId)
+	if err != nil {
+		return defaultString
+	}
+
+	bl, _ := pem.Decode(sId.IdBytes)
+	if bl == nil {
+		return defaultString
+	}
+
+	return string(sId.IdBytes)
+}
+
+func ReturnCreatorOrgString(bytes []byte) string {
 	defaultString := strings.Replace(string(bytes), "\n", ".", -1)
 
 	sId := &msp.SerializedIdentity{}
@@ -73,8 +93,8 @@ type Readset struct {
 }
 
 type Writeset struct {
-	Namespace string `json:"namespace"`
-	Key       string `json:"key"`
-	Value     string `json:"value"`
-	IsDelete  bool   `json:"isDelete"`
+	Namespace string            `json:"namespace"`
+	Key       string            `json:"key"`
+	Value     config.DataStruct `json:"value"`
+	IsDelete  bool              `json:"isDelete"`
 }

@@ -49,8 +49,14 @@ async function main() {
 
             // Submit the transaction.
             if (tx.key){
-                await contract.submitTransaction(tx.txFunction, tx.key);
-                console.log(`Transaction has been submitted: ${tx.user}\t${tx.txFunction}\t${tx.key}`);
+                if (tx.previousKey) {
+                    await contract.submitTransaction(tx.txFunction, tx.key, tx.previousKey);
+                    console.log(`Transaction has been submitted: ${tx.user}\t${tx.txFunction}\t${tx.key}\t${tx.previousKey}`);
+                }
+                else {
+                    await contract.submitTransaction(tx.txFunction, tx.key);
+                    console.log(`Transaction has been submitted: ${tx.user}\t${tx.txFunction}\t${tx.key}`);
+                }
             }
             else {
                 await contract.submitTransaction(tx.txFunction);

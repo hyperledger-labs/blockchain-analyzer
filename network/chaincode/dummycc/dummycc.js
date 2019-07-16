@@ -7,21 +7,9 @@
 const { Contract } = require('fabric-contract-api');
 const crypto = require('crypto');
 var counter = 1;
+var lastKey;
 
 class DummyCC extends Contract {
-
-    async initLedger(ctx) {
-
-        console.info('============= START : Initialize Ledger ===========');
-
-        for (var i = 1; i <= 10; i++) {
-            var hash = crypto.createHash('sha256').update(Buffer.from(i.toString())).digest('hex');
-            await ctx.stub.putState('Key' + i, Buffer.from(hash));
-            console.info('Added <--> ', 'Key' + i + ': ' + hash);
-        }
-        counter = i;
-        console.info('============= END : Initialize Ledger ===========');
-    }
 
     async queryValue(ctx, key) {
         const dataAsBytes = await ctx.stub.getState(key);
@@ -29,15 +17,18 @@ class DummyCC extends Contract {
             throw new Error(`${key} does not exist`);
         }
         console.log(key.toString());
-        return dataAsBytes.toString();
+        // return dataAsBytes.toString();
+        return JSON.parse(dataAsBytes)
     }
 
-    async setValue(ctx, key) {
-        console.info('============= START : Set Value ===========');
+    async setValue(ctx, key, previousKey) {
         var hash = crypto.createHash('sha256').update(Buffer.from(counter.toString())).digest('hex');
-        await ctx.stub.putState(key, Buffer.from(hash));
-        console.info('Added <--> ', key.toString() + ': ' + hash);
-        console.info('============= END : Set Value ===========');
+        const data = {
+            hash,
+            previousKey
+        }
+        await ctx.stub.putState(key, Buffer.from(JSON.stringify(data)));
+        console.info('Added <--> ', key.toString() + ': ' + JSON.stringify(data));
         counter++;
     }
 

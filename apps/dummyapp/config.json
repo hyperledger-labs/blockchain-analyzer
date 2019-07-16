@@ -45,12 +45,14 @@
         {
             "user": "user2",
             "txFunction": "setValue",
-            "key": "Key2"
+            "key": "Key2",
+            "previousKey": "Key1"
         },
         {
             "user": "user3",
             "txFunction": "setValue",
-            "key": "Key3"
+            "key": "Key3",
+            "previousKey": "Key2"
         },
         {
             "user": "user4",

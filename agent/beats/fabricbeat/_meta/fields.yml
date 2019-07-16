@@ -66,7 +66,13 @@
       type: keyword
 
     - name: value
+      type: object
+
+    - name: previous_key
       type: keyword
 
     - name: peer
+      type: keyword
+
+    - name: creator_org
       type: keyword

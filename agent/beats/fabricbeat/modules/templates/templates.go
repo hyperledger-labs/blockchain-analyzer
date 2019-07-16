@@ -18,7 +18,7 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 
 	// The beginnings of the dashboard template names (i.e. overview-dashboard-TEMPLATE.json -> overview)
 	dashboardNames := []string{"overview", "block", "key", "transaction"}
-	visualizationNames := []string{"block_count", "transaction_count", "transaction_per_organization", "transaction_count_timeline"}
+	visualizationNames := []string{"block_count", "transaction_count", "transaction_per_organization", "transaction_count_timeline", "peer_selection"}
 	templates := []string{"block", "transaction", "key"}
 	var patternId string
 	// Create index patterns for the peer the agent connects to

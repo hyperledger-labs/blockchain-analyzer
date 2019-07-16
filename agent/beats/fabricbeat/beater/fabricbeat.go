@@ -2,6 +2,7 @@ package beater
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -190,7 +191,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		}
 		for i, d := range block.Data.Data {
 			if typeInfo != "ENDORSER_TRANSACTION" {
-				txId, channelId, creator, _, err := ledgerutils.ProcessTx(d)
+				txId, channelId, creator, creatorOrg, _, err := ledgerutils.ProcessTx(d)
 				if err != nil {
 					return err
 				}
@@ -205,6 +206,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 						"peer":             bt.config.Peer,
 						"created_at":       createdAt,
 						"creator":          creator,
+						"creator_org":      creatorOrg,
 						"transaction_type": typeInfo,
 					},
 				}
@@ -212,7 +214,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 				logp.Info("Non-endorser transaction event sent")
 
 			} else {
-				txId, channelId, creator, txRWSet, chaincodeName, chaincodeVersion, err := ledgerutils.ProcessEndorserTx(d)
+				txId, channelId, creator, creatorOrg, txRWSet, chaincodeName, chaincodeVersion, err := ledgerutils.ProcessEndorserTx(d)
 				if err != nil {
 					return err
 				}
@@ -228,7 +230,11 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 							writeset = append(writeset, &fabricutils.Writeset{})
 							writeset[i].Namespace = ns.NameSpace
 							writeset[i].Key = w.Key
-							writeset[i].Value = string(w.Value)
+							err = json.Unmarshal(w.Value, &writeset[i].Value)
+							// if err != nil {
+							// 	return err
+							// }
+							//writeset[i].Value = string(w.Value)
 							writeset[i].IsDelete = w.IsDelete
 
 							// Sending a new event to the "key" index with the write data
@@ -243,9 +249,11 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"index_name":        bt.config.KeyIndexName,
 									"peer":              bt.config.Peer,
 									"key":               w.Key,
-									"value":             string(w.Value),
+									"previous_key":      writeset[i].Value.PreviousKey,
+									"value":             writeset[i].Value,
 									"created_at":        createdAt,
 									"creator":           creator,
+									"creator_org":       creatorOrg,
 								},
 							}
 							bt.client.Publish(event)
@@ -278,6 +286,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 						"peer":              bt.config.Peer,
 						"created_at":        createdAt,
 						"creator":           creator,
+						"creator_org":       creatorOrg,
 						"readset":           readset,
 						"writeset":          writeset,
 						"transaction_type":  typeInfo,

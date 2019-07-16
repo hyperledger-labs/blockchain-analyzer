@@ -61,51 +61,51 @@ func ProcessBlock(blockNumber uint64, ledgerClient *ledger.Client) (blockRespons
 	return
 }
 
-func ProcessTx(txData []byte) (txId, channelId, creator string, tx *peer.Transaction, err error) {
+func ProcessTx(txData []byte) (txId, channelId, creator, creatorOrg string, tx *peer.Transaction, err error) {
 	env, err := utils.GetEnvelopeFromBlock(txData)
 	if err != nil {
-		return "", "", "", nil, err
+		return "", "", "", "", nil, err
 	}
 
 	payload, err := utils.GetPayload(env)
 	if err != nil {
-		return "", "", "", nil, err
+		return "", "", "", "", nil, err
 	}
 	chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
 	if err != nil {
-		return "", "", "", nil, err
+		return "", "", "", "", nil, err
 	}
 
 	shdr, err := utils.GetSignatureHeader(payload.Header.SignatureHeader)
 	if err != nil {
-		return "", "", "", nil, err
+		return "", "", "", "", nil, err
 	}
 
 	tx, err = utils.GetTransaction(payload.Data)
 	if err != nil {
-		return "", "", "", nil, err
+		return "", "", "", "", nil, err
 	}
 
-	return chdr.TxId, chdr.ChannelId, fabricutils.ReturnCreatorString(shdr.Creator), tx, nil
+	return chdr.TxId, chdr.ChannelId, fabricutils.ReturnCreatorString(shdr.Creator), fabricutils.ReturnCreatorOrgString(shdr.Creator), tx, nil
 }
 
-func ProcessEndorserTx(txData []byte) (txId, channelId, creator string, txRWSet *rwsetutil.TxRwSet, chaincodeName, chaincodeVersion string, err error) {
+func ProcessEndorserTx(txData []byte) (txId, channelId, creator, creatorOrg string, txRWSet *rwsetutil.TxRwSet, chaincodeName, chaincodeVersion string, err error) {
 
-	txId, channelId, creator, tx, err := ProcessTx(txData)
+	txId, channelId, creator, creatorOrg, tx, err := ProcessTx(txData)
 	if err != nil {
-		return "", "", "", nil, "", "", err
+		return "", "", "", "", nil, "", "", err
 	}
 
 	_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
 	if payloadErr != nil {
-		return "", "", "", nil, "", "", err
+		return "", "", "", "", nil, "", "", err
 	}
 
 	txRWSet = &rwsetutil.TxRwSet{}
 	err = txRWSet.FromProtoBytes(respPayload.Results)
 	if err != nil {
-		return "", "", "", nil, "", "", err
+		return "", "", "", "", nil, "", "", err
 	}
 
-	return txId, channelId, creator, txRWSet, respPayload.ChaincodeId.Name, respPayload.ChaincodeId.Version, nil
+	return txId, channelId, creator, creatorOrg, txRWSet, respPayload.ChaincodeId.Name, respPayload.ChaincodeId.Version, nil
 }
