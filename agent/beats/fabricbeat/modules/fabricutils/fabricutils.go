@@ -5,8 +5,6 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"github.com/balazsprehoda/fabricbeat/config"
-
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/protos/msp"
@@ -93,8 +91,9 @@ type Readset struct {
 }
 
 type Writeset struct {
-	Namespace string            `json:"namespace"`
-	Key       string            `json:"key"`
-	Value     config.DataStruct `json:"value"`
-	IsDelete  bool              `json:"isDelete"`
+	Namespace string `json:"namespace"`
+	Key       string `json:"key"`
+	//	Value     config.DataStruct `json:"value"`
+	Value    map[string]string `json:"value"`
+	IsDelete bool              `json:"isDelete"`
 }

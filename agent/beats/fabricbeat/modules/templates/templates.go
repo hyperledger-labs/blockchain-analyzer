@@ -89,7 +89,7 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 
 		// Load dashboard template
 		logp.Info("Creating %s dashboard from template", dashboardName)
-		dashboardBytes, err := ioutil.ReadFile(fmt.Sprintf("/home/prehi/go/src/github.com/balazsprehoda/fabricbeat/kibana_templates/%s-dashboard-TEMPLATE.json", dashboardName))
+		dashboardBytes, err := ioutil.ReadFile(fmt.Sprintf("%s/%s-dashboard-TEMPLATE.json", setup.TemplateDirectory, dashboardName))
 		if err != nil {
 			return err
 		}

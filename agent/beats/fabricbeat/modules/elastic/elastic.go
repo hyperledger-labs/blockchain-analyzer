@@ -72,14 +72,7 @@ func GetBlockHash(elasticURL, blockIndexName, organization, peerName string, blo
 			  }
 			]
 		  }
-		},
-		"sort": [
-		  {
-			"value": {
-			  "order": "desc"
-			}
-		  }
-		]
+		}
 	}`, blockNumber, peerName)
 	logp.Debug("URL for last block query: ", url)
 	request, err := http.NewRequest("GET", url, bytes.NewBufferString(requestBody))

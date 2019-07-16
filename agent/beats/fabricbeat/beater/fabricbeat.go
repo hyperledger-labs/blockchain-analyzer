@@ -231,6 +231,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 							writeset[i].Namespace = ns.NameSpace
 							writeset[i].Key = w.Key
 							err = json.Unmarshal(w.Value, &writeset[i].Value)
+
 							// if err != nil {
 							// 	return err
 							// }
@@ -249,8 +250,8 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"index_name":        bt.config.KeyIndexName,
 									"peer":              bt.config.Peer,
 									"key":               w.Key,
-									"previous_key":      writeset[i].Value.PreviousKey,
-									"value":             writeset[i].Value,
+									"previous_key":      writeset[i].Value["previousKey"],
+									"value":             string(w.Value),
 									"created_at":        createdAt,
 									"creator":           creator,
 									"creator_org":       creatorOrg,

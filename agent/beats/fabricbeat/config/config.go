@@ -36,9 +36,3 @@ var DefaultConfig = Config{
 	DashboardDirectory:   "/home/prehi/internship/testNetwork/hyperledger-elastic/dashboards",
 	TemplateDirectory:    "/home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates",
 }
-
-// This is the structure of the chaincode data. TODO: make it available per channel
-type DataStruct struct {
-	Hash        string
-	PreviousKey string
-}
