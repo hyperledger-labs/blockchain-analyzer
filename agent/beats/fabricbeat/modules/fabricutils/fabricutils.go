@@ -94,6 +94,6 @@ type Writeset struct {
 	Namespace string `json:"namespace"`
 	Key       string `json:"key"`
 	//	Value     config.DataStruct `json:"value"`
-	Value    map[string]string `json:"value"`
-	IsDelete bool              `json:"isDelete"`
+	Value    map[string]interface{} `json:"value"`
+	IsDelete bool                   `json:"isDelete"`
 }
