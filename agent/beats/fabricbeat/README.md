@@ -76,6 +76,73 @@ which is automatically generated based on `fields.yml` by running the following 
 make update
 ```
 
+### Directory structure
+
+The fabricbeat agent's directory structure is as follows:
+
+
+```
+.  
+├── fabricbeat  
+   ├── beater  
+   │   └── fabricbeat.go  
+   ├── cmd  
+   │   └── root.go  
+   ├── config  
+   │   ├── config.go  
+   │   └── config_test.go  
+   ├── CONTRIBUTING.md  
+   ├── data  
+   │   └── meta.json  
+   ├── docs  
+   │   ├── fields.asciidoc  
+   │   └── index.asciidoc  
+   ├── fabricbeat  
+   ├── fabricbeat.docker.yml  
+   ├── fabricbeat.reference.yml  
+   ├── fabricbeat.yml  
+   ├── fields.yml  
+   ├── include  
+   │   └── fields.go  
+   ├── LICENSE.txt  
+   ├── magefile.go  
+   ├── main.go  
+   ├── main_test.go  
+   ├── make.bat  
+   ├── Makefile  
+   ├── _meta  
+   │   ├── beat.docker.yml  
+   │   ├── beat.yml  
+   │   ├── fields.yml  
+   ├── modules  
+   │   ├── elastic  
+   │   │   └── elastic.go  
+   │   ├── fabricbeatsetup  
+   │   │   └── fabricbeatsetup.go  
+   │   ├── fabricutils  
+   │   │   └── fabricutils.go  
+   │   ├── ledgerutils  
+   │   │   └── ledgerutils.go  
+   │   └── templates  
+   │       └── templates.go  
+   ├── msp  
+   │   ├── cacerts  
+   │   ├── signcerts  
+   │   └── user  
+   ├── NOTICE.txt  
+   ├── README.md  
+   ├── tests  
+   │   └── system  
+   │       ├── config  
+   │       ├── fabricbeat.py  
+   │       ├── requirements.txt  
+   │       └── test_base.py  
+   └── vendor   
+       ├── github.com  
+       │   ├── elastic  
+       │   └── magefile  
+       └── vendor.json  
+```
 
 ### Cleanup
 
