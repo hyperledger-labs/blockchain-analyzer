@@ -9,12 +9,12 @@ fabricbeat:
   # Defines in which organization the beats agent's user should be enrolled
   organization: ${ORG_NAME}
   # Defines the peer which fabricbeat should query
-  peer: peer0.org${ORG_NUMBER}.el-network.com
+  peer: peer1.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
-  connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/connection-profile-${ORG_NUMBER}.yaml
+  connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/multichannel/connection-profile-${ORG_NUMBER}.yaml
   # Path to the admin certfile and keyfile
-  adminCertPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
-  adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
+  adminCertPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
+  adminKeyPath: "/home/prehi/internship/testNetwork/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
   # URL of Elasticsearch
   elasticURL: "http://localhost:9200"
   # URL of Kibana

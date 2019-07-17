@@ -1,0 +1,40 @@
+OrdererOrgs:
+
+  - Name: Orderer
+    Domain: el-network.com
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+
+  - Name: Org1
+    Domain: org1.el-network.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: Org2
+    Domain: org2.el-network.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: Org3
+    Domain: org3.el-network.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: Org4
+    Domain: org4.el-network.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1

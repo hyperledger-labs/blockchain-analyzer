@@ -1,0 +1,390 @@
+version: "2"
+
+networks:
+  el-network:
+
+services:
+  ######
+  # CA #
+  ######
+
+  ca.org1.el-network.com:
+    container_name: ca.org1.el-network.com
+    image: hyperledger/fabric-ca:1.4
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org1.el-network.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.el-network.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/key.pem
+      # - FABRIC_CA_SERVER_TLS_ENABLED=true
+    ports:
+      - 7054:7054
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org1.el-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - el-network
+  
+  ca.org2.el-network.com:
+    container_name: ca.org2.el-network.com
+    image: hyperledger/fabric-ca:1.4
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org2.el-network.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.el-network.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/key.pem
+      # - FABRIC_CA_SERVER_TLS_ENABLED=true
+    ports:
+      - 8054:7054
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org2.el-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - el-network
+
+  ca.org3.el-network.com:
+    container_name: ca.org3.el-network.com
+    image: hyperledger/fabric-ca:1.4
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org3.el-network.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org3.el-network.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/key.pem
+      # - FABRIC_CA_SERVER_TLS_ENABLED=true
+    ports:
+      - 9054:7054
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org3.el-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - el-network
+
+  ca.org4.el-network.com:
+    container_name: ca.org4.el-network.com
+    image: hyperledger/fabric-ca:1.4
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org4.el-network.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org4.el-network.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/key.pem
+      # - FABRIC_CA_SERVER_TLS_ENABLED=true
+    ports:
+      - 10054:7054
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org4.el-network.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - el-network
+
+  ###########
+  # orderer #
+  ###########
+
+  orderer.el-network.com:
+    container_name: orderer.el-network.com
+    image: hyperledger/fabric-orderer:1.4
+    environment:
+      - GOPATH=$HOME/go
+      - FABRIC_LOGGING_SPEC=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp/
+      - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: $GOPATH/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    ports:
+      - 7050:7050
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/el-network.com/orderers/orderer.el-network.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/el-network.com/orderers/orderer.el-network.com/tls/:/var/hyperledger/orderer/tls
+      # - orderer.el-network.com:/var/hyperledger/production/orderer
+    networks:
+      - el-network
+
+  #########
+  # peers #
+  #########
+
+  peer0.org1.el-network.com:
+    container_name: peer0.org1.el-network.com
+    image: hyperledger/fabric-peer:1.4
+    environment:
+      - GOPATH=$HOME/go
+      - GODEBUG=netdns=go
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_el-network
+      - FABRIC_LOGGING_SPEC=grpc=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.org1.el-network.com
+      - CORE_PEER_ADDRESS=peer0.org1.el-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.el-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.el-network.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org1.el-network.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org1.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org1
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org1pass
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/tls:/etc/hyperledger/fabric/tls
+      # - peer0.org1.el-network.com:/var/hyperledger/production
+    working_dir: $GOPATH/src/github.com/hyperledger/fabric
+    command: peer node start
+    depends_on:
+      - orderer.el-network.com
+    ports:
+      - 7051:7051
+    networks:
+      - el-network
+
+  peer0.org2.el-network.com:
+    container_name: peer0.org2.el-network.com
+    image: hyperledger/fabric-peer:1.4
+    environment:
+      - GOPATH=$HOME/go
+      - GODEBUG=netdns=go
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_el-network
+      - FABRIC_LOGGING_SPEC=INFO
+      # - FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.org2.el-network.com
+      - CORE_PEER_ADDRESS=peer0.org2.el-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.el-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.el-network.com:7051
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.el-network.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org2.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org2
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org2pass
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/tls:/etc/hyperledger/fabric/tls
+      # - peer0.org2.el-network.com:/var/hyperledger/production
+    working_dir: $GOPATH/src/github.com/hyperledger/fabric
+    command: peer node start
+    depends_on:
+      - orderer.el-network.com
+    ports:
+      - 8051:7051
+    networks:
+      - el-network
+
+  peer0.org3.el-network.com:
+    container_name: peer0.org3.el-network.com
+    image: hyperledger/fabric-peer:1.4
+    environment:
+      - GOPATH=$HOME/go
+      - GODEBUG=netdns=go
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_el-network
+      - FABRIC_LOGGING_SPEC=INFO
+      # - FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.org3.el-network.com
+      - CORE_PEER_ADDRESS=peer0.org3.el-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3.el-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3.el-network.com:7051
+      - CORE_PEER_LOCALMSPID=Org3MSP
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org3.el-network.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org3.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org3
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org3pass
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/tls:/etc/hyperledger/fabric/tls
+      # - peer0.org3.el-network.com:/var/hyperledger/production
+    working_dir: $GOPATH/src/github.com/hyperledger/fabric
+    command: peer node start
+    depends_on:
+      - orderer.el-network.com
+    ports:
+      - 9051:7051
+    networks:
+      - el-network
+
+  peer0.org4.el-network.com:
+    container_name: peer0.org4.el-network.com
+    image: hyperledger/fabric-peer:1.4
+    environment:
+      - GOPATH=$HOME/go
+      - GODEBUG=netdns=go
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_el-network
+      - FABRIC_LOGGING_SPEC=INFO
+      # - FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.org4.el-network.com
+      - CORE_PEER_ADDRESS=peer0.org4.el-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org4.el-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org4.el-network.com:7051
+      - CORE_PEER_LOCALMSPID=Org4MSP
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org4.el-network.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      # Database
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.org4.el-network.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0org4
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=org4pass
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/tls:/etc/hyperledger/fabric/tls
+      # - peer0.org4.el-network.com:/var/hyperledger/production
+    working_dir: $GOPATH/src/github.com/hyperledger/fabric
+    command: peer node start
+    depends_on:
+      - orderer.el-network.com
+    ports:
+      - 10051:7051
+    networks:
+      - el-network
+  
+  ###########
+  # CouchDB #
+  ###########
+
+  couchdb.org1.el-network.com:
+    container_name: couchdb.org1.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org1
+      - COUCHDB_PASSWORD=org1pass
+    ports:
+      - 5984:5984
+    networks:
+      - el-network
+
+  couchdb.org2.el-network.com:
+    container_name: couchdb.org2.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org2
+      - COUCHDB_PASSWORD=org2pass
+    ports:
+      - 6984:5984
+    networks:
+      - el-network
+
+  couchdb.org3.el-network.com:
+    container_name: couchdb.org3.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org3
+      - COUCHDB_PASSWORD=org3pass
+    ports:
+      - 7984:5984
+    networks:
+      - el-network
+
+  couchdb.org4.el-network.com:
+    container_name: couchdb.org4.el-network.com
+    image: hyperledger/fabric-couchdb
+    environment:
+      - COUCHDB_USER=peer0org4
+      - COUCHDB_PASSWORD=org4pass
+    ports:
+      - 8984:5984
+    networks:
+      - el-network
+  
+  #######
+  # cli #
+  #######
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:1.4
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.org1.el-network.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    # command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./chaincode/:/opt/gopath/src/github.com/chaincode
+      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.el-network.com
+      - peer0.org1.el-network.com
+      - peer0.org2.el-network.com
+      - peer0.org3.el-network.com
+      - peer0.org4.el-network.com
+      - couchdb.org1.el-network.com
+      - couchdb.org2.el-network.com
+      - couchdb.org3.el-network.com
+      - couchdb.org4.el-network.com
+    networks:
+      - el-network
