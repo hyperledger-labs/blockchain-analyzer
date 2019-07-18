@@ -59,6 +59,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		KeyIndexName:         bt.config.KeyIndexName,
 		DashboardDirectory:   bt.config.DashboardDirectory,
 		TemplateDirectory:    bt.config.TemplateDirectory,
+		LinkingKey:           bt.config.LinkingKey,
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -131,34 +132,33 @@ func (bt *Fabricbeat) Stop() {
 func (bt *Fabricbeat) rampUp(b *beat.Beat) error {
 	for index, ledgerClient := range bt.Fsetup.LedgerClients {
 
-		var lastBlockNumber elastic.BlockNumber
 		var err error
 		// Get the last known block's number from Elasticsearch.
-		lastBlockNumber.BlockNumber, err = elastic.GetBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index))
+		lastBlockNumber, err := elastic.GetBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%s/_doc/1", bt.config.Peer, bt.Fsetup.Channels[ledgerClient]))
 		if err != nil {
 			return err
 		}
 		// Save last known block number locally for this channel
 		bt.lastBlockNums[ledgerClient] = lastBlockNumber.BlockNumber
 
-		logp.Info("Last known block number: %d", bt.lastBlockNums[ledgerClient])
+		logp.Info("Last known block number on channel %s: %d", lastBlockNumber.ChannelId, bt.lastBlockNums[ledgerClient])
 
 		if bt.lastBlockNums[ledgerClient] != 0 {
 
 			// Get block hash of the last known block
-			blockHashFromElastic, err := elastic.GetBlockHash(bt.config.ElasticURL, bt.config.BlockIndexName, bt.config.Organization, bt.config.Peer, bt.lastBlockNums[ledgerClient])
+			blockHashFromElastic, err := elastic.GetBlockHash(bt.config.ElasticURL, bt.config.BlockIndexName, bt.config.Organization, bt.config.Peer, lastBlockNumber.ChannelId, bt.lastBlockNums[ledgerClient])
 			if err != nil {
 				return err
 			}
 
 			// Retrieve last known block from the ledger
-			blockHash, err := ledgerutils.GetBlockHash(bt.lastBlockNums[ledgerClient], ledgerClient)
+			blockHashFromLedger, err := ledgerutils.GetBlockHash(bt.lastBlockNums[ledgerClient], ledgerClient)
 			if err != nil {
 				return err
 			}
 			// Compare block hash from ledger and Elastic
-			if blockHash != blockHashFromElastic {
-				return errors.New(fmt.Sprintf("The hash of the last known block (block number: %d) and the same block on the ledger do not match!", bt.lastBlockNums[ledgerClient]))
+			if blockHashFromLedger != blockHashFromElastic {
+				return errors.New(fmt.Sprintf("The hash of the last known block (block number: %d) and the same block on the ledger do not match! Hash from Elastic: %s, hash from ledger: %s", bt.lastBlockNums[ledgerClient], blockHashFromElastic, blockHashFromLedger))
 			} else {
 				logp.Info(fmt.Sprintf("The hash of the last known block (block number: %d) and the same block on the ledger match.", bt.lastBlockNums[ledgerClient]))
 			}
@@ -189,9 +189,10 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		if err != nil {
 			return err
 		}
-		for i, d := range block.Data.Data {
+		for _, d := range block.Data.Data {
 			if typeInfo != "ENDORSER_TRANSACTION" {
 				txId, channelId, creator, creatorOrg, _, err := ledgerutils.ProcessTx(d)
+				lastBlockNumber.ChannelId = channelId
 				if err != nil {
 					return err
 				}
@@ -226,17 +227,23 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 
 					if len(ns.KvRwSet.Writes) > 0 {
 						// Getting the writes
-						for _, w := range ns.KvRwSet.Writes {
+						for writeIndex, w := range ns.KvRwSet.Writes {
 							writeset = append(writeset, &fabricutils.Writeset{})
-							writeset[i].Namespace = ns.NameSpace
-							writeset[i].Key = w.Key
-							err = json.Unmarshal(w.Value, &writeset[i].Value)
+							writeset[writeIndex].Namespace = ns.NameSpace
+							writeset[writeIndex].Key = w.Key
+							err = json.Unmarshal(w.Value, &writeset[writeIndex].Value)
+							var strMap map[string]interface{}
+							err = json.Unmarshal(w.Value, &strMap)
+							if err != nil {
+								fmt.Printf("UNMARSHALING VALUE FAILED: ERROR: %s", err.Error())
+							}
+							//datastruct.dummycc.DataStruct
 
 							// if err != nil {
 							// 	return err
 							// }
 							//writeset[i].Value = string(w.Value)
-							writeset[i].IsDelete = w.IsDelete
+							writeset[writeIndex].IsDelete = w.IsDelete
 
 							// Sending a new event to the "key" index with the write data
 							event := beat.Event{
@@ -250,8 +257,8 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"index_name":        bt.config.KeyIndexName,
 									"peer":              bt.config.Peer,
 									"key":               w.Key,
-									"previous_key":      writeset[i].Value["previousKey"],
-									"value":             string(w.Value),
+									"linking_key":       strMap[bt.config.LinkingKey], // writeset[i].Value[bt.config.LinkingKey],
+									"value":             writeset[writeIndex].Value,
 									"created_at":        createdAt,
 									"creator":           creator,
 									"creator_org":       creatorOrg,
@@ -264,13 +271,15 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 
 					if len(ns.KvRwSet.Reads) > 0 {
 						// Getting the reads
-						for i, w := range ns.KvRwSet.Reads {
+						for readIndex, w := range ns.KvRwSet.Reads {
 							readset = append(readset, &fabricutils.Readset{})
-							readset[i].Namespace = ns.NameSpace
-							readset[i].Key = w.Key
+							readset[readIndex].Namespace = ns.NameSpace
+							readset[readIndex].Key = w.Key
 						}
 					}
 				}
+
+				fmt.Println(len(writeset))
 
 				transactions = append(transactions, txId)
 				// Sending the transaction data to the "transaction" index
@@ -301,14 +310,37 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		dataHash := hex.EncodeToString(block.Header.DataHash)
 		blockHash := fabricutils.GenerateBlockHash(block.Header.PreviousHash, block.Header.DataHash, block.Header.Number)
 		// Sending the block data to the "block" index
+
+		// TEMP
+		type OutmostStruct struct {
+			OuterStruct struct {
+				MiddleStruct struct {
+					InnerStruct struct {
+						Flag string
+					}
+				}
+			}
+		}
+
+		var testStruct OutmostStruct
+		var testEmptyInterface interface{}
+		testStruct.OuterStruct.MiddleStruct.InnerStruct.Flag = "FLAG"
+		testStructBytes, err := json.Marshal(testStruct)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(testStructBytes, &testEmptyInterface)
+
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: libbeatCommon.MapStr{
 				"type":          b.Info.Name,
 				"block_number":  lastBlockNumber.BlockNumber,
+				"channel_id":    lastBlockNumber.ChannelId,
 				"block_hash":    blockHash,
 				"previous_hash": prevHash,
 				"data_hash":     dataHash,
+				"test_struct":   testEmptyInterface,
 				"created_at":    createdAt,
 				"index_name":    bt.config.BlockIndexName,
 				"peer":          bt.config.Peer,
@@ -319,7 +351,7 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		logp.Info("Block event sent")
 
 		// Send the latest known block number to Elasticsearch
-		err = elastic.SendBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%d/_doc/1", bt.config.Peer, index), lastBlockNumber)
+		err = elastic.SendBlockNumber(fmt.Sprintf(bt.Fsetup.ElasticURL+"/last_block_%s_%s/_doc/1", bt.config.Peer, bt.Fsetup.Channels[ledgerClient]), lastBlockNumber)
 		if err != nil {
 			return err
 		}

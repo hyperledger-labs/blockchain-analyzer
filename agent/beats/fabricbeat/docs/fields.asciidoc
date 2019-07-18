@@ -3543,11 +3543,11 @@ type: keyword
 *`value`*::
 +
 --
-type: keyword
+type: object
 
 --
 
-*`previous_key`*::
+*`linking_key`*::
 +
 --
 type: keyword
@@ -3565,6 +3565,13 @@ type: keyword
 +
 --
 type: keyword
+
+--
+
+*`test_struct`*::
++
+--
+type: object
 
 --
 

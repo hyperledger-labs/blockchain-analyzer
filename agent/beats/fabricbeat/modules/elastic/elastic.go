@@ -26,6 +26,7 @@ type BlockIndexFilterResponse struct {
 // This struct is for getting the block number from the block number response.
 type BlockNumber struct {
 	BlockNumber uint64 `json:"blockNumber"`
+	ChannelId   string `json:"channelId"`
 }
 
 // This struct is for parsing the block number response from Elasticsearch.
@@ -37,7 +38,7 @@ type BlockNumberResponse struct {
 }
 
 // Returns the hash of the specified block from the specified index.
-func GetBlockHash(elasticURL, blockIndexName, organization, peerName string, blockNumber uint64) (string, error) {
+func GetBlockHash(elasticURL, blockIndexName, organization, peerName, channelId string, blockNumber uint64) (string, error) {
 	// Get the index from which we want to get the last known block
 	resp, err := http.Get(fmt.Sprintf(elasticURL+"/_cat/indices/fabricbeat-*%s*%s*", blockIndexName, organization))
 	body, err := ioutil.ReadAll(resp.Body)
@@ -46,8 +47,14 @@ func GetBlockHash(elasticURL, blockIndexName, organization, peerName string, blo
 	}
 	defer resp.Body.Close()
 	// [2] is the name of the index
-	blockIndex := strings.Fields(string(body))[2]
+	stringFields := strings.Fields(string(body))
+	logp.Info("Length of response: %d", len(stringFields))
+	if len(stringFields) < 3 {
+		return "", err
+	}
+	blockIndex := stringFields[2]
 
+	logp.Info("Index to get last known block from: %s", blockIndex)
 	// Retrieve the last known block from Elasticsearch
 	httpClient := &http.Client{}
 	url := fmt.Sprintf("%s/%s/_search", elasticURL, blockIndex)
@@ -69,11 +76,18 @@ func GetBlockHash(elasticURL, blockIndexName, organization, peerName string, blo
 					"value": "%s"
 				  }
 				}
+			  },
+			  {
+				"term": {
+				  "channel_id": {
+					"value": "%s"
+				  }
+				}
 			  }
 			]
 		  }
 		}
-	}`, blockNumber, peerName)
+	}`, blockNumber, peerName, channelId)
 	logp.Debug("URL for last block query: ", url)
 	request, err := http.NewRequest("GET", url, bytes.NewBufferString(requestBody))
 	if err != nil {
@@ -101,21 +115,24 @@ func GetBlockHash(elasticURL, blockIndexName, organization, peerName string, blo
 	if lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit == nil {
 		return "", errors.New("Could not properly unmarshal the response body to BlockIndexFilterResponse: BlockIndexFilterResponse.BlockIndexFilterHitsObject.BlockIndexFilterHit is nil")
 	}
+	if len(lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit) == 0 {
+		return "", errors.New("No matching doc found for query")
+	}
 
 	blockHashFromElastic := lastBlockResponseFromElastic.BlockIndexFilterHitsObject.BlockIndexFilterHit[0].BlockIndexData.BlockHash
 	return blockHashFromElastic, nil
 }
 
 // Sends a GET Http request to the sepcified URL, parses the response and returns the block number.
-func GetBlockNumber(url string) (uint64, error) {
+func GetBlockNumber(url string) (*BlockNumber, error) {
 	var lastBlockNumber BlockNumber
 	resp, err := http.Get(url)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 && resp.StatusCode != 404 {
-		return 0, errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
+		return nil, errors.New(fmt.Sprintf("Failed getting the last block number! Http response status code: %d", resp.StatusCode))
 	}
 	if resp.StatusCode == 404 {
 		// It is the very first start of the agent, there is no last block yet.
@@ -125,18 +142,18 @@ func GetBlockNumber(url string) (uint64, error) {
 		// Get the block number info from the response body
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 		defer resp.Body.Close()
 
 		var lastBlockNumberResponse BlockNumberResponse
 		err = json.Unmarshal(body, &lastBlockNumberResponse)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 		lastBlockNumber = lastBlockNumberResponse.BlockNumber
 	}
-	return lastBlockNumber.BlockNumber, nil
+	return &lastBlockNumber, nil
 }
 
 func SendBlockNumber(url string, lastBlockNumber BlockNumber) error {

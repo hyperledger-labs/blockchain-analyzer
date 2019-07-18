@@ -154,4 +154,4 @@ CORE_PEER_ADDRESS=peer0.org1.el-network.com:7051
 CORE_PEER_LOCALMSPID=Org1MSP
 CORE_PEER_TLS_ROOTCERT_FILE=$CACERT_1
 
-peer chaincode instantiate -o orderer.el-network.com:7050 -C $CHANNEL_NAME -n fabcar -v 2.0 -c '{"Args":[]}' -P "OR ('Org1MSP.member','Org3MSP.member')" --tls --cafile $CACERT_ORDERER
+peer chaincode instantiate -o orderer.el-network.com:7050 -C $CHANNEL_NAME -n fabcar -v 2.0 -c '{"Args":["initLedger"]}' -P "OR ('Org1MSP.member','Org3MSP.member')" --tls --cafile $CACERT_ORDERER

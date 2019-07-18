@@ -19,6 +19,7 @@ type Config struct {
 	KeyIndexName         string        `config:"keyIndexName"`
 	DashboardDirectory   string        `config:"dashboardDirectory"`
 	TemplateDirectory    string        `config:"templateDirectory"`
+	LinkingKey           string        `config:"linkingKey"`
 }
 
 var DefaultConfig = Config{
@@ -35,4 +36,5 @@ var DefaultConfig = Config{
 	KeyIndexName:         "key",
 	DashboardDirectory:   "/home/prehi/internship/testNetwork/hyperledger-elastic/dashboards",
 	TemplateDirectory:    "/home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates",
+	LinkingKey:           "previousKey",
 }

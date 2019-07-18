@@ -66,9 +66,9 @@
       type: keyword
 
     - name: value
-      type: keyword
+      type: object
 
-    - name: previous_key
+    - name: linking_key
       type: keyword
 
     - name: peer
@@ -76,3 +76,6 @@
 
     - name: creator_org
       type: keyword
+
+    - name: test_struct
+      type: object

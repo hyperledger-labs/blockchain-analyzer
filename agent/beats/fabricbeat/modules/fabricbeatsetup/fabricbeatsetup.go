@@ -27,12 +27,14 @@ type FabricbeatSetup struct {
 	AdminIdentity        providerMSP.SigningIdentity
 	ResClient            *resmgmt.Client
 	LedgerClients        []*ledger.Client
+	Channels             map[*ledger.Client]string
 	SDK                  *fabsdk.FabricSDK
 	BlockIndexName       string
 	TransactionIndexName string
 	KeyIndexName         string
 	DashboardDirectory   string
 	TemplateDirectory    string
+	LinkingKey           string
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -95,6 +97,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 	}
 
 	// Initialize the ledger client for each channel
+	setup.Channels = make(map[*ledger.Client]string)
 	for _, channel := range channelsResponse.Channels {
 		channelContext := setup.SDK.ChannelContext(channel.ChannelId, fabsdk.WithIdentity(setup.AdminIdentity))
 		if channelContext == nil {
@@ -105,6 +108,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 			return err
 		}
 		setup.LedgerClients = append(setup.LedgerClients, ledgerClient)
+		setup.Channels[ledgerClient] = channel.ChannelId
 		logp.Info("Ledger client initialized for channel " + channel.ChannelId)
 	}
 	logp.Info("Channel clients initialized")

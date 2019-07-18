@@ -30,6 +30,8 @@ fabricbeat:
   dashboardDirectory: /home/prehi/internship/testNetwork/hyperledger-elastic/dashboards/7/dashboard
   # Folder which contains the templates for Kibana objects (index patterns, dashboards, etc.)
   templateDirectory: /home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates
+  # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
+  linkingKey: "previousKey"
 
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
