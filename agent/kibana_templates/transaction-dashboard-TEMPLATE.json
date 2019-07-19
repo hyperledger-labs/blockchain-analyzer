@@ -4,7 +4,6 @@
     {
       "id": "TRANSACTION_DASHBOARD_TEMPLATE_ID",
       "type": "dashboard",
-      "updated_at": "2019-07-05T10:10:56.845Z",
       "version": "WzI1NCwxNF0=",
       "attributes": {
         "title": "TRANSACTION_DASHBOARD_TEMPLATE_TITLE",
@@ -27,47 +26,6 @@
       ],
       "migrationVersion": {
         "dashboard": "7.0.0"
-      }
-    },
-    {
-      "id": "TRANSACTION_SEARCH_TEMPLATE_ID",
-      "type": "search",
-      "updated_at": "2019-07-05T10:10:45.961Z",
-      "version": "WzI1MywxNF0=",
-      "attributes": {
-        "title": "TRANSACTION_SEARCH_TEMPLATE_TITLE",
-        "description": "",
-        "hits": 0,
-        "columns": [
-          "block_number",
-          "chaincode_name",
-          "chaincode_version",
-          "channel_id",
-          "created_at",
-          "creator",
-          "readset",
-          "writeset",
-          "transaction_type",
-          "tx_id"
-        ],
-        "sort": [
-          "created_at",
-          "desc"
-        ],
-        "version": 1,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
-        }
-      },
-      "references": [
-        {
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern",
-          "id": "TRANSACTION_PATTERN"
-        }
-      ],
-      "migrationVersion": {
-        "search": "7.0.0"
       }
     }
   ]

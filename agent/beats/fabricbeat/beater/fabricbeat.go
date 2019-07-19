@@ -59,7 +59,13 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		KeyIndexName:         bt.config.KeyIndexName,
 		DashboardDirectory:   bt.config.DashboardDirectory,
 		TemplateDirectory:    bt.config.TemplateDirectory,
-		LinkingKey:           bt.config.LinkingKey,
+		// LinkingKey:           bt.config.LinkingKey,
+	}
+
+	// Initializing chaincode data from config
+	fSetup.Chaincodes = make(map[string]fabricbeatConfig.Chaincode)
+	for _, chaincode := range bt.config.Chaincodes {
+		fSetup.Chaincodes[chaincode.Name] = chaincode
 	}
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -231,18 +237,19 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 							writeset = append(writeset, &fabricutils.Writeset{})
 							writeset[writeIndex].Namespace = ns.NameSpace
 							writeset[writeIndex].Key = w.Key
-							err = json.Unmarshal(w.Value, &writeset[writeIndex].Value)
-							var strMap map[string]interface{}
-							err = json.Unmarshal(w.Value, &strMap)
-							if err != nil {
-								fmt.Printf("UNMARSHALING VALUE FAILED: ERROR: %s", err.Error())
-							}
-							//datastruct.dummycc.DataStruct
 
-							// if err != nil {
-							// 	return err
-							// }
-							//writeset[i].Value = string(w.Value)
+							err = json.Unmarshal(w.Value, &writeset[writeIndex].Value)
+							if err != nil {
+								logp.Warn("Error unmarshaling value into writeset: %s", err.Error())
+							}
+							// With this map, we can obtain the top level fields of the value.
+							var valueMap map[string]interface{}
+							err = json.Unmarshal(w.Value, &valueMap)
+							if err != nil {
+								logp.Warn("Error unmarshaling value into map: %s", err.Error())
+							}
+							fmt.Println(fmt.Sprintf("\n\n\nSize of map: %d\n\n\n", len(valueMap)))
+
 							writeset[writeIndex].IsDelete = w.IsDelete
 
 							// Sending a new event to the "key" index with the write data
@@ -256,8 +263,9 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"chaincode_version": chaincodeVersion,
 									"index_name":        bt.config.KeyIndexName,
 									"peer":              bt.config.Peer,
+									"write":             writeset[writeIndex],
 									"key":               w.Key,
-									"linking_key":       strMap[bt.config.LinkingKey], // writeset[i].Value[bt.config.LinkingKey],
+									"linking_key":       valueMap[bt.Fsetup.Chaincodes[chaincodeName].LinkingKey], // Get the configured linking key name for this chaincode, and use it to obtain linking key from Value
 									"value":             writeset[writeIndex].Value,
 									"created_at":        createdAt,
 									"creator":           creator,

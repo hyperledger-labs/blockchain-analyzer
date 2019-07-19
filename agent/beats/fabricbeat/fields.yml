@@ -2499,3 +2499,6 @@
 
     - name: test_struct
       type: object
+
+    - name: write
+      type: object

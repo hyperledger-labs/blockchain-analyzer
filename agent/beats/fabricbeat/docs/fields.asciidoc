@@ -3575,6 +3575,13 @@ type: object
 
 --
 
+*`write`*::
++
+--
+type: object
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 

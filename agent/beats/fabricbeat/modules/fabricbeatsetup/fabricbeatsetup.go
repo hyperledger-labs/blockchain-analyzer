@@ -11,6 +11,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/pkg/errors"
+
+	fabricConfig "github.com/balazsprehoda/fabricbeat/config"
 )
 
 // Fabric, Elasticsearch and Kibana specific setup
@@ -35,6 +37,7 @@ type FabricbeatSetup struct {
 	DashboardDirectory   string
 	TemplateDirectory    string
 	LinkingKey           string
+	Chaincodes           map[string]fabricConfig.Chaincode
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -119,7 +122,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 		return err
 	}
 	for _, chaincode := range chaincodeResponse.Chaincodes {
-		logp.Info(chaincode.Name)
+		logp.Info("Installed chaincode name: %s", chaincode.Name)
 	}
 
 	logp.Info("Initialization Successful")

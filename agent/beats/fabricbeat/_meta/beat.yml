@@ -33,6 +33,14 @@ fabricbeat:
   # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
   linkingKey: "previousKey"
 
+  chaincodes:
+    - name: "dummycc"
+      linkingKey: "previousKey"
+      values: ["hash"]
+    - name: "fabcar"
+      linkingKey: ""
+      values: ["make", "model", "colour", "owner"]
+
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
 

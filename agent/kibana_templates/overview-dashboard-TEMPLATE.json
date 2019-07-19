@@ -4,7 +4,6 @@
     {
       "id": "OVERVIEW_DASHBOARD_TEMPLATE_ID",
       "type": "dashboard",
-      "updated_at": "2019-07-08T12:59:06.478Z",
       "version": "WzQ1MiwyMl0=",
       "attributes": {
         "title": "OVERVIEW_DASHBOARD_TEMPLATE_TITLE",
@@ -67,7 +66,6 @@
     {
       "id": "BLOCK_COUNT_VISUALIZATION_TEMPLATE_ID",
       "type": "visualization",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0MSwyMV0=",
       "attributes": {
         "description": "",
@@ -94,7 +92,6 @@
     {
       "id": "TRANSACTION_COUNT_VISUALIZATION_TEMPLATE_ID",
       "type": "visualization",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0MiwyMV0=",
       "attributes": {
         "description": "",
@@ -121,7 +118,6 @@
     {
       "id": "TRANSACTION_PER_ORGANIZATION_VISUALIZATION_TEMPLATE_ID",
       "type": "visualization",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0MywyMV0=",
       "attributes": {
         "description": "",
@@ -148,7 +144,6 @@
     {
       "id": "TRANSACTION_COUNT_TIMELINE_VISUALIZATION_TEMPLATE_ID",
       "type": "visualization",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0NCwyMV0=",
       "attributes": {
         "description": "",
@@ -199,7 +194,6 @@
     {
       "id": "BLOCK_SEARCH_TEMPLATE_ID",
       "type": "search",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0NSwyMV0=",
       "attributes": {
         "columns": [
@@ -235,7 +229,6 @@
     {
       "id": "TRANSACTION_SEARCH_TEMPLATE_ID",
       "type": "search",
-      "updated_at": "2019-07-08T12:29:03.778Z",
       "version": "WzQ0OSwyMV0=",
       "attributes": {
         "columns": [
@@ -277,14 +270,13 @@
     {
       "id": "KEY_SEARCH_TEMPLATE_ID",
       "type": "search",
-      "updated_at": "2019-07-08T12:29:02.769Z",
       "version": "WzQ0NywyMV0=",
       "attributes": {
         "columns": [
           "created_at",
           "key",
-          "value",
-          "previous_key",
+          "VALUE_TEMPLATE",
+          "linking_key",
           "chaincode_name",
           "tx_id",
           "creator",

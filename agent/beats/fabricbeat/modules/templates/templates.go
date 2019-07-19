@@ -113,6 +113,17 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 			searchTitleExpression := fmt.Sprintf("%s_SEARCH_TEMPLATE_TITLE", strings.ToUpper(templateName))
 			re = regexp.MustCompile(searchTitleExpression)
 			dashboard = re.ReplaceAllString(dashboard, searchTitle)
+
+			// Replace value placeholders with values from the config
+			var searchValue string
+			for _, v := range setup.Chaincodes {
+				for _, value := range v.Values {
+					searchValue = fmt.Sprintf(`%s "value.%s",`, searchValue, value)
+				}
+			}
+			searchValueExpression := fmt.Sprintf(`"VALUE_TEMPLATE",`)
+			re = regexp.MustCompile(searchValueExpression)
+			dashboard = re.ReplaceAllString(dashboard, searchValue)
 		}
 
 		for _, visualizationName := range visualizationNames {
