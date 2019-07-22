@@ -9,7 +9,7 @@ fabricbeat:
   # Defines in which organization the beats agent's user should be enrolled
   organization: ${ORG_NAME}
   # Defines the peer which fabricbeat should query
-  peer: peer1.org${ORG_NUMBER}.el-network.com
+  peer: peer0.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
   connectionProfile: /home/prehi/internship/testNetwork/hyperledger-elastic/network/multichannel/connection-profile-${ORG_NUMBER}.yaml
   # Path to the admin certfile and keyfile
@@ -31,14 +31,13 @@ fabricbeat:
   # Folder which contains the templates for Kibana objects (index patterns, dashboards, etc.)
   templateDirectory: /home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates
   # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
-  linkingKey: "previousKey"
 
   chaincodes:
-    - name: "dummycc"
-      linkingKey: "previousKey"
-      values: ["hash"]
-    - name: "fabcar"
-      linkingKey: ""
+    - linkingKey: previousKey
+      name: dummycc
+      values: [hash]
+    - name: fabcar
+      linkingKey:
       values: ["make", "model", "colour", "owner"]
 
 #-------------------------- Elasticsearch output ------------------------------

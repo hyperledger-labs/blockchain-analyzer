@@ -1,5 +1,5 @@
 BEAT_NAME=fabricbeat
-BEAT_PATH=github.com/balazsprehoda/fabricbeat
+BEAT_PATH?=github.com/balazsprehoda/fabricbeat
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false

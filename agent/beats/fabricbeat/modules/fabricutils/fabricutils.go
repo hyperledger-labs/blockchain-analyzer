@@ -5,6 +5,7 @@ import (
 	"encoding/pem"
 	"strings"
 
+	"github.com/balazsprehoda/fabricbeat/config"
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/protos/msp"
@@ -85,16 +86,23 @@ func ReturnCreatorOrgString(bytes []byte) string {
 	return sId.Mspid
 }
 
+func IndexOfChaincode(array []config.Chaincode, name string) int {
+	for i, v := range array {
+		if v.Name == name {
+			return i
+		}
+	}
+	return -1
+}
+
 type Readset struct {
 	Namespace string `json:"namespace"`
 	Key       string `json:"key"`
 }
 
 type Writeset struct {
-	Namespace string `json:"namespace"`
-	Key       string `json:"key"`
-	//	Value     config.DataStruct `json:"value"`
-	// Value    map[string]interface{} `json:"value"`
-	Value    interface{} `json:"value"`
-	IsDelete bool        `json:"isDelete"`
+	Namespace string      `json:"namespace"`
+	Key       string      `json:"key"`
+	Value     interface{} `json:"value"`
+	IsDelete  bool        `json:"isDelete"`
 }

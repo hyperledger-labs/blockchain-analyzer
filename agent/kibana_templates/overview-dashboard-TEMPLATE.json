@@ -9,7 +9,7 @@
         "title": "OVERVIEW_DASHBOARD_TEMPLATE_TITLE",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":9,\"i\":\"1\",\"w\":18,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":9,\"i\":\"2\",\"w\":18,\"x\":30,\"y\":0},\"panelIndex\":\"2\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"3\",\"w\":24,\"x\":0,\"y\":9},\"panelIndex\":\"3\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"4\",\"w\":24,\"x\":24,\"y\":9},\"panelIndex\":\"4\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_3\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":24,\"x\":0,\"y\":24},\"panelIndex\":\"5\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_4\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":24,\"x\":24,\"y\":24},\"panelIndex\":\"6\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_5\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":12,\"i\":\"7\",\"w\":48,\"x\":0,\"y\":39},\"panelIndex\":\"7\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_6\"},{\"gridData\":{\"x\":18,\"y\":0,\"w\":12,\"h\":9,\"i\":\"8\"},\"version\":\"7.1.1\",\"panelIndex\":\"8\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"}]",
+        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":9,\"i\":\"1\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":9,\"i\":\"2\",\"w\":12,\"x\":36,\"y\":0},\"panelIndex\":\"2\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"3\",\"w\":24,\"x\":0,\"y\":9},\"panelIndex\":\"3\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"4\",\"w\":24,\"x\":24,\"y\":9},\"panelIndex\":\"4\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_3\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":24,\"x\":0,\"y\":24},\"panelIndex\":\"5\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_4\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":24,\"x\":24,\"y\":24},\"panelIndex\":\"6\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_5\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":12,\"i\":\"7\",\"w\":48,\"x\":0,\"y\":39},\"panelIndex\":\"7\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_6\"},{\"gridData\":{\"x\":12,\"y\":0,\"w\":12,\"h\":9,\"i\":\"8\"},\"version\":\"7.1.1\",\"panelIndex\":\"8\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"},{\"gridData\":{\"x\":24,\"y\":0,\"w\":12,\"h\":9,\"i\":\"9\"},\"version\":\"7.1.1\",\"panelIndex\":\"9\",\"embeddableConfig\":{},\"panelRefName\":\"panel_8\"}]",
         "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
         "version": 1,
         "timeRestore": false,
@@ -57,6 +57,11 @@
           "name": "panel_7",
           "type": "visualization",
           "id":   "PEER_SELECTION_VISUALIZATION_TEMPLATE_ID"
+        },
+        {
+          "name": "panel_8",
+          "type": "visualization",
+          "id":   "CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_ID"
         }
       ],
       "migrationVersion": {
@@ -190,7 +195,31 @@
           "id": "BLOCK_PATTERN"
         }
       ]
-  },
+    },
+    {
+      "id": "CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_ID",
+      "type": "visualization",
+      "attributes": {
+        "title": "CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_TITLE",
+        "visState": "{\"title\":\"CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_TITLE\",\"type\":\"input_control_vis\",\"params\":{\"controls\":[{\"id\":\"CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_ID\",\"fieldName\":\"channel_id\",\"parent\":\"\",\"label\":\"\",\"type\":\"list\",\"options\":{\"type\":\"terms\",\"multiselect\":false,\"dynamicOptions\":false,\"size\":10,\"order\":\"desc\"},\"indexPatternRefName\":\"control_0_index_pattern\"}],\"updateFiltersOnChange\":false,\"useTimeFilter\":false,\"pinFilters\":false},\"aggs\":[]}",
+        "uiStateJSON": "{}",
+        "description": "",
+        "version": 1,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        }
+      },
+      "migrationVersion": {
+        "visualization": "7.0.1"
+      },
+      "references": [
+        {
+          "name": "control_0_index_pattern",
+          "type": "index-pattern",
+          "id": "BLOCK_PATTERN"
+        }
+      ]
+    },
     {
       "id": "BLOCK_SEARCH_TEMPLATE_ID",
       "type": "search",
@@ -206,7 +235,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"index_name: \\\"block\\\"\"},\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"index_name: \\\"block\\\"\"},\"version\":true}"
         },
         "sort": [
           "created_at",
@@ -247,7 +276,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
         },
         "sort": [
           "created_at",
@@ -285,7 +314,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
         },
         "sort": [
           "created_at",

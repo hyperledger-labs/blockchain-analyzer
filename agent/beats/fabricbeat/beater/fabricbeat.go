@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/balazsprehoda/fabricbeat/config"
 	"github.com/balazsprehoda/fabricbeat/modules/ledgerutils"
 
 	"github.com/elastic/beats/libbeat/beat"
 	libbeatCommon "github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	fabricbeatConfig "github.com/balazsprehoda/fabricbeat/config"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
@@ -27,7 +26,7 @@ import (
 // Fabricbeat configuration.
 type Fabricbeat struct {
 	done          chan struct{}
-	config        fabricbeatConfig.Config
+	config        config.Config
 	client        beat.Client
 	Fsetup        *fabricbeatsetup.FabricbeatSetup
 	lastBlockNums map[*ledger.Client]uint64
@@ -35,7 +34,7 @@ type Fabricbeat struct {
 
 // New creates an instance of fabricbeat.
 func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
-	c := fabricbeatConfig.DefaultConfig
+	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
@@ -59,14 +58,16 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		KeyIndexName:         bt.config.KeyIndexName,
 		DashboardDirectory:   bt.config.DashboardDirectory,
 		TemplateDirectory:    bt.config.TemplateDirectory,
-		// LinkingKey:           bt.config.LinkingKey,
+		// Chaincodes:           make(map[string]config.Chaincode),
+		Chaincodes: bt.config.Chaincodes,
 	}
 
 	// Initializing chaincode data from config
-	fSetup.Chaincodes = make(map[string]fabricbeatConfig.Chaincode)
-	for _, chaincode := range bt.config.Chaincodes {
+	/*for _, chaincode := range bt.config.Chaincodes {
 		fSetup.Chaincodes[chaincode.Name] = chaincode
-	}
+	}*/
+
+	fmt.Println(fmt.Sprintf("len(fSetup.Chaincodes) = %d", len(fSetup.Chaincodes)))
 
 	// Initialization of the Fabric SDK from the previously set properties
 	err1 := fSetup.Initialize()
@@ -75,6 +76,8 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		return nil, err1
 	}
 	bt.Fsetup = fSetup
+
+	fmt.Println(fmt.Sprintf("len(fSetup.Chaincodes) = %d", len(fSetup.Chaincodes)))
 
 	// Generate the index patterns and dashboards for the connected peer from templates in the kibana_templates folder
 	err := templates.GenerateDashboards(fSetup)
@@ -252,6 +255,27 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 
 							writeset[writeIndex].IsDelete = w.IsDelete
 
+							fmt.Println(fmt.Sprintf("len(bt.Fsetup.Chaincodes) = %d", len(bt.Fsetup.Chaincodes)))
+
+							//fmt.Println("Chaincode name: " + bt.Fsetup.Chaincodes[chaincodeName].Name + "\n\n\n")
+
+							//fmt.Println("Linking key: " + bt.Fsetup.Chaincodes[chaincodeName].LinkingKey + "\n\n\n")
+							for _, chaincode := range bt.config.Chaincodes {
+								fmt.Println(fmt.Sprintf("Chaincode name: %s, linking key: %s, values length: %d", chaincode.Name, chaincode.LinkingKey, len(chaincode.Values)))
+							}
+
+							var linkingKeyString string
+							ccIndex := fabricutils.IndexOfChaincode(bt.Fsetup.Chaincodes, chaincodeName)
+							if ccIndex < 0 || valueMap[bt.config.Chaincodes[ccIndex].LinkingKey] == nil {
+								linkingKeyString = ""
+							} else {
+								if str, ok := valueMap[bt.config.Chaincodes[ccIndex].LinkingKey].(string); ok {
+									linkingKeyString = str
+								} else {
+									return errors.New(fmt.Sprintf("valueMap contains interface{} value instead of string with key %s", bt.config.Chaincodes[ccIndex].LinkingKey))
+								}
+							}
+
 							// Sending a new event to the "key" index with the write data
 							event := beat.Event{
 								Timestamp: time.Now(),
@@ -265,11 +289,12 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"peer":              bt.config.Peer,
 									"write":             writeset[writeIndex],
 									"key":               w.Key,
-									"linking_key":       valueMap[bt.Fsetup.Chaincodes[chaincodeName].LinkingKey], // Get the configured linking key name for this chaincode, and use it to obtain linking key from Value
-									"value":             writeset[writeIndex].Value,
-									"created_at":        createdAt,
-									"creator":           creator,
-									"creator_org":       creatorOrg,
+									// "linking_key":       valueMap[bt.Fsetup.Chaincodes[chaincodeName].LinkingKey], // Get the configured linking key name for this chaincode, and use it to obtain linking key from Value
+									"linking_key": linkingKeyString,
+									"value":       writeset[writeIndex].Value,
+									"created_at":  createdAt,
+									"creator":     creator,
+									"creator_org": creatorOrg,
 								},
 							}
 							bt.client.Publish(event)
@@ -286,8 +311,6 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 						}
 					}
 				}
-
-				fmt.Println(len(writeset))
 
 				transactions = append(transactions, txId)
 				// Sending the transaction data to the "transaction" index

@@ -9,12 +9,12 @@
         "title": "KEY_DASHBOARD_TEMPLATE_TITLE",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":27,\"i\":\"1\"},\"version\":\"7.1.1\",\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"}]",
+        "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":7,\"w\":48,\"h\":20,\"i\":\"1\"},\"version\":\"7.1.1\",\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"},{\"gridData\":{\"x\":0,\"y\":0,\"w\":15,\"h\":7,\"i\":\"2\"},\"version\":\"7.1.1\",\"panelIndex\":\"2\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"gridData\":{\"x\":15,\"y\":0,\"w\":15,\"h\":7,\"i\":\"3\"},\"version\":\"7.1.1\",\"panelIndex\":\"3\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"}]",
         "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}",
         "version": 1,
         "timeRestore": false,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"key: \\\"Key1\\\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
         }
       },
       "references": [
@@ -22,6 +22,16 @@
           "name": "panel_0",
           "type": "search",
           "id": "KEY_SEARCH_TEMPLATE_ID"
+        },
+        {
+          "name": "panel_1",
+          "type": "visualization",
+          "id": "PEER_SELECTION_VISUALIZATION_TEMPLATE_ID"
+        },
+        {
+          "name": "panel_2",
+          "type": "visualization",
+          "id": "CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_ID"
         }
       ],
       "migrationVersion": {

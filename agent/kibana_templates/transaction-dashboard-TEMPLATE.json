@@ -9,7 +9,7 @@
         "title": "TRANSACTION_DASHBOARD_TEMPLATE_TITLE",
         "hits": 0,
         "description": "",
-        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":27,\"i\":\"1\",\"w\":48,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_0\"}]",
+        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":48,\"x\":0,\"y\":7},\"panelIndex\":\"1\",\"version\":\"7.1.1\",\"panelRefName\":\"panel_0\"},{\"gridData\":{\"x\":0,\"y\":0,\"w\":15,\"h\":7,\"i\":\"2\"},\"version\":\"7.1.1\",\"panelIndex\":\"2\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"gridData\":{\"x\":15,\"y\":0,\"w\":15,\"h\":7,\"i\":\"3\"},\"version\":\"7.1.1\",\"panelIndex\":\"3\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"}]",
         "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
         "version": 1,
         "timeRestore": false,
@@ -22,6 +22,16 @@
           "name": "panel_0",
           "type": "search",
           "id": "TRANSACTION_SEARCH_TEMPLATE_ID"
+        },
+        {
+          "name": "panel_1",
+          "type": "visualization",
+          "id": "PEER_SELECTION_VISUALIZATION_TEMPLATE_ID"
+        },
+        {
+          "name": "panel_2",
+          "type": "visualization",
+          "id": "CHANNEL_SELECTION_VISUALIZATION_TEMPLATE_ID"
         }
       ],
       "migrationVersion": {

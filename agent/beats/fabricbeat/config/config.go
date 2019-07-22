@@ -19,14 +19,13 @@ type Config struct {
 	KeyIndexName         string        `config:"keyIndexName"`
 	DashboardDirectory   string        `config:"dashboardDirectory"`
 	TemplateDirectory    string        `config:"templateDirectory"`
-	// LinkingKey           string        `config:"linkingKey"`
-	Chaincodes []Chaincode `config:"chaincodes"`
+	Chaincodes           []Chaincode   `config:"chaincodes"`
 }
 
 type Chaincode struct {
-	Name       string   `chaincode:"name"`
-	LinkingKey string   `chaincode:"linkingKey"`
-	Values     []string `chaincode:"values"`
+	Name       string   //`chaincode:"name"`
+	LinkingKey string   //`chaincode:"linkingKey"`
+	Values     []string //`chaincode:"values"`
 }
 
 var DefaultConfig = Config{
@@ -43,6 +42,16 @@ var DefaultConfig = Config{
 	KeyIndexName:         "key",
 	DashboardDirectory:   "/home/prehi/internship/testNetwork/hyperledger-elastic/dashboards",
 	TemplateDirectory:    "/home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates",
-	// LinkingKey:           "previousKey",
-	Chaincodes: nil,
+	Chaincodes: []Chaincode{
+		Chaincode{
+			Name:       "dummycc",
+			LinkingKey: "previousKey",
+			Values:     []string{"hash"},
+		},
+		Chaincode{
+			Name:       "fabcar",
+			LinkingKey: "",
+			Values:     []string{"make", "model", "colour", "owner"},
+		},
+	},
 }

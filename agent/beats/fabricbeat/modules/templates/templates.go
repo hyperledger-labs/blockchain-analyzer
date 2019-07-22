@@ -18,7 +18,7 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 
 	// The beginnings of the dashboard template names (i.e. overview-dashboard-TEMPLATE.json -> overview)
 	dashboardNames := []string{"overview", "block", "key", "transaction"}
-	visualizationNames := []string{"block_count", "transaction_count", "transaction_per_organization", "transaction_count_timeline", "peer_selection"}
+	visualizationNames := []string{"block_count", "transaction_count", "transaction_per_organization", "transaction_count_timeline", "peer_selection", "channel_selection"}
 	templates := []string{"block", "transaction", "key"}
 	var patternId string
 	// Create index patterns for the peer the agent connects to
@@ -44,11 +44,14 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 			idExpression = fmt.Sprintf("%s_SEARCH_TEMPLATE_ID", strings.ToUpper(dashboardName))
 			re = regexp.MustCompile(idExpression)
 			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-search-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+		}
 
+		for _, visualizationName := range visualizationNames {
 			// Replace visualization id placeholders
-			idExpression = fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(dashboardName))
-			re = regexp.MustCompile(idExpression)
-			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+			idExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(visualizationName))
+			fmt.Println(fmt.Sprintf("Looking for expression %s", idExpression))
+			re := regexp.MustCompile(idExpression)
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s-%s", visualizationName, setup.Peer, setup.OrgName))
 		}
 
 		// Replace title placeholders
