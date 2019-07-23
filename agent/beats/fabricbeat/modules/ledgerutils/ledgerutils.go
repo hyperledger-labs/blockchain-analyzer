@@ -11,7 +11,8 @@ import (
 	"github.com/hyperledger/fabric/protos/peer"
 	"github.com/hyperledger/fabric/protos/utils"
 
-	"github.com/balazsprehoda/fabricbeat/modules/fabricutils"
+	"fabricbeat/modules/fabricutils"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 

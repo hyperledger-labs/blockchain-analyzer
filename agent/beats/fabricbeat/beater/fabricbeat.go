@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/balazsprehoda/fabricbeat/config"
-	"github.com/balazsprehoda/fabricbeat/modules/ledgerutils"
+	"fabricbeat/config"
+	"fabricbeat/modules/ledgerutils"
 
 	"github.com/elastic/beats/libbeat/beat"
 	libbeatCommon "github.com/elastic/beats/libbeat/common"
@@ -17,10 +17,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/balazsprehoda/fabricbeat/modules/elastic"
-	"github.com/balazsprehoda/fabricbeat/modules/fabricbeatsetup"
-	"github.com/balazsprehoda/fabricbeat/modules/fabricutils"
-	"github.com/balazsprehoda/fabricbeat/modules/templates"
+	"fabricbeat/modules/elastic"
+	"fabricbeat/modules/fabricbeatsetup"
+	"fabricbeat/modules/fabricutils"
+	"fabricbeat/modules/templates"
 )
 
 // Fabricbeat configuration.

@@ -12,7 +12,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/pkg/errors"
 
-	fabricConfig "github.com/balazsprehoda/fabricbeat/config"
+	fabricConfig "fabricbeat/config"
 )
 
 // Fabric, Elasticsearch and Kibana specific setup

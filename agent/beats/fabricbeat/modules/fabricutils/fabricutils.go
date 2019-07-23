@@ -5,7 +5,8 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"github.com/balazsprehoda/fabricbeat/config"
+	"fabricbeat/config"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"
 	"github.com/hyperledger/fabric/protos/msp"

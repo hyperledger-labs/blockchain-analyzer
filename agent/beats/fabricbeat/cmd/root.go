@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/balazsprehoda/fabricbeat/beater"
+	"fabricbeat/beater"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
