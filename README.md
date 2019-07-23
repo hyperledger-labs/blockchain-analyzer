@@ -31,13 +31,27 @@ A four peers/CA setup with two channels, and two users each associated with two 
 
 ## Fabric Network
 
-It is a simple test network with 4 organizations, 1 peer each, a solo orderer communicating over TLS and the basic Fabcar chaincode extended with a `getHistoryForCar()` function. Hyperledger Explorer can be connected using the `connectionProfile.json` file.
+The `network` directory contains two network setups, `basic` and `multichannel`.
 
-To generate crypto and setup the network, simply run `start-network.sh`
-To stop the network and delete all the generated data (crypto material and channel artifacts), run `destroy-network.sh`
+### Basic Network
 
-Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode.
+It is a simple test network with 4 organizations, 1 peer each, a solo orderer communicating over TLS and a sample chaincode called `dummycc`. It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.
 
+To generate crypto and setup the network, simply run `make start`
+To stop the network and delete all the generated data (crypto material, channel artifacts and dummyapp wallet), run `make destroy`
+
+We can enter the CLI by issuing the command `docker exec -it cli bash`. Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode.
+
+### Multichannel Network
+
+It is a test network setup with 4 organizations, 2 peers each, a solo orderer communicating over TLS and two channels:
+
+1. `fourchannel`:
+  * members: all four organizations
+  * chaincode: `dummycc`: It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.
+2. `twochannel`:
+  * members: only `Org1` and `Org3`
+  * chaincode: `fabcar`: The classic fabcar example chaincode extended with a `getHistoryForCar()` chaincode function.
 
 ### Optional. generate makefile configuration
 ```
@@ -45,69 +59,36 @@ make generate ABSPATH=/Users/default/code
 ```
 
 ### Start the network
+
+To generate crypto and setup the network, simply run
+
 ```
 make start #or
 make start ABSPATH=/Users/default/code
 
 ```
 
+We can enter the CLI by issuing the command 
+```
+docker exec -it cli bash
+```
+
+Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode.
+
 ### Stop the network
+
+To stop the network and delete all the generated data (crypto material, channel artifacts and dummyapp wallet), run
+
 ```
 make destroy
 ```
 
-## Hyperledger Explorer Configuration
-
-Configuring HL Explorer: https://github.com/hyperledger/blockchain-explorer  
-To connect HL Explorer to `hyperledger-elastic` network, you should make the following changes:
-
-1. Change `blockchain-explorer/app/explorerconfig.json` to this:
-
-```
-{
-	"persistence": "postgreSQL",
-	"platforms": ["fabric"],
-	"postgreSQL": {
-		"host": "127.0.0.1",
-		"port": "5432",
-		"database": "fabricexplorer",
-		"username": "hppoc",
-		"passwd": "password"
-	},
-	"sync": {
-		"type": "local",
-		"platform": "fabric",
-		"blocksSyncTime": "1"
-	},
-	"jwt": {
-		"secret": "a secret phrase!!",
-		"expiresIn": "2h"
-	}
-}
-```
-
-2. Change `blockchain-explorer/app/platform/fabric/config.json` to look like this:
-
-```
-{
-	"network-configs": {
-		"elastic-network": {
-			"name": "elasticnetwork",
-			"profile": "project-location/hyperledger-elastic/network/connectionProfile.json",
-			"enableAuthentication": false
-		}
-	},
-	"license": "Apache-2.0"
-}
-```
-
-...where `project-location` is the absolute path to the `hyperledger-elastic` project location on disk.
-
-3. Also make sure you have setup the database correctly! (Follow [these](https://github.com/hyperledger/blockchain-explorer#50-database-setup----) instructions.)
-
-
 ## Beats Agent
 
-1. Make sure that the `fabricbeat` folder is inside your `GOPATH`
+1. Either place the `fabricbeat` directory under `${GOPATH}/src/github.com/balazsprehoda/`, or set the `BEAT_PATH` variable to point to the location of `fabricbeat`, and add it to your `GOPATH`.
+2. Run
+```
+cd fabricbeat
+```
 2. Run `make`
-3. Run `./fabricbeat -e -d "*"` from the `fabricbeat/` folder
+3. Run `./fabricbeat -e -d "*"`
