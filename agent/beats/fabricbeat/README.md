@@ -114,3 +114,56 @@ make release
 ```
 
 This will fetch and create all images required for the build process. The whole process to finish can take several minutes.
+
+## Comparison and Testing with Hyperledger Explorer
+
+The ledger can be inspected from both Kibana and Hyperledger Explorer, which makes it easy to compare the two, and make sure that the visualized data in Kibana is correct.
+
+### Hyperledger Explorer Configuration
+
+Configuring HL Explorer: https://github.com/hyperledger/blockchain-explorer  
+To connect HL Explorer to `basic` network, you should make the following changes:
+
+1. Change `blockchain-explorer/app/explorerconfig.json` to this:
+
+```
+{
+	"persistence": "postgreSQL",
+	"platforms": ["fabric"],
+	"postgreSQL": {
+		"host": "127.0.0.1",
+		"port": "5432",
+		"database": "fabricexplorer",
+		"username": "hppoc",
+		"passwd": "password"
+	},
+	"sync": {
+		"type": "local",
+		"platform": "fabric",
+		"blocksSyncTime": "1"
+	},
+	"jwt": {
+		"secret": "a secret phrase!!",
+		"expiresIn": "2h"
+	}
+}
+```
+
+2. Change `blockchain-explorer/app/platform/fabric/config.json` to look like this:
+
+```
+{
+	"network-configs": {
+		"elastic-network": {
+			"name": "elasticnetwork",
+			"profile": "project-location/hyperledger-elastic/network/basic/connectionProfile.json",
+			"enableAuthentication": false
+		}
+	},
+	"license": "Apache-2.0"
+}
+```
+
+...where `project-location` is the absolute path to the `hyperledger-elastic` project location on disk.
+
+3. Also make sure that you have set up the database correctly! (Follow [these](https://github.com/hyperledger/blockchain-explorer#50-database-setup----) instructions.)
