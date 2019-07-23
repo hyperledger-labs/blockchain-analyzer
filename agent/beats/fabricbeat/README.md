@@ -4,6 +4,12 @@ Welcome to Fabricbeat.
 
 Ensure that this folder is at the following location:
 `${GOPATH}/src/github.com/balazsprehoda/fabricbeat`
+Or run:
+```
+export BEAT_PATH=$PWD
+export GOPATH=$GOPATH:$BEAT_PATH
+```
+The above script sets the BEAT_PATH variable to the current directory, and adds it to the GOPATH.
 
 ## Getting Started with Fabricbeat
 
