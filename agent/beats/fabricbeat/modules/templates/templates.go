@@ -49,7 +49,6 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 		for _, visualizationName := range visualizationNames {
 			// Replace visualization id placeholders
 			idExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(visualizationName))
-			fmt.Println(fmt.Sprintf("Looking for expression %s", idExpression))
 			re := regexp.MustCompile(idExpression)
 			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s-%s", visualizationName, setup.Peer, setup.OrgName))
 		}
