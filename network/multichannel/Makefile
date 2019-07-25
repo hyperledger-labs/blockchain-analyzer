@@ -3,7 +3,7 @@
 
 HLNETWORK?=el-network
 # default path to be used in connectionprofile.json
-ABSPATH?=/home/prehi/internship/testNetwork
+ABSPATH?=${GOPATh}/src
 ORG?=Org1
 # ABSPATH="/Users/default/code"
 

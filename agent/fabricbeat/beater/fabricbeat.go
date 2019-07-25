@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"fabricbeat/config"
-	"fabricbeat/modules/ledgerutils"
+	"hyperledger-elastic/agent/fabricbeat/config"
+	"hyperledger-elastic/agent/fabricbeat/modules/ledgerutils"
 
 	"github.com/elastic/beats/libbeat/beat"
 	libbeatCommon "github.com/elastic/beats/libbeat/common"
@@ -17,10 +17,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"fabricbeat/modules/elastic"
-	"fabricbeat/modules/fabricbeatsetup"
-	"fabricbeat/modules/fabricutils"
-	"fabricbeat/modules/templates"
+	"hyperledger-elastic/agent/fabricbeat/modules/elastic"
+	"hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
+	"hyperledger-elastic/agent/fabricbeat/modules/fabricutils"
+	"hyperledger-elastic/agent/fabricbeat/modules/templates"
 )
 
 // Fabricbeat configuration.

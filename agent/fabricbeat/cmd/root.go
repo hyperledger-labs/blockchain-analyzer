@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fabricbeat/beater"
+	"hyperledger-elastic/agent/fabricbeat/beater"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
