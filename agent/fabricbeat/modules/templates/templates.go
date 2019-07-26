@@ -9,7 +9,11 @@ import (
 	"regexp"
 	"strings"
 
+<<<<<<< HEAD:agent/fabricbeat/modules/templates/templates.go
 	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
+=======
+	"hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
+>>>>>>> c25abde7e8f5e73d3a4a1ec5b0a17b235b1c160b:agent/fabricbeat/modules/templates/templates.go
 
 	"github.com/elastic/beats/libbeat/logp"
 )
