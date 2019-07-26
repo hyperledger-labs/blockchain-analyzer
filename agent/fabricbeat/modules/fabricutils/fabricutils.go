@@ -5,7 +5,7 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"fabricbeat/config"
+	"github.com/hyperledger-elastic/agent/fabricbeat/config"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"

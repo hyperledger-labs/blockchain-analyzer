@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"fabricbeat/modules/fabricbeatsetup"
+	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
