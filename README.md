@@ -66,7 +66,7 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
 
 ### Optional. generate makefile configuration
 ```
-make generate ABSPATH=/Users/default/code
+make generate ABSPATH={ABSOLUTE_PATH_TO_SRC_DIR}
 ```
 
 ### Start the network
@@ -110,6 +110,12 @@ The `config.json` contains the configuration for the application. We can configu
 4. `previousKey`: This field is optional. We can specify here the key to which the new transaction (key-value pair) is linked.
 
 ###  User enrollment and registration
+
+Setup path of the network configuration (basic or multichannel shipped with this repository)
+```
+export ABSPATH={ABSOLUTE_PATH}/src/github.com/hyperledger-elastic/network/basic/
+```
+
 To enroll admins, register and enroll users, run the following command:
 ```
 make users

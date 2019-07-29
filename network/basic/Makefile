@@ -14,6 +14,7 @@ destroy:
 	./destroy-network.sh
 	rm -rf *-e
 	rm -rf ../../apps/dummyapp/wallet
+	rm -rf connection-profile-[0-9].yaml
 
 generate:
 	cp docker-compose-TEMPLATE.yaml docker-compose.yaml
@@ -24,7 +25,8 @@ generate:
 	for NUMBER in 1 2 3 4 ; \
 	do \
 		cp connection-profile-TEMPLATE.yaml connection-profile-$${NUMBER}.yaml; \
-		sed -i -e "s/HLNETWORK/${HLNETWORK}/g" connection-profile-$${NUMBER}.yaml; \
-		sed -i -e "s/ORG/Org$${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
-		sed -i -e "s~ABSPATH~${ABSPATH}~g" connection-profile-$${NUMBER}.yaml; \
+		sed -i -e  "s/HLNETWORK/${HLNETWORK}/g" connection-profile-$${NUMBER}.yaml; \
+		sed -i -e  "s/ORG/Org$${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
+		sed -i -e  "s~ABSPATH~${ABSPATH}~g" connection-profile-$${NUMBER}.yaml; \
 	done
+	rm *-e

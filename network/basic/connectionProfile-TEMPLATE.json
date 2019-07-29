@@ -43,7 +43,7 @@
 					"chaincodeQuery": true,
 					"ledgerQuery": true,
 					"eventSource": true
-				}
+        }
 			},
 			"orderers": [
 				"orderer.HLNETWORK.com"
@@ -171,7 +171,8 @@
 			"url": "grpcs://localhost:10051",
 			"grpcOptions": {
 				"ssl-target-name-override": "peer0.org4.HLNETWORK.com"
-			}
+      }
+
 		}
 	},
 	"orderers": {

@@ -13,7 +13,7 @@ client:
        endorser: '3000'
      orderer: '3000'
   cryptoconfig:
-    path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config"
+    path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config"
 
 BCCSP:
     security:
@@ -25,14 +25,9 @@ BCCSP:
      level: 256
 
 channels:
-  fourchannel:
+  mychannel:
     peers:
       peer0.org1.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer1.org1.HLNETWORK.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
@@ -42,58 +37,12 @@ channels:
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
-      peer1.org2.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
       peer0.org3.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer1.org3.HLNETWORK.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
       peer0.org4.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer1.org4.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-    orderers:
-    - orderer.HLNETWORK.com
-    connection:
-      timeout:
-        peer:
-          endorser: '6000'
-          eventHub: '6000'
-          eventReg: '6000'
-        orderer: '6000'
-  twochannel:
-    peers:
-      peer0.org1.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer1.org1.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer0.org3.HLNETWORK.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
-      peer1.org3.HLNETWORK.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
@@ -114,114 +63,86 @@ organizations:
     fullpath: true
     peers:
     - peer0.org1.HLNETWORK.com
-    - peer1.org1.HLNETWORK.com
     certificateAuthorities:
     - ca.org1.HLNETWORK.com
     cryptopath: peerOrganizations/org1.HLNETWORK.com/msp
     adminPrivateKey:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/keystore/adminKey1"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/keystore/adminKey1"
     signedCert:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/signcerts/Admin@org1.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/signcerts/Admin@org1.HLNETWORK.com-cert.pem"
   org2:
     mspid: Org2MSP
     fullpath: true
     peers:
     - peer0.org2.HLNETWORK.com
-    - peer1.org2.HLNETWORK.com
     certificateAuthorities:
     - ca.org2.HLNETWORK.com
     cryptopath: peerOrganizations/org2.HLNETWORK.com/msp
     adminPrivateKey:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/keystore/adminKey2"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/keystore/adminKey2"
     signedCert:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/signcerts/Admin@org2.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/signcerts/Admin@org2.HLNETWORK.com-cert.pem"
   org3:
     mspid: Org3MSP
     fullpath: true
     peers:
     - peer0.org3.HLNETWORK.com
-    - peer1.org3.HLNETWORK.com
     certificateAuthorities:
     - ca.org3.HLNETWORK.com
     cryptopath: peerOrganizations/org3.HLNETWORK.com/msp
     adminPrivateKey:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/keystore/adminKey3"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/keystore/adminKey3"
     signedCert:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/signcerts/Admin@org3.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/signcerts/Admin@org3.HLNETWORK.com-cert.pem"
   org4:
     mspid: Org4MSP
     fullpath: true
     peers:
     - peer0.org4.HLNETWORK.com
-    - peer1.org4.HLNETWORK.com
     certificateAuthorities:
     - ca.org4.HLNETWORK.com
     cryptopath: peerOrganizations/org4.HLNETWORK.com/msp
     adminPrivateKey:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/keystore/adminKey4"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/keystore/adminKey4"
     signedCert:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/signcerts/Admin@org4.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/signcerts/Admin@org4.HLNETWORK.com-cert.pem"
   ordererOrg:
     mspid: OrdererMSP
     fullpath: true
     cryptopath: ordererOrganizations/HLNETWORK.com/msp
     adminPrivateKey:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/keystore/ordererAdminKey"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/keystore/ordererAdminKey"
     signedCert:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/signcerts/Admin@HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/signcerts/Admin@HLNETWORK.com-cert.pem"
 peers:
   peer0.org1.HLNETWORK.com:
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
     url: grpcs://localhost:7051
     grpcOptions:
       ssl-target-name-override: peer0.org1.HLNETWORK.com
-  peer1.org1.HLNETWORK.com:
-    tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer1.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
-    url: grpcs://localhost:7052
-    grpcOptions:
-      ssl-target-name-override: peer1.org1.HLNETWORK.com
   peer0.org2.HLNETWORK.com:
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
     url: grpcs://localhost:8051
     grpcOptions:
       ssl-target-name-override: peer0.org2.HLNETWORK.com
-  peer1.org2.HLNETWORK.com:
-    tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer1.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
-    url: grpcs://localhost:8052
-    grpcOptions:
-      ssl-target-name-override: peer1.org2.HLNETWORK.com
   peer0.org3.HLNETWORK.com:
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
     url: grpcs://localhost:9051
     grpcOptions:
       ssl-target-name-override: peer0.org3.HLNETWORK.com
-  peer1.org3.HLNETWORK.com:
-    tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer1.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
-    url: grpcs://localhost:9052
-    grpcOptions:
-      ssl-target-name-override: peer1.org3.HLNETWORK.com
   peer0.org4.HLNETWORK.com:
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
     url: grpcs://localhost:10051
     grpcOptions:
       ssl-target-name-override: peer0.org4.HLNETWORK.com
-  peer1.org4.HLNETWORK.com:
-    tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer1.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
-    url: grpcs://localhost:10052
-    grpcOptions:
-      ssl-target-name-override: peer1.org4.HLNETWORK.com
 orderers:
   orderer.HLNETWORK.com:
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/msp/tlscacerts/tlsca.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/ordererOrganizations/HLNETWORK.com/msp/tlscacerts/tlsca.HLNETWORK.com-cert.pem"
     url: grpcs://localhost:7050
     grpcOptions:
       ssl-target-name-override: orderer.HLNETWORK.com
@@ -237,7 +158,7 @@ certificateAuthorities:
       enrollId: admin
       enrollSecret: adminpw
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
   
   ca.org2.HLNETWORK.com:
     url: http://localhost:8054
@@ -248,7 +169,7 @@ certificateAuthorities:
       enrollId: admin
       enrollSecret: adminpw
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
 
   ca.org3.HLNETWORK.com:
     url: http://localhost:9054
@@ -259,7 +180,7 @@ certificateAuthorities:
       enrollId: admin
       enrollSecret: adminpw
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
 
   ca.org4.HLNETWORK.com:
     url: http://localhost:10054
@@ -270,7 +191,7 @@ certificateAuthorities:
       enrollId: admin
       enrollSecret: adminpw
     tlsCACerts:
-      path: "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
+      path: "ABSPATH/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
 
 entityMatchers:
   peer:
@@ -279,12 +200,6 @@ entityMatchers:
       eventUrlSubstitutionExp: localhost:7053
       sslTargetOverrideUrlSubstitutionExp: peer0.org1.HLNETWORK.com
       mappedHost: peer0.org1.HLNETWORK.com
-
-    - pattern: (\w*)peer1.org1.HLNETWORK.com(\w*)
-      urlSubstitutionExp: localhost:7052
-      eventUrlSubstitutionExp: localhost:7053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org1.HLNETWORK.com
-      mappedHost: peer1.org1.HLNETWORK.com  
     
     - pattern: (\w*)peer0.org2.HLNETWORK.com(\w*)
       urlSubstitutionExp: localhost:8051
@@ -292,35 +207,17 @@ entityMatchers:
       sslTargetOverrideUrlSubstitutionExp: peer0.org2.HLNETWORK.com
       mappedHost: peer0.org2.HLNETWORK.com
 
-    - pattern: (\w*)peer1.org2.HLNETWORK.com(\w*)
-      urlSubstitutionExp: localhost:8052
-      eventUrlSubstitutionExp: localhost:8053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org2.HLNETWORK.com
-      mappedHost: peer1.org2.HLNETWORK.com
-
     - pattern: (\w*)peer0.org3.HLNETWORK.com(\w*)
       urlSubstitutionExp: localhost:9051
       eventUrlSubstitutionExp: localhost:9053
       sslTargetOverrideUrlSubstitutionExp: peer0.org3.HLNETWORK.com
       mappedHost: peer0.org3.HLNETWORK.com
-
-    - pattern: (\w*)peer1.org3.HLNETWORK.com(\w*)
-      urlSubstitutionExp: localhost:9052
-      eventUrlSubstitutionExp: localhost:9053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org3.HLNETWORK.com
-      mappedHost: peer1.org3.HLNETWORK.com
   
     - pattern: (\w*)peer0.org4.HLNETWORK.com(\w*)
       urlSubstitutionExp: localhost:10051
       eventUrlSubstitutionExp: localhost:10053
       sslTargetOverrideUrlSubstitutionExp: peer0.org4.HLNETWORK.com
       mappedHost: peer0.org4.HLNETWORK.com
-
-    - pattern: (\w*)peer1.org4.HLNETWORK.com(\w*)
-      urlSubstitutionExp: localhost:10052
-      eventUrlSubstitutionExp: localhost:10053
-      sslTargetOverrideUrlSubstitutionExp: peer1.org4.HLNETWORK.com
-      mappedHost: peer1.org4.HLNETWORK.com
 
   orderer:
     - pattern: (\w*)orderer.HLNETWORK.com(\w*)
