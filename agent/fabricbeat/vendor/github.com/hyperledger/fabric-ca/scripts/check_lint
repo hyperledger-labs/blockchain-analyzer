@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+GOLINT="$GOPATH/bin/golint"
+
+function runlint {
+   for dir in `ls`
+   do
+      if [ -d $dir ]; then
+        case "$dir" in
+         vendor|bin|testdata|scripts)
+           ;;
+        *)
+           $GOLINT $dir/...
+           ;;
+        esac
+      fi
+   done
+}
+
+if [ ! -f $GOLINT ]; then
+   echo "Installing golint ..."
+   go get -u golang.org/x/lint/golint
+fi
+
+echo "Running lint ..."
+found=$(runlint)
+if [ "$found" != "" ]; then
+   echo "YOU MUST FIX THE FOLLOWING LINT PROBLEMS:"
+   echo "$found"
+   echo "END LINT PROBLEMS"
+   exit 1
+fi
+echo "No lint errors were found"

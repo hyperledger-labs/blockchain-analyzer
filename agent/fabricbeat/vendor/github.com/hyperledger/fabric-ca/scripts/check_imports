@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+GOIMPORTS="$GOPATH/bin/goimports"
+
+if [ ! -f $GOIMPORTS ]; then
+   echo "Installing goimports ..."
+   go get golang.org/x/tools/cmd/goimports
+   if [ $? -ne 0 ]; then
+      echo "Failed to install goimports"
+      exit 1
+   fi
+fi
+
+echo "Checking imports ..."
+found=`$GOIMPORTS -l \`find . -name "*.go" |grep -v "./vendor"\` 2>&1`
+if [ "$found" != "" ]; then
+   echo "The following files have import problems:"
+   echo "$found"
+   echo "You may run 'goimports -w <file>' to fix each file."
+   exit 1
+fi
+echo "All files are properly formatted"
