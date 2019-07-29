@@ -16,8 +16,8 @@ if [[  "${WHICHOS}" == *"Darwin"* ]]; then
 fi
 
 if [[ ${OSTYPE} == "Darwin" ]]; then
-  CRYPTOGEN=./cryptogen_mac
-  CONFIGTXGEN=./configtxgen_mac
+  CRYPTOGEN=../cryptogen_mac
+  CONFIGTXGEN=../configtxgen_mac
 fi
 
 #Generate crypto material using crypto-config.yaml as config file
