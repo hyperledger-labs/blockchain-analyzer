@@ -29,11 +29,9 @@ build
 
 .DS_Store
 
-keystore/
 fabricbeat/_meta/dashboards.yml
 fabricbeat
 !fabricbeat/
-/keystore
 
 *.pyc
 
