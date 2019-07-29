@@ -165,6 +165,11 @@ After that, we have to set the `BEAT_PATH` variable to point to the fabricbeat f
 export BEAT_PATH=$GOPATH/src/github.com/hyperledger-elastic/agent/fabricbeat
 ```
 
+We want to use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
+```
+export GO111MODULE=auto
+```  
+
 ### Configure Fabricbeat
 
 We can configure the agent using the `fabricbeat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
