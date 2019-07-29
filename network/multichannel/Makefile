@@ -3,7 +3,7 @@
 
 HLNETWORK?=el-network
 # default path to be used in connectionprofile.json
-ABSPATH?=${GOPATh}/src/github.com
+ABSPATH?=${GOPATH}/src/github.com
 # ABSPATH="/Users/default/code"
 
 start:
@@ -28,3 +28,4 @@ generate:
 		sed -i -e "s/ORG/Org$${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
 		sed -i -e "s~ABSPATH~${ABSPATH}~g" connection-profile-$${NUMBER}.yaml; \
 	done
+	export ABSPATH=${ABSPATH}
