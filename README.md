@@ -30,12 +30,12 @@ One peer / CA / order, single user for initial testing
 A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
 
 ## Prerequisites
-* Go  
-* Docker  
-* docker-compose (v1.24.1)  
-* Node.js  
-* pip  
-* virtualenv  
+* Go (v1.12.7+)  
+* Docker  (v19.03.0+)
+* docker-compose (v1.24.1+)  
+* Node.js (v8.10+)  
+* pip (v19.2.1+)  
+* virtualenv (16.7.0+)  
 
 ## Getting Started
 
