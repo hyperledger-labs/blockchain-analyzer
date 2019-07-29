@@ -29,6 +29,14 @@ Create a setup for generating various dummy data in various configurations
 One peer / CA / order, single user for initial testing
 A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
 
+## Prerequisites
+* Go  
+* Docker  
+* docker-compose (v1.24.1)  
+* Node.js  
+* pip  
+* virtualenv  
+
 ## Getting Started
 
 To get started with the project, clone the git repository. It is important that you place it under $GOPATH/src/github.com  
