@@ -25,6 +25,6 @@ generate:
 	do \
 		cp connection-profile-TEMPLATE.yaml connection-profile-$${NUMBER}.yaml; \
 		sed -i -e "s/HLNETWORK/${HLNETWORK}/g" connection-profile-$${NUMBER}.yaml; \
-		sed -i -e "s/ORG/Org${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
+		sed -i -e "s/ORG/Org$${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
 		sed -i -e "s~ABSPATH~${ABSPATH}~g" connection-profile-$${NUMBER}.yaml; \
 	done
