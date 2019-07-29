@@ -137,10 +137,10 @@
                 "ca.org1.el-network.com"
             ],
 			"adminPrivateKey": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
 			},
 			"signedCert": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
 			}
 		},
 		"Org2": {
@@ -154,10 +154,10 @@
                 "ca.org2.el-network.com"
             ],
 			"adminPrivateKey": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/keystore/adminKey2"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/keystore/adminKey2"
 			},
 			"signedCert": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/signcerts/Admin@org2.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/users/Admin@org2.el-network.com/msp/signcerts/Admin@org2.el-network.com-cert.pem"
 			}
 		},
 		"Org3": {
@@ -171,10 +171,10 @@
                 "ca.org3.el-network.com"
             ],
 			"adminPrivateKey": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/keystore/adminKey3"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/keystore/adminKey3"
 			},
 			"signedCert": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/signcerts/Admin@org3.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/users/Admin@org3.el-network.com/msp/signcerts/Admin@org3.el-network.com-cert.pem"
 			}
 		},
 		"Org4": {
@@ -188,27 +188,27 @@
                 "ca.org4.el-network.com"
             ],
 			"adminPrivateKey": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/keystore/adminKey4"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/keystore/adminKey4"
 			},
 			"signedCert": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/signcerts/Admin@org4.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/users/Admin@org4.el-network.com/msp/signcerts/Admin@org4.el-network.com-cert.pem"
 			}
 		},
 		"OrdererOrg": {
 			"mspid": "OrdererMSP",
 			"fullpath": true,
 			"adminPrivateKey": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/keystore/ordererAdminKey"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/keystore/ordererAdminKey"
 			},
 			"signedCert": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/signcerts/Admin@el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/users/Admin@el-network.com/msp/signcerts/Admin@el-network.com-cert.pem"
 			}
 		}
 	},
 	"peers": {
 		"peer0.org1.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/peers/peer0.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7051",
 			"grpcOptions": {
@@ -217,7 +217,7 @@
 		},
 		"peer0.org2.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/peers/peer0.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:8051",
 			"grpcOptions": {
@@ -226,7 +226,7 @@
 		},
 		"peer0.org3.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/peers/peer0.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:9051",
 			"grpcOptions": {
@@ -235,7 +235,7 @@
 		},
 		"peer0.org4.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/peers/peer0.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:10051",
 			"grpcOptions": {
@@ -244,7 +244,7 @@
 		},
 		"peer1.org1.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/peers/peer1.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/peers/peer1.org1.el-network.com/msp/tlscacerts/tlsca.org1.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7052",
 			"grpcOptions": {
@@ -253,7 +253,7 @@
 		},
 		"peer1.org2.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/peers/peer1.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.el-network.com/peers/peer1.org2.el-network.com/msp/tlscacerts/tlsca.org2.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:8052",
 			"grpcOptions": {
@@ -262,7 +262,7 @@
 		},
 		"peer1.org3.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/peers/peer1.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.el-network.com/peers/peer1.org3.el-network.com/msp/tlscacerts/tlsca.org3.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:9052",
 			"grpcOptions": {
@@ -271,7 +271,7 @@
 		},
 		"peer1.org4.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/peers/peer1.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.el-network.com/peers/peer1.org4.el-network.com/msp/tlscacerts/tlsca.org4.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:10052",
 			"grpcOptions": {
@@ -282,7 +282,7 @@
 	"orderers": {
 		"orderer.el-network.com": {
 			"tlsCACerts": {
-				"path": "/home/prehi/go/src/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/msp/tlscacerts/tlsca.el-network.com-cert.pem"
+				"path": "/home/ubuntutest/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/el-network.com/msp/tlscacerts/tlsca.el-network.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7050",
 			"grpcOptions": {
