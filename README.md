@@ -34,6 +34,7 @@ A four peers/CA setup with two channels, and two users each associated with two 
 * Docker  (v19.03.0+)
 * docker-compose (v1.24.1+)  
 * Node.js (v8.10+)  
+* python (2.7)
 * pip (v19.2.1+)  
 * virtualenv (16.7.0+)  
 
