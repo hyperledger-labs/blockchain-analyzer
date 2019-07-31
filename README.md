@@ -123,15 +123,19 @@ make users
 ```
 
 ###  Invoke transactions
-To add key/value pairs, run
+To add key-value pairs, run
 ```
 make invoke
 ```
 
 ### Query key
-To make a query, run
+To query a specific key, run
 ```
 make query KEY=key1
+```
+To query all key-value pairs, run
+```
+make query-all
 ```
 
 ## Elastic Stack
@@ -154,6 +158,10 @@ make start
 To stop the containers, issue
 ```
 make destroy
+```
+To stop the containers and remove old data, run
+```
+make erase
 ```
 
 ## Beats Agent
