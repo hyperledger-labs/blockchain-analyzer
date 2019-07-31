@@ -79,6 +79,7 @@ sudo apt install npm
 We can check the installed version by running
 ```
 nodejs -v
+npm -v
 ```
 
 ### Python
@@ -112,7 +113,7 @@ git clone https://github.com/balazsprehoda/hyperledger-elastic.git
 To start the basic Fabric network, run these commands:
 ```
 cd hyperledger-elastic/network/basic
-make generate ABSPATH=$GOPATH/src/github.com
+export ABSPATH=$GOPATH/src/github.com
 make start
 ```
 
