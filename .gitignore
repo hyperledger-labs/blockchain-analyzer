@@ -16,11 +16,16 @@ crypto-config/
 
 # Generated channel artifacts
 channel-artifacts/
+channel-artifacts-fourchannel/
+channel-artifacts-twochannel/
 
 # Generated connection profiles
 connection-profile-*.yaml
 !connection-profile-TEMPLATE.yaml
 connectionProfile.json
+
+# Generated docker-compose.yaml
+network/*/docker-compose.yaml
 
 # Node modules
 node_modules
