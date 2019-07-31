@@ -161,6 +161,8 @@ and then restart it with
 make start
 ```
 
+If you see *"Cannot connect to the Elasticsearch cluster"*, try opening the page in another tab.
+
 ## Building and running the agent
 We use the agent to periodically query ledger data and ship it to Elasticsearch. To get started with the agent, run
 ```
