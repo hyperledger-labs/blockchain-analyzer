@@ -1,6 +1,6 @@
-# Example Setup
+# Example Setup With Basic Network
 
-This is an example to setup the project on a new Ubuntu 18.04 virtual machine from scratch.
+This is an example to setup the project with basic network on a new Ubuntu 18.04 virtual machine from scratch.
 
 ## Prerequisites
 
