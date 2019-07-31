@@ -27,6 +27,9 @@ connectionProfile.json
 # Generated docker-compose.yaml
 network/*/docker-compose.yaml
 
+# Generated dashboards
+dashboards/
+
 # Node modules
 node_modules
 
