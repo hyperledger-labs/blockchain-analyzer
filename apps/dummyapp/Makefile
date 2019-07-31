@@ -3,7 +3,7 @@
 
 HLNETWORK?=el-network
 # default path to be used in connectionprofile.json
-ABSPATH?=/home/prehi/internship/testNetwork
+ABSPATH?=${GOPATH}/src/github.com
 # ABSPATH="/Users/default/code"
 
 install:
@@ -18,6 +18,9 @@ invoke:
 
 query:
 	node query.js ${KEY}
+
+query-all:
+	node queryAll.js 
 
 clean:
 	rm -rf ./wallet

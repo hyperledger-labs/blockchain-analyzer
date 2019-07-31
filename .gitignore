@@ -17,6 +17,11 @@ crypto-config/
 # Generated channel artifacts
 channel-artifacts/
 
+# Generated connection profiles
+connection-profile-*.yaml
+!connection-profile-TEMPLATE.yaml
+connectionProfile.json
+
 # Node modules
 node_modules
 

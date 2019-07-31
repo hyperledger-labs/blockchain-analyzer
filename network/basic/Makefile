@@ -29,4 +29,4 @@ generate:
 		sed -i -e  "s/ORG/Org$${NUMBER}/g" connection-profile-$${NUMBER}.yaml; \
 		sed -i -e  "s~ABSPATH~${ABSPATH}~g" connection-profile-$${NUMBER}.yaml; \
 	done
-	rm *-e
+

@@ -43,13 +43,8 @@ async function main() {
         const contract = network.getContract(config.channel.contract);
 
         // Evaluate the specified transaction.
-        if (process.argv.length < 3) {
-            console.log('No key provided, querying all values')
-            const result = await contract.evaluateTransaction('queryAllValues');
-            console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-        }
-        console.log(`Querying value for key ${process.argv[2]}`)
-        const result = await contract.evaluateTransaction('queryValue', process.argv[2]);
+        console.log('No key provided, querying all values')
+        const result = await contract.evaluateTransaction('queryAllValues');
         console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
 
     } catch (error) {
