@@ -2,10 +2,10 @@
 #set +x
 
 HLNETWORK?=el-network
-# default path to be used in connectionprofile.json
-ABSPATH?=${GOPATH}/src/github.com
+# default path to be used in connection profile files
+ABSPATH?=$(shell dirname $(shell dirname $(shell dirname ${PWD})))
+
 WHICHOS := $(shell uname)
-# ABSPATH="/Users/default/code"
 
 start:
 	make generate ABSPATH=${ABSPATH}
