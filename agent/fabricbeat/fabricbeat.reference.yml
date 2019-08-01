@@ -9,7 +9,7 @@ fabricbeat:
   # Defines which organization the connected peer is part of
   organization: org${ORG_NUMBER}
   # Defines the peer which fabricbeat should query
-  peer: peer0.org${ORG_NUMBER}.el-network.com
+  peer: peer${PEER_NUMBER}.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
   connectionProfile: ${GOPATH}/src/github.com/hyperledger-elastic/network/${NETWORK}/connection-profile-${ORG_NUMBER}.yaml
   # Path to the admin certfile and keyfile

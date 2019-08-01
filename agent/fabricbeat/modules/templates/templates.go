@@ -39,19 +39,19 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 			// Replace dashboard id placeholders
 			idExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_ID", strings.ToUpper(dashboardName))
 			re := regexp.MustCompile(idExpression)
-			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-dashboard-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-dashboard-%s", dashboardName, setup.OrgName))
 
 			// Replace search id placeholders
 			idExpression = fmt.Sprintf("%s_SEARCH_TEMPLATE_ID", strings.ToUpper(dashboardName))
 			re = regexp.MustCompile(idExpression)
-			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-search-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-search-%s", dashboardName, setup.OrgName))
 		}
 
 		for _, visualizationName := range visualizationNames {
 			// Replace visualization id placeholders
 			idExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(visualizationName))
 			re := regexp.MustCompile(idExpression)
-			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s-%s", visualizationName, setup.Peer, setup.OrgName))
+			indexPatternJSONstring = re.ReplaceAllString(indexPatternJSONstring, fmt.Sprintf("%s-visualization-%s", visualizationName, setup.OrgName))
 		}
 
 		// Replace title placeholders
@@ -63,7 +63,7 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 		// Send index pattern to Kibana via Kibana Saved Objects API
 		logp.Info("Persisting %s index pattern for connected peer", templateName)
 
-		patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.Peer)
+		patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.OrgName)
 		request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", setup.KibanaURL, patternId), bytes.NewBuffer(indexPatternJSON))
 		if err != nil {
 			return err
@@ -100,19 +100,19 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 
 		for _, templateName := range templates {
 			// Replace index pattern id placeholders
-			patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.Peer)
+			patternId = fmt.Sprintf("fabricbeat-%s-%s", templateName, setup.OrgName)
 			patternExpression := fmt.Sprintf("%s_PATTERN", strings.ToUpper(templateName))
 			re := regexp.MustCompile(patternExpression)
 			dashboard = re.ReplaceAllString(string(dashboard), patternId)
 
 			// Replace search id placeholders
-			searchId := fmt.Sprintf("%s-search-%s-%s", templateName, setup.Peer, setup.OrgName)
+			searchId := fmt.Sprintf("%s-search-%s", templateName, setup.OrgName)
 			searchIdExpression := fmt.Sprintf("%s_SEARCH_TEMPLATE_ID", strings.ToUpper(templateName))
 			re = regexp.MustCompile(searchIdExpression)
 			dashboard = re.ReplaceAllString(dashboard, searchId)
 
 			// Replace search title placeholders
-			searchTitle := fmt.Sprintf("%s Search %s (%s)", strings.Title(templateName), setup.Peer, setup.OrgName)
+			searchTitle := fmt.Sprintf("%s Search (%s)", strings.Title(templateName), setup.OrgName)
 			searchTitleExpression := fmt.Sprintf("%s_SEARCH_TEMPLATE_TITLE", strings.ToUpper(templateName))
 			re = regexp.MustCompile(searchTitleExpression)
 			dashboard = re.ReplaceAllString(dashboard, searchTitle)
@@ -131,13 +131,13 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 
 		for _, visualizationName := range visualizationNames {
 			// Replace visualization id placeholders
-			visualizationId := fmt.Sprintf("%s-visualization-%s-%s", visualizationName, setup.Peer, setup.OrgName)
+			visualizationId := fmt.Sprintf("%s-visualization-%s", visualizationName, setup.OrgName)
 			visualizationIdExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_ID", strings.ToUpper(visualizationName))
 			re := regexp.MustCompile(visualizationIdExpression)
 			dashboard = re.ReplaceAllString(dashboard, visualizationId)
 
 			// Replace visualization title placeholders
-			visualizationTitle := fmt.Sprintf("%s Visualization %s (%s)", strings.Title(visualizationName), setup.Peer, setup.OrgName)
+			visualizationTitle := fmt.Sprintf("%s Visualization (%s)", strings.Title(visualizationName), setup.OrgName)
 			visualizationTitleExpression := fmt.Sprintf("%s_VISUALIZATION_TEMPLATE_TITLE", strings.ToUpper(visualizationName))
 			re = regexp.MustCompile(visualizationTitleExpression)
 			dashboard = re.ReplaceAllString(dashboard, visualizationTitle)
@@ -146,15 +146,15 @@ func GenerateDashboards(setup *fabricbeatsetup.FabricbeatSetup) error {
 		// Replace dashboard id
 		idExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_ID", strings.ToUpper(dashboardName))
 		re := regexp.MustCompile(idExpression)
-		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s-dashboard-%s-%s", dashboardName, setup.Peer, setup.OrgName))
+		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s-dashboard-%s", dashboardName, setup.OrgName))
 
 		// Replace dashboard title
 		titleExpression := fmt.Sprintf("%s_DASHBOARD_TEMPLATE_TITLE", strings.ToUpper(dashboardName))
 		re = regexp.MustCompile(titleExpression)
-		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s Dashboard %s (%s)", strings.Title(dashboardName), setup.Peer, setup.OrgName))
+		dashboard = re.ReplaceAllString(string(dashboard), fmt.Sprintf("%s Dashboard (%s)", strings.Title(dashboardName), setup.OrgName))
 
 		// Persist the created dashboard in the configured directory, from where it is going to be loaded
-		err = ioutil.WriteFile(fmt.Sprintf("%s/%s-%s-%s.json", setup.DashboardDirectory, dashboardName, setup.Peer, setup.OrgName), []byte(dashboard), 0664)
+		err = ioutil.WriteFile(fmt.Sprintf("%s/%s-%s.json", setup.DashboardDirectory, dashboardName, setup.OrgName), []byte(dashboard), 0664)
 		if err != nil {
 			return err
 		}

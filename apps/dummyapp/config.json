@@ -1,9 +1,9 @@
 {
     "channel": {
-        "channelName": "mychannel",
+        "channelName": "fourchannel",
         "contract": "dummycc"
     },
-    "connection_profile": "../../network/basic/connectionProfile.json",
+    "connection_profile": "../../network/multichannel/connectionProfile.json",
     "organizations": {
         "Org1": {
             "MSP": "Org1MSP"
