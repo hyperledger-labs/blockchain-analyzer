@@ -7,7 +7,7 @@ Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 ## Contents
 1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description)  
 2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#expected-outcome)  
-3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path#overview)
+3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#overview)
 4. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)  
 5. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)  
 6. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)  
