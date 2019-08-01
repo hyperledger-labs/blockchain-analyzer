@@ -219,7 +219,7 @@ export GO111MODULE=auto
 
 ### Configure fabricbeat
 
-We can configure the agent using the `fabricbeat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
+We can configure the agent using the `fabricbeat.yml` file. This file is generated based on the `fabricbeat/_meta/beat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
 ```
 make update
 ```
@@ -254,6 +254,13 @@ The paths and peer/org names contain variables that can be passed when starting 
 * `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
 * `NETWORK` is the name of the network (basic or multichannel)
 If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove and ignore these variables and hardcode the names and paths. We can run multiple instances at the same time with different configurations (the workflow for this scenario is 1. modify config 2. `make update` 3. `make` 4. run the agent 5. modify config 6. `make update` 7. run another instance of the agent).
+
+### About indices
+
+We use 3 different indices per organization: one for blocks, one for transactions and one for single writes.  
+If we run multiple agents for peers in the same organization, they are goint to send their data to the same indices. We can then select the peer on the dashboards to view its data only.  
+If we run multiple instances for peers in different organizations, we are going to see the data of different organizations on different dashboards.  
+The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
 
 ### Build fabricbeat
 
