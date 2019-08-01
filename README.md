@@ -7,31 +7,32 @@ Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 ## Contents
 1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description)  
 2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#expected-outcome)  
-3. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)  
-4. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)  
-5. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)  
-  5.1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#basic-network)  
-  5.2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#multichannel-network)  
-  5.3. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#optional-generate-makefile-configuration)  
-  5.4. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-the-network)   
-  5.5. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-the-network)  
-6. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#dummyapp-application)  
-  6.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#installation)  
-  6.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configuration)  
-  6.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#user-enrollment-and-registration)  
-  6.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#invoke-transactions)  
-  6.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#query)  
-7. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#elastic-stack)  
-  7.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#credit)  
-  7.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description-1)  
-  7.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start)  
-  7.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-and-destroy)  
-8. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#beats-agent)  
-  8.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#environment-setup)  
-  8.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configure-fabricbeat)  
-  8.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#build-fabricbeat)  
-  8.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-fabricbeat)   
-  8.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-fabricbeat)  
+3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#overview)
+4. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)  
+5. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)  
+6. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)  
+  6.1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#basic-network)  
+  6.2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#multichannel-network)  
+  6.3. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#optional-generate-makefile-configuration)  
+  6.4. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-the-network)   
+  6.5. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-the-network)  
+7. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#dummyapp-application)  
+  7.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#installation)  
+  7.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configuration)  
+  7.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#user-enrollment-and-registration)  
+  7.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#invoke-transactions)  
+  7.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#query)  
+8. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#elastic-stack)  
+  8.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#credit)  
+  8.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description-1)  
+  8.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start)  
+  8.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-and-destroy)  
+9. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#beats-agent)  
+  9.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#environment-setup)  
+  9.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configure-fabricbeat)  
+  9.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#build-fabricbeat)  
+  9.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-fabricbeat)   
+  9.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-fabricbeat)  
   
 
 ## Description
@@ -58,6 +59,11 @@ Dashboards similar to Hyperledger Explorer
 Create a setup for generating various dummy data in various configurations
 One peer / CA / order, single user for initial testing
 A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
+
+## Overview
+
+Basic data flow: 
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 ## Prerequisites
 
@@ -205,18 +211,56 @@ After that, we have to set the `BEAT_PATH` variable to point to the fabricbeat f
 ```
 export BEAT_PATH=$GOPATH/src/github.com/hyperledger-elastic/agent/fabricbeat
 ```
-
-We want to use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
+Note: there is no trailing slash.
+We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
 ```
 export GO111MODULE=auto
 ```  
 
 ### Configure fabricbeat
 
-We can configure the agent using the `fabricbeat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
+We can configure the agent using the `fabricbeat.yml` file. This file is generated based on the `fabricbeat/_meta/beat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
 ```
 make update
 ```
+
+The configurable fields are the following:
+* `period`: defines how often an event is sent to the output (Elasticsearch in this case)
+* `organization`: defines which organization the connected peer is part of
+* `peer`: defines the peer which fabricbeat should query (must be defined in the connection profile)
+* `connectionProfile`: defines the location of the connection profile of the Fabric network
+* `adminCertPath`: absolute path to the admin certfile
+* `adminKeyPath`: absolute path to the admin keyfile
+* `elasticURL`: URL of Elasticsearch (defaults to http://localhost:9200)
+* `kibanaURL`: URL of Kibana (defaults to http://localhost:5601)
+* `blockIndexName`: defines the name of the index to which the block data should be sent
+* `transactionIndexName`: defines the name of the index to which the transaction data should be sent
+* `keyIndexName`: defines the name of the index to which the key write data should be sent
+* `dashboardDirectory`: folder which should contain the generated dashboards
+* `templateDirectory`: folder which contains the templates for Kibana objects (index patterns, dashboards, etc.)
+* `chaincodes`: describes the chaincodes installed on the peer
+  * `name`: the name of the chaincode
+  * `values`: the keys of the values that get persisted with the key (e.g. fabcar: key: CAR0 values: [make, model, colour, owner])
+  * `linkingKey`: the name of the key that links transactions (e.g. dummycc: previousKey)
+* `setup.ilm.enabled`: setting this false makes possible to define our own indices (for blocks, transactions and keys per organization)
+* `output.elasticsearch.index`: the template for runtime index creation
+* `output.elasticsearch.hosts`: the list of elasticsearch hosts we want our agent to connect to
+* `setup.template.name`: the name of the index template that is going to be automatically created if does not exist
+* `setup.template.pattern`: the index template is loaded for indices matching this pattern
+* `setup.dashboards.directory`: the directory that contains the (generated) dashboards to be imported into Kibana on start of the agent
+
+The paths and peer/org names contain variables that can be passed when starting the agent:
+* `GOPATH` is the value of the gopath environment variable
+* `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
+* `NETWORK` is the name of the network (basic or multichannel)
+If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove and ignore these variables and hardcode the names and paths. We can run multiple instances at the same time with different configurations (the workflow for this scenario is 1. modify config 2. `make update` 3. `make` 4. run the agent 5. modify config 6. `make update` 7. run another instance of the agent).
+
+### About indices
+
+We use 3 different indices per organization: one for blocks, one for transactions and one for single writes.  
+If we run multiple agents for peers in the same organization, they are goint to send their data to the same indices. We can then select the peer on the dashboards to view its data only.  
+If we run multiple instances for peers in different organizations, we are going to see the data of different organizations on different dashboards.  
+The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
 
 ### Build fabricbeat
 
@@ -233,9 +277,9 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 If we want to use the agent with one of the example networks from the `hyperledger-elastic/network` folder, we can start the agent using:
 ```
-ORG_NUMBER=1 ORG_NAME=org1 ./fabricbeat -e -d "*"
+ORG_NUMBER=1 NETWORK=basic ./fabricbeat -e -d "*"
 ```
-The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another peer, change the configuration (and/or the passed variables) accordingly.
+The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
 ### Stop fabricbeat
 
