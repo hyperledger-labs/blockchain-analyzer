@@ -7,6 +7,7 @@ Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 ## Contents
 1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description)  
 2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#expected-outcome)  
+4. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path#overview)
 3. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)  
 4. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)  
 5. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)  
@@ -58,6 +59,11 @@ Dashboards similar to Hyperledger Explorer
 Create a setup for generating various dummy data in various configurations
 One peer / CA / order, single user for initial testing
 A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
+
+## Overview
+
+Basic data flow: 
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 ## Prerequisites
 
@@ -205,8 +211,8 @@ After that, we have to set the `BEAT_PATH` variable to point to the fabricbeat f
 ```
 export BEAT_PATH=$GOPATH/src/github.com/hyperledger-elastic/agent/fabricbeat
 ```
-
-We want to use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
+Note: there is no trailing slash.
+We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
 ```
 export GO111MODULE=auto
 ```  
@@ -217,6 +223,37 @@ We can configure the agent using the `fabricbeat.yml` file. If we want to update
 ```
 make update
 ```
+
+The configurable fields are the following:
+* `period`: defines how often an event is sent to the output (Elasticsearch in this case)
+* `organization`: defines which organization the connected peer is part of
+* `peer`: defines the peer which fabricbeat should query (must be defined in the connection profile)
+* `connectionProfile`: defines the location of the connection profile of the Fabric network
+* `adminCertPath`: absolute path to the admin certfile
+* `adminKeyPath`: absolute path to the admin keyfile
+* `elasticURL`: URL of Elasticsearch (defaults to http://localhost:9200)
+* `kibanaURL`: URL of Kibana (defaults to http://localhost:5601)
+* `blockIndexName`: defines the name of the index to which the block data should be sent
+* `transactionIndexName`: defines the name of the index to which the transaction data should be sent
+* `keyIndexName`: defines the name of the index to which the key write data should be sent
+* `dashboardDirectory`: folder which should contain the generated dashboards
+* `templateDirectory`: folder which contains the templates for Kibana objects (index patterns, dashboards, etc.)
+* `chaincodes`: describes the chaincodes installed on the peer
+  * `name`: the name of the chaincode
+  * `values`: the keys of the values that get persisted with the key (e.g. fabcar: key: CAR0 values: [make, model, colour, owner])
+  * `linkingKey`: the name of the key that links transactions (e.g. dummycc: previousKey)
+* `setup.ilm.enabled`: setting this false makes possible to define our own indices (for blocks, transactions and keys per organization)
+* `output.elasticsearch.index`: the template for runtime index creation
+* `output.elasticsearch.hosts`: the list of elasticsearch hosts we want our agent to connect to
+* `setup.template.name`: the name of the index template that is going to be automatically created if does not exist
+* `setup.template.pattern`: the index template is loaded for indices matching this pattern
+* `setup.dashboards.directory`: the directory that contains the (generated) dashboards to be imported into Kibana on start of the agent
+
+The paths and peer/org names contain variables that can be passed when starting the agent:
+* `GOPATH` is the value of the gopath environment variable
+* `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
+* `NETWORK` is the name of the network (basic or multichannel)
+If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove and ignore these variables and hardcode the names and paths. We can run multiple instances at the same time with different configurations (the workflow for this scenario is 1. modify config 2. `make update` 3. `make` 4. run the agent 5. modify config 6. `make update` 7. run another instance of the agent).
 
 ### Build fabricbeat
 
@@ -233,9 +270,9 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 If we want to use the agent with one of the example networks from the `hyperledger-elastic/network` folder, we can start the agent using:
 ```
-ORG_NUMBER=1 ORG_NAME=org1 ./fabricbeat -e -d "*"
+ORG_NUMBER=1 NETWORK=basic ./fabricbeat -e -d "*"
 ```
-The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another peer, change the configuration (and/or the passed variables) accordingly.
+The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
 ### Stop fabricbeat
 
