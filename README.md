@@ -4,6 +4,36 @@ Mentor: Salman Baset [salmanbaset](https://github.com/salmanbaset)
 
 Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
+## Contents
+1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description)
+2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#expected-outcome)
+3. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)
+4. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)
+5. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)
+  1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#basic-network)
+  2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#multichannel-network)
+  3. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#(optional)-generate-makefile-configuration)
+  4. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-the-network)
+  5. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-the-network)
+6. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#dummyapp-application)
+  1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#installation)
+  2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configuration)
+  3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#user-enrollment-and-registration)
+  4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#invoke-transactions)
+  5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#query)
+7. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#elastic-stack)
+  1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#credit)
+  2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description-1)
+  3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start)
+  4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-and-destroy)
+8. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#beats-agent)
+  1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#environment-setup)
+  2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configure-fabricbeat)
+  3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#build-fabricbeat)
+  4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-fabricbeat)
+  5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-fabricbeat)
+  
+
 ## Description
 
 Each blockchain platform, including Hyperledger Fabric, provide a way to record information on blockchain in an immutable manner. In the case of Hyperledger Fabric, information is recorded as a `key-value` pair. All previous updates to a `key` are recorded in the ledger, but only the latest value of a `key` can be easily queried using CouchDB; the previous updates are only available in ledger files. This mechanism makes it challenging to perform analysis of updates to a `key`, a necessary requirement for information provenance.
@@ -45,11 +75,11 @@ git clone https://github.com/balazsprehoda/hyperledger-elastic.git
 
 The `network` directory contains two network setups, `basic` and `multichannel`. 
 
-### Basic Network
+### Basic network
 
 It is a simple test network with 4 organizations, 1 peer each, a solo orderer communicating over TLS and a sample chaincode called `dummycc`. It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.  
 
-### Multichannel Network
+### Multichannel network
 
 It is a test network setup with 4 organizations, 2 peers each, a solo orderer communicating over TLS and two channels:
 
@@ -60,7 +90,7 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
   * members: only `Org1` and `Org3`
   * chaincode: `fabcar`: The classic fabcar example chaincode extended with a `getHistoryForCar()` chaincode function.
 
-### Optional. generate makefile configuration
+### (Optional) Generate makefile configuration
 ```
 make generate ABSPATH={ABSOLUTE_PATH_TO_SRC_DIR}
 ```
@@ -123,7 +153,7 @@ To add key-value pairs, run
 make invoke
 ```
 
-### Query key
+### Query
 To query a specific key, run
 ```
 make query KEY=key1
@@ -137,7 +167,8 @@ make query-all
 This project includes an Elasticsearch and Kibana setup to index and visualize blockchain data.  
 The commands in this section should be issued from the `hyperledger-elastic/stack` folder.
 
-### Borrowed from
+### Credit
+This setup is borrowed from
 https://github.com/maxyermayank/docker-compose-elasticsearch-kibana
 
 ### Description
@@ -164,7 +195,7 @@ make erase
 The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
 The commands in this section should be issued from the `hyperledger-elastic/agent/fabricbeat` directory.
 
-### Environment Setup
+### Environment setup
 
 Before configuring and building the fabricbeat agent, we should make sure that the `GOPATH` variable is set correctly. Then, we have to add `$GOPATH/bin` to the `PATH`:
 ```
@@ -180,21 +211,21 @@ We want to use vendoring instead of go modules, so we have to make sure `GO111MO
 export GO111MODULE=auto
 ```  
 
-### Configure Fabricbeat
+### Configure fabricbeat
 
 We can configure the agent using the `fabricbeat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
 ```
 make update
 ```
 
-### Build Fabricbeat
+### Build fabricbeat
 
 To build the agent, issue the following command:
 ```
 make
 ```
 
-### Start Fabricbeat
+### Start fabricbeat
 
 To start the agent, issue the following command from the `fabricbeat` directory:
 ```
@@ -206,6 +237,6 @@ ORG_NUMBER=1 ORG_NAME=org1 ./fabricbeat -e -d "*"
 ```
 The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another peer, change the configuration (and/or the passed variables) accordingly.
 
-### Stop Fabricbeat
+### Stop fabricbeat
 
 To stop the agent, simply type `Ctrl+C`
