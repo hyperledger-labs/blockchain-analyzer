@@ -98,7 +98,7 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
 
 ### (Optional) Generate makefile configuration
 ```
-make generate ABSPATH={ABSOLUTE_PATH_TO_SRC_DIR}
+make generate
 ```
 
 ### Start the network
@@ -142,11 +142,6 @@ The `config.json` contains the configuration for the application. We can configu
 4. `previousKey`: This field is optional. We can specify here the key to which the new transaction (key-value pair) is linked.
 
 ###  User enrollment and registration
-
-Setup path of the network configuration (basic or multichannel shipped with this repository)
-```
-export ABSPATH={ABSOLUTE_PATH}/src/github.com/hyperledger-elastic/network/basic/
-```
 
 To enroll admins, register and enroll users, run the following command:
 ```
@@ -207,11 +202,6 @@ Before configuring and building the fabricbeat agent, we should make sure that t
 ```
 export PATH=$PATH:$GOPATH/bin
 ```
-After that, we have to set the `BEAT_PATH` variable to point to the fabricbeat folder:
-```
-export BEAT_PATH=$GOPATH/src/github.com/hyperledger-elastic/agent/fabricbeat
-```
-Note: there is no trailing slash.
 We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
 ```
 export GO111MODULE=auto
@@ -253,7 +243,9 @@ The paths and peer/org names contain variables that can be passed when starting 
 * `GOPATH` is the value of the gopath environment variable
 * `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
 * `NETWORK` is the name of the network (basic or multichannel)
-If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove and ignore these variables and hardcode the names and paths. We can run multiple instances at the same time with different configurations (the workflow for this scenario is 1. modify config 2. `make update` 3. `make` 4. run the agent 5. modify config 6. `make update` 7. run another instance of the agent).
+* `PEER_NUMBER` is the number of the peer (in basic network, it can be only 0, in multichannel, it can be 0 or 1)
+Thanks to these variables, we can run multiple instances at the same time with different configurations without rebuilding the agent.
+If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove these variables and hardcode the names and paths, or use this example to come up with a similar solution.
 
 ### About indices
 
@@ -277,7 +269,7 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 If we want to use the agent with one of the example networks from the `hyperledger-elastic/network` folder, we can start the agent using:
 ```
-ORG_NUMBER=1 NETWORK=basic ./fabricbeat -e -d "*"
+ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 ```
 The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
