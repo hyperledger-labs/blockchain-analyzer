@@ -88,5 +88,5 @@ ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 ```
 
 Next, we can navigate to http://localhost:5601. Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner.
-After that, we can click the dashboards and see the overview of our data on the Overview Dashboard peer0.org1.el-network.com (org1).
+After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org1).
 If the dashboards are empty, set the time range wider!
