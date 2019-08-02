@@ -89,6 +89,12 @@ You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole networ
 
 For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
 
+If you are working in a virtual machine, the fabricbeat agent might stop with an error saying "Kibana server is not ready". In this case, issue
+```
+sudo sysctl -w vm.max_map_count=262144
+```
+to set the vm.max_map_count kernel setting to 262144, then destroy and bring up the network again.
+
 ## Fabric Network
 
 The `network` directory contains two network setups, `basic` and `multichannel`. 
