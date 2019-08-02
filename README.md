@@ -5,34 +5,34 @@ Mentor: Salman Baset [salmanbaset](https://github.com/salmanbaset)
 Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
 ## Contents
-1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description)  
-2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#expected-outcome)  
-3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#overview)
-4. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#prerequisites)  
-5. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#getting-started)  
-6. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#fabric-network)  
-  6.1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#basic-network)  
-  6.2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#multichannel-network)  
-  6.3. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#optional-generate-makefile-configuration)  
-  6.4. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-the-network)   
-  6.5. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-the-network)  
-7. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#dummyapp-application)  
-  7.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#installation)  
-  7.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configuration)  
-  7.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#user-enrollment-and-registration)  
-  7.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#invoke-transactions)  
-  7.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#query)  
-8. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#elastic-stack)  
-  8.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#credit)  
-  8.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#description-1)  
-  8.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start)  
-  8.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-and-destroy)  
-9. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#beats-agent)  
-  9.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#environment-setup)  
-  9.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#configure-fabricbeat)  
-  9.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#build-fabricbeat)  
-  9.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#start-fabricbeat)   
-  9.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path#stop-fabricbeat)  
+1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description)  
+2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#expected-outcome)  
+3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#overview)
+4. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#prerequisites)  
+5. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#getting-started)  
+6. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#fabric-network)  
+  6.1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#basic-network)  
+  6.2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#multichannel-network)  
+  6.3. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#optional-generate-makefile-configuration)  
+  6.4. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-the-network)   
+  6.5. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-the-network)  
+7. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#dummyapp-application)  
+  7.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#installation)  
+  7.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configuration)  
+  7.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#user-enrollment-and-registration)  
+  7.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#invoke-transactions)  
+  7.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#query)  
+8. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#elastic-stack)  
+  8.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#credit)  
+  8.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description-1)  
+  8.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start)  
+  8.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-and-destroy)  
+9. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#beats-agent)  
+  9.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#environment-setup)  
+  9.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configure-fabricbeat)  
+  9.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#build-fabricbeat)  
+  9.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-fabricbeat)   
+  9.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-fabricbeat)  
   
 
 ## Description
@@ -63,11 +63,11 @@ A four peers/CA setup with two channels, and two users each associated with two 
 ## Overview
 
 Basic data flow: 
-![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 ## Prerequisites
 
-Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/docs/Prerequisites.md).   
+Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Prerequisites.md).   
 
 ## Getting Started
 
@@ -87,7 +87,7 @@ You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole networ
 * `make destroy-basic` to stop basic network and remove generated data, or
 * `make destroy-multichannel` to stop multichannel network and remove generated data.
 
-For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/docs/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/docs/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
+For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
 
 ## Fabric Network
 

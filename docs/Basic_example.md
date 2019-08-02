@@ -4,7 +4,7 @@ This is an example to setup the project with basic network on a new Ubuntu 18.04
 
 ## Prerequisites
 
-Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/docs/Prerequisites.md).   
+Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Prerequisites.md).   
 
 ## Cloning the repository
 To get started with the project, we have to clone the repository first. It is important that we put it under `$GOPATH/src/github.com`. 
