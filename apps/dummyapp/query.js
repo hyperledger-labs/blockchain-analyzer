@@ -8,7 +8,11 @@ const { FileSystemWallet, Gateway } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
 
-const ccpPath = path.resolve(__dirname, '..', '..', 'network', 'connectionProfile.json');
+const configPath = path.resolve(__dirname, 'config.json');
+const configJSON = fs.readFileSync(configPath, 'utf8');
+const config = JSON.parse(configJSON);
+
+const ccpPath = path.resolve(__dirname, config.connection_profile);
 const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
 const ccp = JSON.parse(ccpJSON);
 
@@ -33,13 +37,19 @@ async function main() {
         await gateway.connect(ccp, { wallet, identity: 'user1', discovery: { enabled: false } });
 
         // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork('mychannel');
+        const network = await gateway.getNetwork(config.channel.channelName);
 
         // Get the contract from the network.
-        const contract = network.getContract('dummycc');
+        const contract = network.getContract(config.channel.contract);
 
         // Evaluate the specified transaction.
-        const result = await contract.evaluateTransaction('queryAllValues');
+        if (process.argv.length < 3) {
+            console.log('No key provided, querying all values')
+            const result = await contract.evaluateTransaction('queryAllValues');
+            console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        }
+        console.log(`Querying value for key ${process.argv[2]}`)
+        const result = await contract.evaluateTransaction('queryValue', process.argv[2]);
         console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
 
     } catch (error) {

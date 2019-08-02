@@ -16,6 +16,19 @@ crypto-config/
 
 # Generated channel artifacts
 channel-artifacts/
+channel-artifacts-fourchannel/
+channel-artifacts-twochannel/
+
+# Generated connection profiles
+connection-profile-*.yaml
+!connection-profile-TEMPLATE.yaml
+connectionProfile.json
+
+# Generated docker-compose.yaml
+network/*/docker-compose.yaml
+
+# Generated dashboards
+dashboards/
 
 # Node modules
 node_modules
@@ -29,11 +42,9 @@ build
 
 .DS_Store
 
-keystore/
 fabricbeat/_meta/dashboards.yml
 fabricbeat
 !fabricbeat/
-/keystore
 
 *.pyc
 
