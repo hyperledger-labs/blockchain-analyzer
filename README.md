@@ -71,11 +71,23 @@ Please make sure that you have set up the environment for the project. Follow th
 
 ## Getting Started
 
-To get started with the project, clone the git repository. It is important that you place it under $GOPATH/src/github.com  
+To get started with the project, clone the git repository. It is important that you place it under `$GOPATH/src/github.com`  
 ```
 cd $GOPATH/src/github.com  
 git clone https://github.com/balazsprehoda/hyperledger-elastic.git  
 ```
+
+This project provides a simple way of installing and trying out the main features, just to see its purpose. First, make sure that `GOPATH` is set correctly. Then, in the top directory of the project (`hyperledger-elastic`), run  
+* `make basic` to build and run components with a basic configuration, or
+* `make multichannel` to build and run components with a more complex configuration.
+
+After setting up the project, navigate to http://localhost:5601 to see the Kibana dashboards and the blockchain data. Click on "dashboards" on the left. Since no default index pattern is selected yet, Kibana is going to take you to the index pattern management site. Here, click "fabricbeat-\*", then the black star in the top-right corner. After this, you can click the dashboards menu and select the dashboard you wish to inspect.
+
+You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole network and remove generated data by issuing  
+* `make destroy-basic` to stop basic network and remove generated data, or
+* `make destroy-multichannel` to stop multichannel network and remove generated data.
+
+For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
 
 ## Fabric Network
 
