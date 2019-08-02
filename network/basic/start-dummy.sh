@@ -12,5 +12,5 @@ source ./generate-artifacts.sh
 
 COMPOSE_PROJECT_NAME=$CHANNEL_NAME docker-compose -f docker-compose.yaml up -d
 
-sleep 5
+sleep 15
 docker exec -it cli scripts/dummycc/channel-chaincode-dummy-setup.sh

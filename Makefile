@@ -8,6 +8,8 @@ basic:
 	make remove-intermediate
 	cd apps/dummyapp && make install && make users && make invoke
 	export PATH=${PATH}:${GOPATH}/bin && cd agent/fabricbeat && make update && make
+	#Waiting for Kibana
+	sleep 15
 	cd agent/fabricbeat && NETWORK=basic ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*"
 
 multichannel:
@@ -17,6 +19,8 @@ multichannel:
 	make remove-intermediate
 	cd apps/dummyapp && make install && make users && make invoke
 	export PATH=${PATH}:${GOPATH}/bin && cd agent/fabricbeat && make update && make
+	#Waiting for Kibana
+	sleep 15
 	cd agent/fabricbeat && NETWORK=multichannel ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*" &
 	cd agent/fabricbeat && NETWORK=multichannel ORG_NUMBER=1 PEER_NUMBER=1 ./fabricbeat -e -d "*" &
 	cd agent/fabricbeat && NETWORK=multichannel ORG_NUMBER=2 PEER_NUMBER=0 ./fabricbeat -e -d "*"

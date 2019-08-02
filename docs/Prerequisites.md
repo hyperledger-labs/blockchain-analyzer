@@ -3,8 +3,7 @@
 * Docker  (v19.03.0+)
 * docker-compose (v1.24.1+)  
 * Node.js (v8.10+)  
-* python (2.7)
-* pip (v9.0.1+)  
+* python (2.7) 
 * virtualenv (16.7.0+)  
 
 ### Golang
@@ -90,12 +89,6 @@ npm -v
 Ubuntu comes with python 2.7 already installed. We can check the version by running
 ```
 python --version
-```
-
-### Pip
-
-```
-sudo apt install python-pip
 ```
 
 ### Virtualenv
