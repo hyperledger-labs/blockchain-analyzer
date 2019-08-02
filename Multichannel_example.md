@@ -18,7 +18,6 @@ git clone https://github.com/balazsprehoda/hyperledger-elastic.git
 To start the multichannel Fabric network, run these commands:
 ```
 cd hyperledger-elastic/network/multichannel
-export ABSPATH=$GOPATH/src/github.com
 make start
 ```
 
@@ -74,18 +73,6 @@ We use the agent to periodically query ledger data and ship it to Elasticsearch.
 ```
 cd ../agent/fabricbeat
 export PATH=$PATH:$GOPATH/bin
-export BEAT_PATH=$GOPATH/src/github.com/hyperledger-elastic/agent/fabricbeat
-```
-
-Next, we have to update the `_meta/beat.yml` file to contain the correct paths:
-```
-connectionProfile: ${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/connection-profile-${ORG_NUMBER}.yaml
-adminCertPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
-adminKeyPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
-```
-The above settings define the peer we want to connect to, and the user credentials used for initializing transactions.  
-Then, we can generate the config file and docs:
-```
 make update
 ```
 
@@ -97,9 +84,15 @@ make
 
 If the build is successful, we can start the agent and connect to peer0.org1.el-network.com by issuing the command
 ```
-ORG_NUMBER=1 ORG_NAME=org1 ./fabricbeat -e -d "*"
+ORG_NUMBER=3 PEER_NUMBER=1 NETWORK=multichannel ./fabricbeat -e -d "*"
 ```
 
 Next, we can navigate to http://localhost:5601. Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner.
-After that, we can click the dashboards and see the overview of our data on the Overview Dashboard peer0.org1.el-network.com (org1).
+After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org3).
 If the dashboards are empty, set the time range wider!
+
+To start more instances of the fabricbeat agent, open another tab/terminal, make sure that the GOPATH variable is set (`export GOPATH=$HOME/go`) , and run fabricbeat passing different variables from the previous run(s) (e.g.
+```
+ORG_NUMBER=2 PEER_NUMBER=0 NETWORK=multichannel ./fabricbeat -e -d "*"
+```
+will start an agent querying peer0.org2.el-network.com). If the started instance queries a peer from the same organization as the previous one, we can select the peer we want to see the data of from a dropdown on the dashboards. If the new peer is shipping data from a different organization, we can see its data on a different dashboard (click the dashboards menu on the left, and choose one).
