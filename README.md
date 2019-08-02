@@ -67,7 +67,7 @@ Basic data flow:
 
 ## Prerequisites
 
-Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/Prerequisites.md).   
+Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/test-build-path/docs/Prerequisites.md).   
 
 ## Getting Started
 
@@ -87,7 +87,7 @@ You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole networ
 * `make destroy-basic` to stop basic network and remove generated data, or
 * `make destroy-multichannel` to stop multichannel network and remove generated data.
 
-For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
+For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/docs/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/test-build-path/docs/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
 
 ## Fabric Network
 
