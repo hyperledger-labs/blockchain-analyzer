@@ -1,6 +1,6 @@
-# Example Setup With Basic Network
+# Example Setup With Multichannel Network
 
-This is an example to setup the project with basic network on a new Ubuntu 18.04 virtual machine from scratch.
+This is an example to setup the project with multichannel network on a new Ubuntu 18.04 virtual machine from scratch.
 
 ## Prerequisites
 
@@ -14,10 +14,10 @@ cd $GOPATH/src/github.com
 git clone https://github.com/balazsprehoda/hyperledger-elastic.git
 ```
 
-## Starting the basic network
-To start the basic Fabric network, run these commands:
+## Starting the multichannel network
+To start the multichannel Fabric network, run these commands:
 ```
-cd hyperledger-elastic/network/basic
+cd hyperledger-elastic/network/multichannel
 make start
 ```
 
@@ -27,7 +27,7 @@ We use the dummyapp to generate users and transactions. It digests a config file
 cd ../../apps/dummyapp
 make install
 ```
-Open `config.json`, and make sure that `channelName` is set to *mychannel* and the `connection_profile` is set to *"../../network/basic/connectionProfile.json"*!
+Open `config.json`, and make sure that `channelName` is set to *fourchannel* and the `connection_profile` is set to *"../../network/multichannel/connectionProfile.json"*!
 After that, we can generate the users:
 ```
 make users
@@ -84,9 +84,20 @@ make
 
 If the build is successful, we can start the agent and connect to peer0.org1.el-network.com by issuing the command
 ```
-ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
+ORG_NUMBER=1 PEER_NUMBER=1 NETWORK=multichannel ./fabricbeat -e -d "*"
 ```
 
-Next, we can navigate to http://localhost:5601. Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner.
-After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org1).
-If the dashboards are empty, set the time range wider!
+Next, we can navigate to http://localhost:5601. Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner:
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Index_pattern_selection_basic.png "Setting default index pattern")
+After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org1):
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Overview_with_filter_multi.png "Overview with filter")
+
+**If the dashboards are empty, set the time range wider!**
+
+We can go on discovering the dashboards by scrolling and clicking the link fields, or by selecting another dashboards from the Dashboards menu.
+
+To start more instances of the fabricbeat agent, open another tab/terminal, make sure that the GOPATH variable is set (`export GOPATH=$HOME/go`) , and run fabricbeat passing different variables from the previous run(s) (e.g.
+```
+ORG_NUMBER=2 PEER_NUMBER=0 NETWORK=multichannel ./fabricbeat -e -d "*"
+```
+will start an agent querying peer0.org2.el-network.com). If the started instance queries a peer from the same organization as the previous one, we can select the peer we want to see the data of from a dropdown on the dashboards. If the new peer is shipping data from a different organization, we can see its data on a different dashboard (click the dashboards menu on the left, and choose one).

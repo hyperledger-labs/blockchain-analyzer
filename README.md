@@ -63,7 +63,7 @@ A four peers/CA setup with two channels, and two users each associated with two 
 ## Overview
 
 Basic data flow: 
-![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 ## Prerequisites
 
@@ -77,17 +77,9 @@ cd $GOPATH/src/github.com
 git clone https://github.com/balazsprehoda/hyperledger-elastic.git  
 ```
 
-This project provides a simple way of installing and trying out the main features, just to see its purpose. First, make sure that `GOPATH` is set correctly. Then, in the top directory of the project (`hyperledger-elastic`), run  
-* `make basic` to build and run components with a basic configuration, or
-* `make multichannel` to build and run components with a more complex configuration.
+This project provides an automated way to try the main features. For details, see [Basic Demo](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_demo.md) and [Multichannel Demo](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_demo.md).
 
-After setting up the project, navigate to http://localhost:5601 to see the Kibana dashboards and the blockchain data. Click on "dashboards" on the left. Since no default index pattern is selected yet, Kibana is going to take you to the index pattern management site. Here, click "fabricbeat-\*", then the black star in the top-right corner. After this, you can click the dashboards menu and select the dashboard you wish to inspect.
-
-You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole network and remove generated data by issuing  
-* `make destroy-basic` to stop basic network and remove generated data, or
-* `make destroy-multichannel` to stop multichannel network and remove generated data.
-
-For a manual setup, follow the instructions provided in [Basic_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_example.md) or [Multichannel_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_example.md). For more customizable setup, please see the next sections on this page.
+For a manual setup, follow the instructions provided in [Basic_setup_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_setup_example.md) or [Multichannel_setup_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_setup_example.md). For more customizable setup, please see the next sections on this page.
 
 If you are working in a virtual machine, the fabricbeat agent might stop with an error saying "Kibana server is not ready". In this case, issue
 ```
