@@ -55,12 +55,12 @@ Of course, a blockchain solution can track information provenance in multiple wa
 
 A open source implementation, eventually available as Hyperledger Labs, containing:
 
-Elastic beats plugin for Hyperledger Fabric
-Kibana dashboards
-Dashboards similar to Hyperledger Explorer
-Create a setup for generating various dummy data in various configurations
-One peer / CA / order, single user for initial testing
-A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
+* Elastic beats plugin for Hyperledger Fabric  
+* Kibana dashboards  
+* Dashboards similar to Hyperledger Explorer  
+* Create a setup for generating various dummy data in various configurations  
+* One peer / CA / order, single user for initial testing  
+* A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.  
 
 ## Overview
 
