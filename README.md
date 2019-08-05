@@ -6,6 +6,8 @@ Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
 Project Name: Blockchain Analyzer
 
+The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/stack) directory and its contents!
+
 ## Contents
 1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description)  
 2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#expected-outcome)  
