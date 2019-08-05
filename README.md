@@ -53,7 +53,7 @@ Of course, a blockchain solution can track information provenance in multiple wa
 
 ## Expected Outcome
 
-A open source implementation, eventually available as Hyperledger Labs, containing:
+An open source implementation, eventually available as Hyperledger Labs, containing:
 
 * Elastic beats plugin for Hyperledger Fabric  
 * Kibana dashboards  
