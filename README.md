@@ -4,6 +4,8 @@ Mentor: Salman Baset [salmanbaset](https://github.com/salmanbaset)
 
 Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
+Project Name: Blockchain Analyzer
+
 ## Contents
 1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description)  
 2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#expected-outcome)  
@@ -64,6 +66,9 @@ A four peers/CA setup with two channels, and two users each associated with two 
 
 Basic data flow: 
 ![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
+
+Dashboard example:
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Overview_with_filter_multi.png "Dashboard with peer and channel selected")
 
 ## Prerequisites
 
