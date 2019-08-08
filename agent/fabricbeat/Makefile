@@ -38,3 +38,7 @@ git-init:
 git-add:
 	git add -A
 	git commit -m "Add generated fabricbeat files"
+
+.PHONY: clean
+clean::
+	rm -rf build/
