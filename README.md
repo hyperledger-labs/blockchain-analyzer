@@ -114,6 +114,7 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
   * chaincode: `fabcar`: The classic fabcar example chaincode extended with a `getHistoryForCar()` chaincode function.
 
 ### (Optional) Generate makefile configuration
+
 ```
 make generate
 ```
@@ -142,16 +143,19 @@ make destroy
 ```
 
 ## Dummyapp Application  
+
 The dummyapp application is used to generate users and transactions. It can connect to both the basic and the multichannel networks.  
 The commands in this section should be issued from the `hyperledger-elastic/apps/dummyapp` directory.
 
 ### Installation
+
 Before the first run, we have to install the necessary node modules:
 ```
 npm install
 ```
 
 ### Configuration
+
 The `config.json` contains the configuration for the application. We can configure the channel and chaincode name that we want our application to use, the users we want to enroll and the transactions we want to initialize. Transactions have 4 fields:
 1. `user`: This field is required. We have to specify which user to use when making the transaction.
 2. `txFunction`: This field is required. We have to specify here the chaincode function that should be called.
@@ -159,18 +163,21 @@ The `config.json` contains the configuration for the application. We can configu
 4. `previousKey`: This field is optional. We can specify here the key to which the new transaction (key-value pair) is linked.
 
 ###  User enrollment and registration
+
 To enroll admins, register and enroll users, run the following command:
 ```
 make users
 ```
 
 ###  Invoke transactions
+
 To add key-value pairs, run
 ```
 make invoke
 ```
 
 ### Query
+
 To query a specific key, run
 ```
 make query KEY=key1
@@ -181,23 +188,28 @@ make query-all
 ```
 
 ## Elastic Stack
+
 This project includes an Elasticsearch and Kibana setup to index and visualize blockchain data.  
 The commands in this section should be issued from the `hyperledger-elastic/stack` folder.
 
 ### Credit
+
 This setup is borrowed from
 https://github.com/maxyermayank/docker-compose-elasticsearch-kibana
 
 ### Description
+
 Kibana container and Elasticsearch cluster with nginx and 3 Elasticsearch containers. To view Kibana in browser, navigate to http://localhost:5601
 
 ### Start
+
 To start the containers, issue
 ```
 make start
 ```
 
 ### Stop and destroy
+
 To stop the containers, issue
 ```
 make destroy
