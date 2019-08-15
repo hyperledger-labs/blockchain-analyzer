@@ -1,0 +1,434 @@
+{
+    "channel": {
+        "channelName": "applechannel",
+        "contract": "applechain"
+    },
+    "connection_profile": "../../network/applechain/connectionProfile.json",
+    "organizations": {
+        "Org1": {
+            "MSP": "Org1MSP"
+        },
+        "Org2": {
+            "MSP": "Org2MSP"
+        },
+        "Org3": {
+            "MSP": "Org3MSP"
+        },
+        "Org4": {
+            "MSP": "Org4MSP"
+        }
+    },
+    "users": [
+        {
+            "name": "user1",
+            "organization": "Org1"
+        },
+        {
+            "name": "user2",
+            "organization": "Org2"
+        },
+        {
+            "name": "user3",
+            "organization": "Org3"
+        },
+        {
+            "name": "user4",
+            "organization": "Org4"
+        }
+    ],
+    "transactions": [
+        {
+            "user": "user1",
+            "txFunction": "addFarm",
+            "key": "Farm0",
+            "name": "Sunshine Manor",
+            "state": "California"
+        },
+        {
+            "user": "user2",
+            "txFunction": "addFarm",
+            "key": "Farm1",
+            "name": "Windy Estate",
+            "state": "Ohio"
+        },
+        {
+            "user": "user3",
+            "txFunction": "addFactory",
+            "key": "Factory0",
+            "name": "Fancy Works",
+            "state": "New York"
+        },
+        {
+            "user": "user4",
+            "txFunction": "addFactory",
+            "key": "Factory1",
+            "name": "Santa's",
+            "state": "Alaska"
+        },
+        {
+            "user": "user3",
+            "txFunction": "addShop",
+            "key": "Shop0",
+            "name": "Ship-Shop",
+            "state": "Kansas"
+        },
+        {
+            "user": "user4",
+            "txFunction": "addShop",
+            "key": "Shop1",
+            "name": "Price Prince",
+            "state": "Minnesota"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createCrate",
+            "key": "Crate0",
+            "farm": "Farm0"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createCrate",
+            "key": "Crate1",
+            "farm": "Farm0"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createCrate",
+            "key": "Crate2",
+            "farm": "Farm0"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createCrate",
+            "key": "Crate3",
+            "farm": "Farm0"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createCrate",
+            "key": "Crate4",
+            "farm": "Farm0"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate5",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate6",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate7",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate8",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate9",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createCrate",
+            "key": "Crate10",
+            "farm": "Farm1"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createTransport",
+            "key": "Transport0",
+            "from": "Farm0",
+            "to": "Factory0",
+            "asset": "Crate0"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createTransport",
+            "key": "Transport1",
+            "from": "Farm0",
+            "to": "Factory0",
+            "asset": "Crate1"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createTransport",
+            "key": "Transport2",
+            "from": "Farm0",
+            "to": "Factory0",
+            "asset": "Crate2"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createTransport",
+            "key": "Transport3",
+            "from": "Farm0",
+            "to": "Factory0",
+            "asset": "Crate3"
+        },
+        {
+            "user": "user1",
+            "txFunction": "createTransport",
+            "key": "Transport4",
+            "from": "Farm0",
+            "to": "Factory0",
+            "asset": "Crate4"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport5",
+            "from": "Farm1",
+            "to": "Factory1",
+            "asset": "Crate5"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport6",
+            "from": "Farm1",
+            "to": "Factory1",
+            "asset": "Crate6"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport7",
+            "from": "Farm1",
+            "to": "Factory1",
+            "asset": "Crate7"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport8",
+            "from": "Farm1",
+            "to": "Shop0",
+            "asset": "Crate8"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport9",
+            "from": "Farm1",
+            "to": "Shop1",
+            "asset": "Crate9"
+        },
+        {
+            "user": "user2",
+            "txFunction": "createTransport",
+            "key": "Transport10",
+            "from": "Farm1",
+            "to": "Shop1",
+            "asset": "Crate10"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJam",
+            "key": "Jam0",
+            "factory": "Factory0",
+            "crate": "Crate0"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJam",
+            "key": "Jam1",
+            "factory": "Factory0",
+            "crate": "Crate1"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJam",
+            "key": "Jam2",
+            "factory": "Factory0",
+            "crate": "Crate2"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJam",
+            "key": "Jam3",
+            "factory": "Factory0",
+            "crate": "Crate3"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJam",
+            "key": "Jam4",
+            "factory": "Factory0",
+            "crate": "Crate4"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport11",
+            "from": "Factory0",
+            "to": "Shop0",
+            "asset": "Jam0"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport12",
+            "from": "Factory0",
+            "to": "Shop0",
+            "asset": "Jam1"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport13",
+            "from": "Factory0",
+            "to": "Shop0",
+            "asset": "Jam2"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJuice",
+            "key": "Juice0",
+            "factory": "Factory1",
+            "crate": "Crate5"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJuice",
+            "key": "Juice1",
+            "factory": "Factory1",
+            "crate": "Crate6"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createJuice",
+            "key": "Juice2",
+            "factory": "Factory1",
+            "crate": "Crate7"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport14",
+            "from": "Factory1",
+            "to": "Shop0",
+            "asset": "Juice0"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport15",
+            "from": "Factory1",
+            "to": "Shop0",
+            "asset": "Juice1"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport16",
+            "from": "Factory1",
+            "to": "Shop0",
+            "asset": "Juice2"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport17",
+            "from": "Factory0",
+            "to": "Shop1",
+            "asset": "Jam3"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createTransport",
+            "key": "Transport18",
+            "from": "Factory0",
+            "to": "Shop1",
+            "asset": "Jam4"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale0",
+            "shop": "Shop0",
+            "product": "Jam0"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale1",
+            "shop": "Shop0",
+            "product": "Jam1"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale2",
+            "shop": "Shop0",
+            "product": "Jam2"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale3",
+            "shop": "Shop0",
+            "product": "Juice0"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale4",
+            "shop": "Shop0",
+            "product": "Juice1"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale5",
+            "shop": "Shop0",
+            "product": "Juice2"
+        },
+        {
+            "user": "user3",
+            "txFunction": "createSale",
+            "key": "Sale6",
+            "shop": "Shop0",
+            "product": "Crate8"
+        },
+        {
+            "user": "user4",
+            "txFunction": "createSale",
+            "key": "Sale7",
+            "shop": "Shop1",
+            "product": "Jam3"
+        },
+        {
+            "user": "user4",
+            "txFunction": "createSale",
+            "key": "Sale8",
+            "shop": "Shop1",
+            "product": "Jam4"
+        },
+        {
+            "user": "user4",
+            "txFunction": "createSale",
+            "key": "Sale9",
+            "shop": "Shop1",
+            "product": "Crate9"
+        },
+        {
+            "user": "user4",
+            "txFunction": "createSale",
+            "key": "Sale10",
+            "shop": "Shop1",
+            "product": "Crate10"
+        }
+    ]
+}
