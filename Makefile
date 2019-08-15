@@ -13,6 +13,16 @@ basic:
 	sleep 15
 	cd agent/fabricbeat && ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*"
 
+apple:
+	cd stack && make start
+	cd network/applechain && make start
+	cd apps/appleapp && make install && make users && make invoke
+	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/apple-config.yml beat.yml
+	export PATH=${PATH}:${GOPATH}/bin && cd agent/fabricbeat && make update && make
+	#Waiting for Kibana
+	sleep 15
+	cd agent/fabricbeat && ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*"
+
 multichannel:
 	cd stack && make start
 	cd network/multichannel && make start
@@ -28,12 +38,17 @@ multichannel:
 	cd agent/fabricbeat && ORG_NUMBER=2 PEER_NUMBER=0 ./fabricbeat -e -d "*"
 
 destroy-basic:
-	cd ./stack && make erase
+	cd stack && make erase
 	cd network/basic && make destroy
 	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/default-config.yml beat.yml
 
+destroy-apple:
+	cd stack && make erase
+	cd network/applechain && make destroy
+	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/default-config.yml beat.yml
+
 destroy-multichannel:
-	cd ./stack && make erase
+	cd stack && make erase
 	cd network/multichannel && make destroy
 	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/default-config.yml beat.yml
 

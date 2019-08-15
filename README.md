@@ -55,14 +55,14 @@ Of course, a blockchain solution can track information provenance in multiple wa
 
 ## Expected Outcome
 
-An open source implementation, eventually available as Hyperledger Labs, containing:
+A open source implementation, eventually available as Hyperledger Labs, containing:
 
-* Elastic beats plugin for Hyperledger Fabric  
-* Kibana dashboards  
-* Dashboards similar to Hyperledger Explorer  
-* Create a setup for generating various dummy data in various configurations  
-* One peer / CA / order, single user for initial testing  
-* A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.  
+* Elastic beats plugin for Hyperledger Fabric
+* Kibana dashboards
+* Dashboards similar to Hyperledger Explorer
+* Create a setup for generating various dummy data in various configurations
+* One peer / CA / order, single user for initial testing
+* A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
 
 ## Overview
 
@@ -208,8 +208,10 @@ make erase
 ```
 
 ## Beats Agent
+
 The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
 The commands in this section should be issued from the `hyperledger-elastic/agent/fabricbeat` directory.
+
 ### Environment setup
 
 Before configuring and building the fabricbeat agent, we should make sure that the `GOPATH` variable is set correctly. Then, we have to add `$GOPATH/bin` to the `PATH`:
@@ -222,6 +224,7 @@ export GO111MODULE=auto
 ```  
 
 ### Configure fabricbeat
+
 We can configure the agent using the `fabricbeat.yml` file. This file is generated based on the `fabricbeat/_meta/beat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
 ```
 make update
@@ -261,18 +264,21 @@ Thanks to these variables, we can run multiple instances at the same time with d
 If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove these variables and hardcode the names and paths, or use this example to come up with a similar solution.
 
 ### About indices
+
 We use 3 different indices per organization: one for blocks, one for transactions and one for single writes.  
 If we run multiple agents for peers in the same organization, they are goint to send their data to the same indices. We can then select the peer on the dashboards to view its data only.  
 If we run multiple instances for peers in different organizations, we are going to see the data of different organizations on different dashboards.  
 The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
 
 ### Build fabricbeat
+
 To build the agent, issue the following command:
 ```
 make
 ```
 
 ### Start fabricbeat
+
 To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 ./fabricbeat -e -d "*"
@@ -284,4 +290,5 @@ ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
 ### Stop fabricbeat
+
 To stop the agent, simply type `Ctrl+C`

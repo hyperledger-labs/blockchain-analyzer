@@ -11,10 +11,10 @@ fabricbeat:
   # Defines the peer which fabricbeat should query
   peer: peer${PEER_NUMBER}.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
-  connectionProfile: ${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/connection-profile-${ORG_NUMBER}.yaml
+  connectionProfile: ${GOPATH}/src/github.com/hyperledger-elastic/network/applechain/connection-profile-${ORG_NUMBER}.yaml
   # Path to the admin certfile and keyfile
-  adminCertPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
-  adminKeyPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
+  adminCertPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/applechain/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
+  adminKeyPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/applechain/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
   # URL of Elasticsearch
   elasticURL: "http://localhost:9200"
   # URL of Kibana
@@ -33,12 +33,9 @@ fabricbeat:
 
   chaincodes:
     # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
-    - linkingkey: previousKey
-      name: dummycc
-      values: [hash]
-    - name: fabcar
-      linkingkey:
-      values: ["make", "model", "colour", "owner"]
+    - linkingkey: link
+      name: applechain
+      values: [farm, crate, factory, shop, product, from, to, asset]
 
 #-------------------------- Elasticsearch output ------------------------------
 setup.ilm.enabled: false
