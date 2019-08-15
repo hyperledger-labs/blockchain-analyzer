@@ -33,11 +33,11 @@ fabricbeat:
 
   chaincodes:
     # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
-    - linkingKey: previousKey
+    - linkingkey: previousKey
       name: dummycc
       values: [hash]
     - name: fabcar
-      linkingKey:
+      linkingkey:
       values: ["make", "model", "colour", "owner"]
 
 #-------------------------- Elasticsearch output ------------------------------

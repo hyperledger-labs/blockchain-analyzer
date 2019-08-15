@@ -24,7 +24,7 @@ type Config struct {
 
 type Chaincode struct {
 	Name       string   //`chaincode:"name"`
-	LinkingKey string   //`chaincode:"linkingKey"`
+	Linkingkey string   //`chaincode:"linkingKey"`
 	Values     []string //`chaincode:"values"`
 }
 
@@ -44,14 +44,9 @@ var DefaultConfig = Config{
 	TemplateDirectory:    "/home/prehi/internship/testNetwork/hyperledger-elastic/agent/kibana_templates",
 	Chaincodes: []Chaincode{
 		Chaincode{
-			Name:       "dummycc",
-			LinkingKey: "previousKey",
-			Values:     []string{"hash"},
-		},
-		Chaincode{
-			Name:       "fabcar",
-			LinkingKey: "",
-			Values:     []string{"make", "model", "colour", "owner"},
+			Name:       "mycc",
+			Linkingkey: "linking_key",
+			Values:     []string{"myvalue"},
 		},
 	},
 }

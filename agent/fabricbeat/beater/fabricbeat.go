@@ -259,20 +259,20 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 
 							//fmt.Println("Chaincode name: " + bt.Fsetup.Chaincodes[chaincodeName].Name + "\n\n\n")
 
-							//fmt.Println("Linking key: " + bt.Fsetup.Chaincodes[chaincodeName].LinkingKey + "\n\n\n")
+							//fmt.Println("Linking key: " + bt.Fsetup.Chaincodes[chaincodeName].Linkingkey + "\n\n\n")
 							for _, chaincode := range bt.config.Chaincodes {
-								fmt.Println(fmt.Sprintf("Chaincode name: %s, linking key: %s, values length: %d", chaincode.Name, chaincode.LinkingKey, len(chaincode.Values)))
+								fmt.Println(fmt.Sprintf("Chaincode name: %s, linking key: %s, values length: %d", chaincode.Name, chaincode.Linkingkey, len(chaincode.Values)))
 							}
 
-							var linkingKeyString string
+							var LinkingkeyString string
 							ccIndex := fabricutils.IndexOfChaincode(bt.Fsetup.Chaincodes, chaincodeName)
-							if ccIndex < 0 || valueMap[bt.config.Chaincodes[ccIndex].LinkingKey] == nil {
-								linkingKeyString = ""
+							if ccIndex < 0 || valueMap[bt.config.Chaincodes[ccIndex].Linkingkey] == nil {
+								LinkingkeyString = ""
 							} else {
-								if str, ok := valueMap[bt.config.Chaincodes[ccIndex].LinkingKey].(string); ok {
-									linkingKeyString = str
+								if str, ok := valueMap[bt.config.Chaincodes[ccIndex].Linkingkey].(string); ok {
+									LinkingkeyString = str
 								} else {
-									return errors.New(fmt.Sprintf("valueMap contains interface{} value instead of string with key %s", bt.config.Chaincodes[ccIndex].LinkingKey))
+									return errors.New(fmt.Sprintf("valueMap contains interface{} value instead of string with key %s", bt.config.Chaincodes[ccIndex].Linkingkey))
 								}
 							}
 
@@ -289,12 +289,11 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 									"peer":              bt.config.Peer,
 									"write":             writeset[writeIndex],
 									"key":               w.Key,
-									// "linking_key":       valueMap[bt.Fsetup.Chaincodes[chaincodeName].LinkingKey], // Get the configured linking key name for this chaincode, and use it to obtain linking key from Value
-									"linking_key": linkingKeyString,
-									"value":       writeset[writeIndex].Value,
-									"created_at":  createdAt,
-									"creator":     creator,
-									"creator_org": creatorOrg,
+									"linking_key":       LinkingkeyString,
+									"value":             writeset[writeIndex].Value,
+									"created_at":        createdAt,
+									"creator":           creator,
+									"creator_org":       creatorOrg,
 								},
 							}
 							bt.client.Publish(event)
@@ -342,26 +341,6 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		blockHash := fabricutils.GenerateBlockHash(block.Header.PreviousHash, block.Header.DataHash, block.Header.Number)
 		// Sending the block data to the "block" index
 
-		// TEMP
-		type OutmostStruct struct {
-			OuterStruct struct {
-				MiddleStruct struct {
-					InnerStruct struct {
-						Flag string
-					}
-				}
-			}
-		}
-
-		var testStruct OutmostStruct
-		var testEmptyInterface interface{}
-		testStruct.OuterStruct.MiddleStruct.InnerStruct.Flag = "FLAG"
-		testStructBytes, err := json.Marshal(testStruct)
-		if err != nil {
-			return err
-		}
-		err = json.Unmarshal(testStructBytes, &testEmptyInterface)
-
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: libbeatCommon.MapStr{
@@ -371,7 +350,6 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 				"block_hash":    blockHash,
 				"previous_hash": prevHash,
 				"data_hash":     dataHash,
-				"test_struct":   testEmptyInterface,
 				"created_at":    createdAt,
 				"index_name":    bt.config.BlockIndexName,
 				"peer":          bt.config.Peer,
