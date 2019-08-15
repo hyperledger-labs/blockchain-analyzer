@@ -30,10 +30,12 @@ multichannel:
 destroy-basic:
 	cd ./stack && make erase
 	cd network/basic && make destroy
+	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/default-config.yml beat.yml
 
 destroy-multichannel:
 	cd ./stack && make erase
 	cd network/multichannel && make destroy
+	cd agent/fabricbeat/_meta && rm -rf beat.yml && cp templates/default-config.yml beat.yml
 
 remove-intermediate:
 ifeq ($(WHICHOS),Darwin)
