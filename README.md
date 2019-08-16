@@ -26,17 +26,23 @@ The Apache 2.0 License applies to the whole project, except from the [stack](htt
   7.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#user-enrollment-and-registration)  
   7.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#invoke-transactions)  
   7.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#query)  
-8. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#elastic-stack)  
-  8.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#credit)  
-  8.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description-1)  
-  8.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start)  
-  8.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-and-destroy)  
-9. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#beats-agent)  
-  9.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#environment-setup)  
-  9.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configure-fabricbeat)  
-  9.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#build-fabricbeat)  
-  9.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-fabricbeat)   
-  9.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-fabricbeat)  
+8. [Appleapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#appleapp-application)  
+  8.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#installation-1)  
+  8.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configuration-1)  
+  8.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#user-enrollment-and-registration-1)  
+  8.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#invoke-transactions-1)  
+  8.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#query-1)  
+9. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#elastic-stack)  
+  9.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#credit)  
+  9.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description-1)  
+  9.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start)  
+  9.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-and-destroy)  
+10. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#beats-agent)  
+  10.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#environment-setup)  
+  10.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configure-fabricbeat)  
+  10.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#build-fabricbeat)  
+  10.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-fabricbeat)   
+  10.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-fabricbeat)  
   
 
 ## Description
@@ -113,6 +119,10 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
   * members: only `Org1` and `Org3`
   * chaincode: `fabcar`: The classic fabcar example chaincode extended with a `getHistoryForCar()` chaincode function.
 
+### Applechain network
+
+It is a test network setup similar to basic network, but with different chaincode (`applechain`). The goal of this network is to imitate a supply chain use-case: crates of apples are harvested on farms, transported to factories as resources for jam and juice production, and the products are transported to shops and sold.
+
 ### (Optional) Generate makefile configuration
 ```
 make generate
@@ -120,7 +130,7 @@ make generate
 
 ### Start the network
 
-To generate crypto and setup the network, make sure that the `GOPATH` variable is set correctly. After that, set `ABSPATH` to point to the parent folder of `hyperledger-elastic` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When we are done with setting these environment variables, we can start the network. Issue the following command in the `network/basic` directory to start the basic network, or in the `network/multichannel` directory to start the multichannel network:
+To generate crypto and setup the network, make sure that the `GOPATH` variable is set correctly. After that, set `ABSPATH` to point to the parent folder of `hyperledger-elastic` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When we are done with setting these environment variables, we can start the network. Issue the following command in the `network/basic` directory to start the basic network, in the `network/multichannel` directory to start the multichannel network, or in the `network/applechain` directory to start the applechain network:
 
 ```
 make start  
@@ -178,6 +188,44 @@ make query KEY=key1
 To query all key-value pairs, run
 ```
 make query-all
+```
+
+## Appleapp Application
+The appleapp application is used to generate users and transactions for a supply chain use-case.  
+The commands in this section should be issued from the `hyperledger-elastic/apps/appleapp` directory.
+
+### Configuration
+The `config.json` contains the configuration for the application. We can configure the channel and chaincode name that we want our application to use, the users we want to enroll and the transactions we want to initialize. Transactions have 4 fields:
+1. `user`: This field is required. We have to specify which user to use when making the transaction.
+2. `txFunction`: This field is required. We have to specify here the chaincode function that should be called.
+3. `key`: This field is required. We have to specify here the key to be written to the ledger.
+4. `name`: This field is optional. We can specify here the name of the facility we create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
+5. `state`: This field is optional. We can specify here the state of the facility we create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
+6. `farm`: This field is optional. We can reference a farm by its key. Can be used with `createCrate`.
+7. `from`: This field is optional. We can reference a facility (farm, factory or shop) from which the transport departs. Can be used with `createTransport`.
+8. `to`: This field is optional. We can reference a facility (farm, factory or shop) to which the transport arrives. Can be used with `createTransport`.
+9. `asset`: This field is optional. We can reference an asset (crate, jam or juice) that is transported. Can be used with `createTransport`.
+10. `factory`: This field is optional. We can reference a factory in which the product is produced. Can be used with `createJam` and `createJuice`.
+11. `crate`: This field is optional. We can reference a crate of apples of which the product is made. Can be used with `createJam` and `createJuice`.
+12. `shop`: This field is optional. We can reference a shop in which the product is sold. Can be used with `createSale`.
+13. `product`: This field is optional. We can reference a product that is being sold. Can be used with `createSale`.
+
+###  User enrollment and registration
+To enroll admins, register and enroll users, run the following command:
+```
+make users
+```
+
+###  Invoke transactions
+To add key/value pairs, run
+```
+make invoke
+```
+
+###  Query key
+To make a query, run
+```
+make query KEY=key1
 ```
 
 ## Elastic Stack
