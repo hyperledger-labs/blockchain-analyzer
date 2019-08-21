@@ -99,6 +99,8 @@ Select Key Dashboard (org1) from the Dashboards menu! We can see all the write e
 
 We can go on discovering the dashboards by scrolling and clicking the link fields, or by selecting another dashboard from the Dashboards menu.
 
+### Graphs
+
 One awesome feature of Elasticsearch and Kibana is the Graph representation of related documents. To create a graph, we need to upgrade our account to start a free trial:
 * Click on *Management* in the menu on the left side  
 * Click *License Management*  
