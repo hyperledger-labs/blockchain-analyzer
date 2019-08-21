@@ -13,7 +13,9 @@ By clicking the dropdown lists, we can see that Org1 is member of `applechannel`
 **If the dashboards are empty, set the time range wider!**
 
 We can see all the writes that occurred to the ledger on the Key Dashboard. To see all the transports that departed from `Factory0`, filter for the term `value.from: "Factory0"`.
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Key_filter_for_source.png "Filter for transports from Factory0")
 
 We can use graph visualizations to see the related documents. For further instructions, please refer to [Apple setup example graphs section](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Apple_setup_example.md#graphs)
+![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Graph_for_all_transports_by_org3.png "Graph for all transports by Org3")
 
 You can stop the fabricbeat agent with `Ctrl+C`, and bring down the whole network and remove generated data by issuing `make destroy-apple`.
