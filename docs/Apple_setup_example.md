@@ -84,7 +84,7 @@ make
 
 If the build is successful, we can start the agent and connect to peer0.org1.el-network.com by issuing the command
 ```
-ORG_NUMBER=1 PEER_NUMBER=1 ./fabricbeat -e -d "*"
+ORG_NUMBER=1 PEER_NUMBER=1 NETWORK=applechain ./fabricbeat -e -d "*"
 ```
 
 Next, we can navigate to http://localhost:5601. Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner:
@@ -128,6 +128,6 @@ To add every transaction that was done by Org2, repeat the same steps for `Org2M
 
 To start more instances of the fabricbeat agent, open another tab/terminal, make sure that the GOPATH variable is set (`export GOPATH=$HOME/go`) , and run fabricbeat passing different variables from the previous run(s) (e.g.
 ```
-ORG_NUMBER=2 PEER_NUMBER=0 ./fabricbeat -e -d "*"
+ORG_NUMBER=2 PEER_NUMBER=0 NETWORK=applechain ./fabricbeat -e -d "*"
 ```
 will start an agent querying peer0.org2.el-network.com). If the started instance queries a peer from the same organization as the previous one, we can select the peer we want to see the data of from a dropdown on the dashboards. If the new peer is shipping data from a different organization, we can see its data on a different dashboard (click the dashboards menu on the left, and choose one).
