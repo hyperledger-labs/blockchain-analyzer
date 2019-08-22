@@ -36,8 +36,7 @@ type FabricbeatSetup struct {
 	KeyIndexName         string
 	DashboardDirectory   string
 	TemplateDirectory    string
-	// Chaincodes           map[string]fabricConfig.Chaincode
-	Chaincodes []fabricConfig.Chaincode
+	Chaincodes           []fabricConfig.Chaincode
 }
 
 // Initialize reads the configuration file and sets up FabricSetup

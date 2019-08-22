@@ -58,14 +58,8 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		KeyIndexName:         bt.config.KeyIndexName,
 		DashboardDirectory:   bt.config.DashboardDirectory,
 		TemplateDirectory:    bt.config.TemplateDirectory,
-		// Chaincodes:           make(map[string]config.Chaincode),
-		Chaincodes: bt.config.Chaincodes,
+		Chaincodes:           bt.config.Chaincodes,
 	}
-
-	// Initializing chaincode data from config
-	/*for _, chaincode := range bt.config.Chaincodes {
-		fSetup.Chaincodes[chaincode.Name] = chaincode
-	}*/
 
 	fmt.Println(fmt.Sprintf("len(fSetup.Chaincodes) = %d", len(fSetup.Chaincodes)))
 
