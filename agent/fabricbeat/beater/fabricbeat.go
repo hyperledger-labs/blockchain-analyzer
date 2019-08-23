@@ -250,10 +250,6 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 							writeset[writeIndex].IsDelete = w.IsDelete
 
 							fmt.Println(fmt.Sprintf("len(bt.Fsetup.Chaincodes) = %d", len(bt.Fsetup.Chaincodes)))
-
-							//fmt.Println("Chaincode name: " + bt.Fsetup.Chaincodes[chaincodeName].Name + "\n\n\n")
-
-							//fmt.Println("Linking key: " + bt.Fsetup.Chaincodes[chaincodeName].Linkingkey + "\n\n\n")
 							for _, chaincode := range bt.config.Chaincodes {
 								fmt.Println(fmt.Sprintf("Chaincode name: %s, linking key: %s, values length: %d", chaincode.Name, chaincode.Linkingkey, len(chaincode.Values)))
 							}
@@ -333,8 +329,8 @@ func (bt *Fabricbeat) ProcessNewBlocks(b *beat.Beat, ledgerClient *ledger.Client
 		prevHash := hex.EncodeToString(block.Header.PreviousHash)
 		dataHash := hex.EncodeToString(block.Header.DataHash)
 		blockHash := fabricutils.GenerateBlockHash(block.Header.PreviousHash, block.Header.DataHash, block.Header.Number)
-		// Sending the block data to the "block" index
 
+		// Sending the block data to the "block" index
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: libbeatCommon.MapStr{

@@ -16,6 +16,7 @@ NO_COLLECT=true
 # Initial beat setup
 .PHONY: setup
 setup: pre-setup git-add
+	go get github.com/hyperledger/fabric-sdk-go
 
 pre-setup: copy-vendor git-init
 	$(MAKE) -f $(LIBBEAT_MAKEFILE) mage -debug ES_BEATS=$(ES_BEATS)
