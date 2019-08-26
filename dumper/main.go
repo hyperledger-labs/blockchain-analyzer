@@ -40,6 +40,10 @@ func main() {
 
 	lastBlockNums := make(map[*ledger.Client]uint64)
 
+	var channelIdWrapper struct {
+		channelId string
+	}
+
 	for _, ledgerClient := range fbSetup.LedgerClients {
 		lastBlockNums[ledgerClient] = 0
 		blockHeight, err := ledgerutils.GetBlockHeight(ledgerClient)
@@ -47,15 +51,13 @@ func main() {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
+
 		for lastBlockNums[ledgerClient] < blockHeight {
 			var transactions []string
 			block, typeInfo, createdAt, _, err := ledgerutils.ProcessBlock(lastBlockNums[ledgerClient], ledgerClient)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
-			}
-			var channelIdWrapper struct {
-				channelId string
 			}
 
 			for _, d := range block.Data.Data {
@@ -109,7 +111,6 @@ func main() {
 								if err != nil {
 									logp.Warn("Error unmarshaling value into map: %s", err.Error())
 								}
-								fmt.Println(fmt.Sprintf("\n\n\nSize of map: %d\n\n\n", len(valueMap)))
 
 								writeset[writeIndex].IsDelete = w.IsDelete
 

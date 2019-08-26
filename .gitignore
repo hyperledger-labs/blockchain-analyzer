@@ -46,6 +46,9 @@ fabricbeat/_meta/dashboards.yml
 fabricbeat
 !fabricbeat/
 
+# Dumper application
+dumper
+
 *.pyc
 
 *.log

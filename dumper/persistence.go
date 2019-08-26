@@ -23,6 +23,7 @@ type FileDumper struct {
 	BlockPath           string
 }
 
+// TODO sequence number does not increase..
 func (fd FileDumper) PersistNonEndorserTx(tx NonEndorserTx) error {
 	err := fd.persistToFile(tx, path.Join(fd.NonEndorserTxPath, fmt.Sprintf("%d.json", fd.NonEndorserTxSeqNum)))
 	fd.NonEndorserTxSeqNum = fd.NonEndorserTxSeqNum + 1
