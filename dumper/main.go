@@ -62,7 +62,7 @@ func main() {
 
 			for _, d := range block.Data.Data {
 				if typeInfo != "ENDORSER_TRANSACTION" {
-					txId, channelId, creator, creatorOrg, _, err := ledgerutils.ProcessTx(d)
+					_, channelId, creator, creatorOrg, _, err := ledgerutils.ProcessTx(d)
 					if err != nil {
 						fmt.Println(err.Error())
 						os.Exit(1)
@@ -72,7 +72,6 @@ func main() {
 					dumper.Persistence.PersistNonEndorserTx(
 						NonEndorserTx{
 							BlockNumber: lastBlockNums[ledgerClient],
-							TxID:        txId,
 							ChannelID:   channelId,
 							CreatedAt:   createdAt,
 							Creator:     creator,

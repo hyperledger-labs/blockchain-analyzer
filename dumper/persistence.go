@@ -23,28 +23,27 @@ type FileDumper struct {
 	BlockPath           string
 }
 
-// TODO sequence number does not increase..
-func (fd FileDumper) PersistNonEndorserTx(tx NonEndorserTx) error {
+func (fd *FileDumper) PersistNonEndorserTx(tx NonEndorserTx) error {
 	err := fd.persistToFile(tx, path.Join(fd.NonEndorserTxPath, fmt.Sprintf("%d.json", fd.NonEndorserTxSeqNum)))
 	fd.NonEndorserTxSeqNum = fd.NonEndorserTxSeqNum + 1
 	return err
 }
 
-func (fd FileDumper) PersistEndorserTx(tx EndorserTx) error {
+func (fd *FileDumper) PersistEndorserTx(tx EndorserTx) error {
 	return fd.persistToFile(tx, path.Join(fd.EndorserTxPath, fmt.Sprintf("%s.json", tx.TxID)))
 }
 
-func (fd FileDumper) PersistWrite(w Write) error {
+func (fd *FileDumper) PersistWrite(w Write) error {
 	err := fd.persistToFile(w, path.Join(fd.WritePath, fmt.Sprintf("%d.json", fd.WriteSeqNum)))
 	fd.WriteSeqNum = fd.WriteSeqNum + 1
 	return err
 }
 
-func (fd FileDumper) PersistBlock(b Block) error {
+func (fd *FileDumper) PersistBlock(b Block) error {
 	return fd.persistToFile(b, path.Join(fd.BlockPath, fmt.Sprintf("%s-%d.json", b.ChannelID, b.BlockNumber)))
 }
 
-func (fd FileDumper) persistToFile(object interface{}, file string) error {
+func (fd *FileDumper) persistToFile(object interface{}, file string) error {
 	objectJSONBytes, err := json.Marshal(object)
 	if err != nil {
 		fmt.Println(err)
@@ -67,7 +66,7 @@ func (fd FileDumper) persistToFile(object interface{}, file string) error {
 	return nil
 }
 
-var DefaultConfig = FileDumper{
+var DefaultConfig = &FileDumper{
 	NonEndorserTxPath:   "NonEndorserTx",
 	NonEndorserTxSeqNum: 0,
 	EndorserTxPath:      "EndorserTx",

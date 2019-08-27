@@ -8,7 +8,6 @@ import (
 
 type NonEndorserTx struct {
 	BlockNumber uint64
-	TxID        string
 	ChannelID   string
 	CreatedAt   time.Time
 	Creator     string
