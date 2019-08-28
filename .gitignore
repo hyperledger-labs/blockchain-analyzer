@@ -48,6 +48,7 @@ fabricbeat
 
 # Dumper application
 dumper
+!dumper/
 
 *.pyc
 
