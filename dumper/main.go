@@ -4,10 +4,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"os"
+	"time"
 
 	"fmt"
-
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
@@ -19,59 +18,80 @@ import (
 func main() {
 	fmt.Println("Standalone dumper program started running")
 
-	fbSetup := fabricbeatsetup.FabricbeatSetup{
+	fbSetup := &fabricbeatsetup.FabricbeatSetup{
 		OrgName:       "org1",
-		ConfigFile:    "/home/prehi/go/src/github.com/hyperledger-elastic/network/basic/connection-profile-1.yaml",
+		ConfigFile:    "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/connection-profile-1.yaml",
 		Peer:          "peer0.org1.el-network.com",
-		AdminCertPath: "/home/prehi/go/src/github.com/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
-		AdminKeyPath:  "/home/prehi/go/src/github.com/hyperledger-elastic/network/basic/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
+		AdminCertPath: "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
+		AdminKeyPath:  "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
 	}
 
-	dumper := &DumperConfig{
-		FabricSetup: fbSetup,
-		Persistence: DefaultConfig,
-	}
-
-	error := fbSetup.Initialize()
-	if error != nil {
-		fmt.Println(error.Error())
+	err := fbSetup.Initialize()
+	if err != nil {
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	lastBlockNums := make(map[*ledger.Client]uint64)
+	dumper := &DumperConfig{
+		Period:        1 * time.Second,
+		FabricSetup:   fbSetup,
+		LastBlockNums: make(map[*ledger.Client]uint64),
+		Persistence:   DefaultConfig,
+	}
+
+	// Ramp-up phase
+	fmt.Println("Fetching existing data from ledger")
+	err = fetchNewData(dumper)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	// Periodic querying for new data
+	ticker := time.NewTicker(dumper.Period)
+	for _ = range ticker.C {
+		fmt.Println("Fetching new data")
+		err = fetchNewData(dumper)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+	}
+}
+
+func fetchNewData(dumper *DumperConfig) error {
+
+	// var channelIdPtr *string
 
 	var channelIdWrapper struct {
 		channelId string
 	}
 
-	for _, ledgerClient := range fbSetup.LedgerClients {
-		lastBlockNums[ledgerClient] = 0
+	for _, ledgerClient := range dumper.FabricSetup.LedgerClients {
 		blockHeight, err := ledgerutils.GetBlockHeight(ledgerClient)
 		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			return err
 		}
 
-		for lastBlockNums[ledgerClient] < blockHeight {
+		for dumper.LastBlockNums[ledgerClient] < blockHeight {
 			var transactions []string
-			block, typeInfo, createdAt, _, err := ledgerutils.ProcessBlock(lastBlockNums[ledgerClient], ledgerClient)
+			block, typeInfo, createdAt, _, err := ledgerutils.ProcessBlock(dumper.LastBlockNums[ledgerClient], ledgerClient)
 			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
+				return err
 			}
 
 			for _, d := range block.Data.Data {
 				if typeInfo != "ENDORSER_TRANSACTION" {
 					_, channelId, creator, creatorOrg, _, err := ledgerutils.ProcessTx(d)
 					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
+						return err
 					}
 					channelIdWrapper.channelId = channelId
+					// *channelIdPtr = channelId
 
 					dumper.Persistence.PersistNonEndorserTx(
 						NonEndorserTx{
-							BlockNumber: lastBlockNums[ledgerClient],
+							BlockNumber: dumper.LastBlockNums[ledgerClient],
 							ChannelID:   channelId,
 							CreatedAt:   createdAt,
 							Creator:     creator,
@@ -79,14 +99,14 @@ func main() {
 							TxType:      typeInfo,
 						},
 					)
-					logp.Info("Non-endorser transaction persisted")
+					fmt.Println("Non-endorser transaction persisted")
 
 				} else {
 					txId, channelId, creator, creatorOrg, txRWSet, chaincodeName, chaincodeVersion, err := ledgerutils.ProcessEndorserTx(d)
 					if err != nil {
-						fmt.Println(err.Error())
-						os.Exit(1)
+						return err
 					}
+					channelIdWrapper.channelId = channelId
 					readset := []*fabricutils.Readset{}
 					writeset := []*fabricutils.Writeset{}
 					// Getting read-write set
@@ -102,13 +122,13 @@ func main() {
 
 								err = json.Unmarshal(w.Value, &writeset[writeIndex].Value)
 								if err != nil {
-									logp.Warn("Error unmarshaling value into writeset: %s", err.Error())
+									fmt.Println(fmt.Sprintf("Error unmarshaling value into writeset: %s", err.Error()))
 								}
 								// With this map, we can obtain the top level fields of the value.
 								var valueMap map[string]interface{}
 								err = json.Unmarshal(w.Value, &valueMap)
 								if err != nil {
-									logp.Warn("Error unmarshaling value into map: %s", err.Error())
+									fmt.Println(fmt.Sprintf("Error unmarshaling value into map: %s", err.Error()))
 								}
 
 								writeset[writeIndex].IsDelete = w.IsDelete
@@ -151,28 +171,7 @@ func main() {
 										CreatorOrg: creatorOrg,
 									},
 								)
-
-								// event := beat.Event{
-								// 	Timestamp: time.Now(),
-								// 	Fields: libbeatCommon.MapStr{
-								// 		"type":              b.Info.Name,
-								// 		"tx_id":             txId,
-								// 		"channel_id":        channelId,
-								// 		"chaincode_name":    chaincodeName,
-								// 		"chaincode_version": chaincodeVersion,
-								// 		"index_name":        bt.config.KeyIndexName,
-								// 		"peer":              bt.config.Peer,
-								// 		"write":             writeset[writeIndex],
-								// 		"key":               w.Key,
-								// 		"linking_key":       LinkingkeyString,
-								// 		"value":             writeset[writeIndex].Value,
-								// 		"created_at":        createdAt,
-								// 		"creator":           creator,
-								// 		"creator_org":       creatorOrg,
-								// 	},
-								// }
-								// bt.client.Publish(event)
-								logp.Info("Write persisted")
+								fmt.Println("Write persisted")
 							}
 						}
 
@@ -190,7 +189,7 @@ func main() {
 
 					dumper.Persistence.PersistEndorserTx(
 						EndorserTx{
-							BlockNumber:      lastBlockNums[ledgerClient],
+							BlockNumber:      dumper.LastBlockNums[ledgerClient],
 							TxID:             txId,
 							ChannelID:        channelId,
 							ChaincodeName:    chaincodeName,
@@ -203,7 +202,7 @@ func main() {
 							TxType:           typeInfo,
 						},
 					)
-					logp.Info("Endorser transaction persisted")
+					fmt.Println("Endorser transaction persisted")
 				}
 			}
 			prevHash := hex.EncodeToString(block.Header.PreviousHash)
@@ -212,8 +211,9 @@ func main() {
 
 			dumper.Persistence.PersistBlock(
 				Block{
-					BlockNumber:  lastBlockNums[ledgerClient],
-					ChannelID:    channelIdWrapper.channelId,
+					BlockNumber: dumper.LastBlockNums[ledgerClient],
+					ChannelID:   channelIdWrapper.channelId,
+					// ChannelID:    *channelIdPtr,
 					BlockHash:    blockHash,
 					PreviousHash: prevHash,
 					DataHash:     dataHash,
@@ -221,10 +221,10 @@ func main() {
 					transactions: transactions,
 				},
 			)
-			logp.Info("Block persisted")
+			fmt.Println("Block persisted")
 
-			lastBlockNums[ledgerClient] += 1
+			dumper.LastBlockNums[ledgerClient] += 1
 		}
 	}
-	fmt.Println("Standalone dumper program run successfully")
+	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricutils"
 )
 
+// Struct for storing non-endorser (most likely config) transaction data
 type NonEndorserTx struct {
 	BlockNumber uint64
 	ChannelID   string
@@ -15,6 +16,7 @@ type NonEndorserTx struct {
 	TxType      string
 }
 
+// Struct for storing endorser transaction data
 type EndorserTx struct {
 	BlockNumber      uint64
 	TxID             string
@@ -29,6 +31,7 @@ type EndorserTx struct {
 	Writeset         []*fabricutils.Writeset
 }
 
+// Struct for storing the data of one key write
 type Write struct {
 	TxID             string
 	ChannelID        string
@@ -43,6 +46,7 @@ type Write struct {
 	CreatorOrg       string
 }
 
+// Struct for storing Block data
 type Block struct {
 	BlockNumber  uint64
 	ChannelID    string
