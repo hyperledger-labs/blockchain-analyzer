@@ -1,7 +1,13 @@
 WHICHOS := $(shell uname)
 GOPATH?=$(shell dirname $(shell dirname $(shell dirname ${PWD})))
 
+install:
+	go get github.com/hyperledger/fabric-sdk-go
+	cd apps/dummyapp && make install
+	cd apps/appleapp && make install
+
 basic:
+	go get github.com/hyperledger/fabric-sdk-go
 	cd stack && make start
 	cd network/basic && make start
 	cd apps/dummyapp &&	sed -i -e "s/\"channelName\": \"fourchannel\"/\"channelName\": \"mychannel\"/g" config.json &&	sed -i -e "s/\"connection_profile\": \"..\/..\/network\/multichannel\/connectionProfile.json\"/\"connection_profile\": \"..\/..\/network\/basic\/connectionProfile.json\"/g" config.json
@@ -14,6 +20,7 @@ basic:
 	cd agent/fabricbeat && ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*"
 
 apple:
+	go get github.com/hyperledger/fabric-sdk-go
 	cd stack && make start
 	cd network/applechain && make start
 	cd apps/appleapp && make install && make users && make invoke
@@ -24,6 +31,7 @@ apple:
 	cd agent/fabricbeat && ORG_NUMBER=1 PEER_NUMBER=0 ./fabricbeat -e -d "*"
 
 multichannel:
+	go get github.com/hyperledger/fabric-sdk-go
 	cd stack && make start
 	cd network/multichannel && make start
 	cd apps/dummyapp &&	sed -i -e "s/\"channelName\": \"mychannel\"/\"channelName\": \"fourchannel\"/g" config.json &&	sed -i -e "s/\"connection_profile\": \"..\/..\/network\/basic\/connectionProfile.json\"/\"connection_profile\": \"..\/..\/network\/multichannel\/connectionProfile.json\"/g" config.json

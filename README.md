@@ -272,6 +272,11 @@ We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is
 export GO111MODULE=auto
 ```  
 
+The agent uses the Go SDK for Fabric. To download the package, run
+```
+go get github.com/hyperledger/fabric-sdk-go
+```
+
 ### Configure fabricbeat
 
 We can configure the agent using the `fabricbeat.yml` file. This file is generated based on the `fabricbeat/_meta/beat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
