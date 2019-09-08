@@ -137,10 +137,10 @@
                 "ca.org1.HLNETWORK.com"
             ],
 			"adminPrivateKey": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/keystore/adminKey1"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/keystore/adminKey1"
 			},
 			"signedCert": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/signcerts/Admin@org1.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/users/Admin@org1.HLNETWORK.com/msp/signcerts/Admin@org1.HLNETWORK.com-cert.pem"
 			}
 		},
 		"Org2": {
@@ -154,10 +154,10 @@
                 "ca.org2.HLNETWORK.com"
             ],
 			"adminPrivateKey": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/keystore/adminKey2"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/keystore/adminKey2"
 			},
 			"signedCert": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/signcerts/Admin@org2.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/users/Admin@org2.HLNETWORK.com/msp/signcerts/Admin@org2.HLNETWORK.com-cert.pem"
 			}
 		},
 		"Org3": {
@@ -171,10 +171,10 @@
                 "ca.org3.HLNETWORK.com"
             ],
 			"adminPrivateKey": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/keystore/adminKey3"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/keystore/adminKey3"
 			},
 			"signedCert": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/signcerts/Admin@org3.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/users/Admin@org3.HLNETWORK.com/msp/signcerts/Admin@org3.HLNETWORK.com-cert.pem"
 			}
 		},
 		"Org4": {
@@ -188,27 +188,27 @@
                 "ca.org4.HLNETWORK.com"
             ],
 			"adminPrivateKey": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/keystore/adminKey4"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/keystore/adminKey4"
 			},
 			"signedCert": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/signcerts/Admin@org4.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/users/Admin@org4.HLNETWORK.com/msp/signcerts/Admin@org4.HLNETWORK.com-cert.pem"
 			}
 		},
 		"OrdererOrg": {
 			"mspid": "OrdererMSP",
 			"fullpath": true,
 			"adminPrivateKey": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/keystore/ordererAdminKey"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/keystore/ordererAdminKey"
 			},
 			"signedCert": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/signcerts/Admin@HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/users/Admin@HLNETWORK.com/msp/signcerts/Admin@HLNETWORK.com-cert.pem"
 			}
 		}
 	},
 	"peers": {
 		"peer0.org1.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer0.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7051",
 			"grpcOptions": {
@@ -217,7 +217,7 @@
 		},
 		"peer0.org2.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer0.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:8051",
 			"grpcOptions": {
@@ -226,7 +226,7 @@
 		},
 		"peer0.org3.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer0.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:9051",
 			"grpcOptions": {
@@ -235,7 +235,7 @@
 		},
 		"peer0.org4.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer0.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:10051",
 			"grpcOptions": {
@@ -244,7 +244,7 @@
 		},
 		"peer1.org1.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer1.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.HLNETWORK.com/peers/peer1.org1.HLNETWORK.com/msp/tlscacerts/tlsca.org1.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7052",
 			"grpcOptions": {
@@ -253,7 +253,7 @@
 		},
 		"peer1.org2.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer1.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org2.HLNETWORK.com/peers/peer1.org2.HLNETWORK.com/msp/tlscacerts/tlsca.org2.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:8052",
 			"grpcOptions": {
@@ -262,7 +262,7 @@
 		},
 		"peer1.org3.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer1.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org3.HLNETWORK.com/peers/peer1.org3.HLNETWORK.com/msp/tlscacerts/tlsca.org3.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:9052",
 			"grpcOptions": {
@@ -271,7 +271,7 @@
 		},
 		"peer1.org4.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer1.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org4.HLNETWORK.com/peers/peer1.org4.HLNETWORK.com/msp/tlscacerts/tlsca.org4.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:10052",
 			"grpcOptions": {
@@ -282,7 +282,7 @@
 	"orderers": {
 		"orderer.HLNETWORK.com": {
 			"tlsCACerts": {
-				"path": "ABSPATH/hyperledger-elastic/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/msp/tlscacerts/tlsca.HLNETWORK.com-cert.pem"
+				"path": "ABSPATH/blockchain-analyzer/network/multichannel/crypto-config/ordererOrganizations/HLNETWORK.com/msp/tlscacerts/tlsca.HLNETWORK.com-cert.pem"
 			},
 			"url": "grpcs://localhost:7050",
 			"grpcOptions": {
