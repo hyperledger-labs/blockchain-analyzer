@@ -1,16 +1,12 @@
-# Hyperledger Summer Internship: Analyzing Hyperledger Fabric Ledger, Transactions and Logs using Elasticsearch and Kibana
+# Blockchain Analyzer: Analyzing Hyperledger Fabric Ledger, Transactions
 
 Mentor: Salman Baset [salmanbaset](https://github.com/salmanbaset)
-
 Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
-Project Name: Blockchain Analyzer
-
-The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents!
 
 ## Contents
 1. [Description](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#description)
-2. [Expected Outcome](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#expected-outcome)
+2. [Background](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#background)
 3. [Overview](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#overview)
 4. [Prerequisites](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#prerequisites)
 5. [Getting Started](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#getting-started)
@@ -44,36 +40,38 @@ The Apache 2.0 License applies to the whole project, except from the [stack](htt
   10.3. [Build fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#build-fabricbeat)
   10.4. [Start fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#start-fabricbeat)
   10.5. [Stop fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#stop-fabricbeat)
-  
+11. [License](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#license)
 
 ## Description
 
 Each blockchain platform, including Hyperledger Fabric, provide a way to record information on blockchain in an immutable manner. In the case of Hyperledger Fabric, information is recorded as a `key-value` pair. All previous updates to a `key` are recorded in the ledger, but only the latest value of a `key` can be easily queried using CouchDB; the previous updates are only available in ledger files. This mechanism makes it challenging to perform analysis of updates to a `key`, a necessary requirement for information provenance.
 
-The goal of this project is to
+Currently, the project includes:
 
-1. write a Elastic beats module (in Go), that will ship ledger data to Elasticsearch instance
+1. an Elastic beats module (in Go), that ships ledger data from a Hyperledger peer to an Elasticsearch instance. 
 
-2. create generic Kibana dashboards that will allow selection of a particular key and visualization updates to it (channel, id, timestamp etc)
+2. generic Kibana dashboards, that allow selection of a particular key and visualization updates to it (channel, id, timestamp etc) - similar to Hyperledger Explorer.
 
-Time permitting, the dashboards can be extended to analyze Fabric logs and in-progress transaction data, as well as creating dashboards similar to Hyperledger Explorer.
+3. [scripts](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/network) to create Fabric network in different configurations, i.e., basic and mulitchannel.
 
-Of course, a blockchain solution can track information provenance in multiple ways. In one such mechanism, a solution may always write new key-value pairs to blockchain, and maintain the relationship among key-value pairs within the solution (off-chain), instead of blockchain. This project does not concern itself on how a solution manages relationship among key-value pairs.
+4. a [program](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/apps/dummyapp) to generate test data
 
-## Expected Outcome
+5. a [standalone utility](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/dumper) to dump Fabric transaction data as JSON file for loading and analyzing in any document store. 
 
-A open source implementation, eventually available as Hyperledger Labs, containing:
+6. [scripts](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) to start and stop Elasticsearch and Kibana.
 
-* Elastic beats plugin for Hyperledger Fabric
-* Kibana dashboards
-* Dashboards similar to Hyperledger Explorer
-* Create a setup for generating various dummy data in various configurations
-* One peer / CA / order, single user for initial testing
-* A four peers/CA setup with two channels, and two users each associated with two peers. Select (e.g.) 10 keys (through configuration file), to which these users write data, for at least one value per key.
+
+### Eventual goal
+The eventual goal of this project is to evaluate transactions of any blockchain using any document databases or search engines such as MongoDB, CouchDB, or Elastic stack.
+
+## Background
+
+This project was developed as part of [Hyperledger summer internship program](https://wiki.hyperledger.org/display/INTERN/Analyzing+Hyperledger+Fabric+Ledger%2C+Transactions%2C+and+Logs+using+Elasticsearch+and+Kibana). 
 
 ## Overview
 
 Basic data flow: 
+
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 Dashboard example:
@@ -101,17 +99,17 @@ sudo sysctl -w vm.max_map_count=262144
 ```
 to set the vm.max_map_count kernel setting to 262144, then destroy and bring up the network again.
 
-## Fabric Network
+## Starting a Fabric Network
 
 The `network` directory contains two network setups, `basic` and `multichannel`. 
 
 ### Basic network
 
-It is a simple test network with 4 organizations, 1 peer each, a solo orderer communicating over TLS and a sample chaincode called `dummycc`. It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.  
+It is a simple test network with four organizations, one peer per organization, a solo orderer communicating over TLS and a sample chaincode called `dummycc`. It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.  
 
 ### Multichannel network
 
-It is a test network setup with 4 organizations, 2 peers each, a solo orderer communicating over TLS and two channels:
+It is a test network setup with four organizations, two peers per organization, a solo orderer communicating over TLS and two channels:
 
 1. `fourchannel`:
   * members: all four organizations
@@ -124,20 +122,20 @@ It is a test network setup with 4 organizations, 2 peers each, a solo orderer co
 
 It is a test network setup similar to basic network, but with different chaincode (`applechain`). The goal of this network is to imitate a supply chain use-case: crates of apples are harvested on farms, transported to factories as resources for jam and juice production, and the products are transported to shops and sold.
 
-### (Optional) Generate makefile configuration
+### (Optional) Generate Makefile configuration
 ```
 make generate
 ```
 
 ### Start the network
 
-To generate crypto and setup the network, make sure that the `GOPATH` variable is set correctly. After that, set `ABSPATH` to point to the parent folder of `blockchain-analyzer` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When we are done with setting these environment variables, we can start the network. Issue the following command in the `network/basic` directory to start the basic network, in the `network/multichannel` directory to start the multichannel network, or in the `network/applechain` directory to start the applechain network:
+To generate crypto and setup the network, make sure that the `GOPATH` variable is correctly set. After that, set `ABSPATH` to point to the parent folder of `blockchain-analyzer` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When these environment variables have been set, start the network. Issue the following command in the `network/basic` directory to start the basic network, in the `network/multichannel` directory to start the multichannel network, or in the `network/applechain` directory to start the applechain network:
 
 ```
 make start  
 ```
 
-We can enter the CLI by issuing the command 
+Enter the Fabric CLI Docker container by issuing the command:
 ```
 docker exec -it cli bash  
 ```
@@ -146,7 +144,8 @@ Inside the CLI, the `/scripts` folder contains the scripts that can be used to i
 
 ### Stop the network
 
-To stop the network and delete all the generated data (crypto material, channel artifacts and dummyapp wallet), run
+To stop the network and delete all the generated data (crypto material, channel artifacts 
+and dummyapp wallet), run:
 
 ```
 make destroy
@@ -154,9 +153,9 @@ make destroy
 
 ## Dummyapp Application  
 The dummyapp application is used to create users and generate transactions
-for different scenarios so that we can analyze the resulting transactions
-with the Elastic stack. Examples of scenarios include
-which channels to use, and which fabric ca users to invoke transactions.
+for different scenarios so that the resulting transactions can be analyzed with the
+Elastic stack. Examples of scenarios include which channels to use, and which 
+Fabric ca users to invoke transactions.
 
 This application can connect to both the basic and the multichannel networks.  
 
@@ -205,7 +204,8 @@ To query all key-value pairs, run
 make query-all
 ```
 
-## Appleapp Application
+## Appleapp Application (Advanced)
+
 The appleapp application is used to generate users and transactions for a supply chain use-case.  
 The commands in this section should be issued from the `blockchain-analyzer/apps/appleapp` directory.
 
@@ -213,19 +213,19 @@ The commands in this section should be issued from the `blockchain-analyzer/apps
 The `config.json` contains the configuration for the application. The following
 fields can be set with an array entry of the `transaction` block in `config.json`:
 
-1. `user`: This field is required. We have to specify which user to use when making the transaction.
-2. `txFunction`: This field is required. We have to specify here the chaincode function that should be called.
-3. `key`: This field is required. We have to specify here the key to be written to the ledger.
-4. `name`: This field is optional. We can specify here the name of the facility we create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
-5. `state`: This field is optional. We can specify here the state of the facility we create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
-6. `farm`: This field is optional. We can reference a farm by its key. Can be used with `createCrate`.
-7. `from`: This field is optional. We can reference a facility (farm, factory or shop) from which the transport departs. Can be used with `createTransport`.
-8. `to`: This field is optional. We can reference a facility (farm, factory or shop) to which the transport arrives. Can be used with `createTransport`.
-9. `asset`: This field is optional. We can reference an asset (crate, jam or juice) that is transported. Can be used with `createTransport`.
-10. `factory`: This field is optional. We can reference a factory in which the product is produced. Can be used with `createJam` and `createJuice`.
-11. `crate`: This field is optional. We can reference a crate of apples of which the product is made. Can be used with `createJam` and `createJuice`.
-12. `shop`: This field is optional. We can reference a shop in which the product is sold. Can be used with `createSale`.
-13. `product`: This field is optional. We can reference a product that is being sold. Can be used with `createSale`.
+1. `user`: This field is required. Specify which user to use when making the transaction.
+2. `txFunction`: This field is required. Specify here the chaincode function that should be called.
+3. `key`: This field is required. Specify here the key to be written to the ledger.
+4. `name`: This field is optional. Specify here the name of the facility to create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
+5. `state`: This field is optional. Specify here the state of the facility to create with the transaction (farm, factory or shop). Can be used with `addFarm`, `addFactory` and `addShop`.
+6. `farm`: This field is optional. Reference a farm by its key. Can be used with `createCrate`.
+7. `from`: This field is optional. Reference a facility (farm, factory or shop) from which the transport departs. Can be used with `createTransport`.
+8. `to`: This field is optional. Reference a facility (farm, factory or shop) to which the transport arrives. Can be used with `createTransport`.
+9. `asset`: This field is optional. Reference an asset (crate, jam or juice) that is transported. Can be used with `createTransport`.
+10. `factory`: This field is optional. Reference a factory in which the product is produced. Can be used with `createJam` and `createJuice`.
+11. `crate`: This field is optional. Reference a crate of apples of which the product is made. Can be used with `createJam` and `createJuice`.
+12. `shop`: This field is optional. Reference a shop in which the product is sold. Can be used with `createSale`.
+13. `product`: This field is optional. Reference a product that is being sold. Can be used with `createSale`.
 
 ###  User enrollment and registration
 To enroll admins, register and enroll users, run the following command:
@@ -279,7 +279,7 @@ The commands in this section should be issued from the `blockchain-analyzer/agen
 
 ### Environment setup
 
-Before configuring and building the fabricbeat agent, we should make sure that the `GOPATH` variable is set correctly. Then, we have to add `$GOPATH/bin` to the `PATH`:
+Before configuring and building the fabricbeat agent, please make sure that the `GOPATH` variable is set correctly. Then, add `$GOPATH/bin` to the `PATH`:
 ```
 export PATH=$PATH:$GOPATH/bin
 ```
@@ -288,17 +288,19 @@ We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is
 export GO111MODULE=auto
 ```  
 
-The agent uses the Go SDK for Fabric. To download the package, run
+The agent uses the Go SDK for Fabric. To download the package, run:
 ```
 go get github.com/hyperledger/fabric-sdk-go
 ```
 
-Setup python 2.7.0 using [`pyenv`](https://github.com/pyenv/pyenv). Python version
-> 2.7 gives errors when running `make update`. 
+Setup python 2.7.0 using [`pyenv`](https://github.com/pyenv/pyenv). 
+Python version > 2.7 gives errors when running `make update`. 
 
 ### Configure fabricbeat
 
-We can configure the agent using the `fabricbeat.yml` file. This file is generated based on the `fabricbeat/_meta/beat.yml` file. If we want to update the generated config file, we can edit `fabricbeat/_meta/beat.yml`, then run
+The agent is configured using the `fabricbeat.yml` file. This file is generated 
+based on the `fabricbeat/_meta/beat.yml` file. If you want to update the generated 
+config file, please edit `fabricbeat/_meta/beat.yml`, and then run:
 ```
 make update
 ```
@@ -333,14 +335,17 @@ The paths and peer/org names contain variables that can be passed when starting 
 * `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
 * `NETWORK` is the name of the network (basic or multichannel)
 * `PEER_NUMBER` is the number of the peer (in basic network, it can be only 0, in multichannel, it can be 0 or 1)
-Thanks to these variables, we can run multiple instances at the same time with different configurations without rebuilding the agent.
-If we want to use the agent with another (custom) network, we have to modify the configuration according to the network's specifications. We can remove these variables and hardcode the names and paths, or use this example to come up with a similar solution.
+
+
+Thanks to these variables, it is possible to run multiple instances at the same time with different configurations without rebuilding the agent.
+
+To use the agent with another (custom) network, modify the configuration according to that network's specifications. 
 
 ### About indices
 
-We use 3 different indices per organization: one for blocks, one for transactions and one for single writes.  
-If we run multiple agents for peers in the same organization, they are goint to send their data to the same indices. We can then select the peer on the dashboards to view its data only.  
-If we run multiple instances for peers in different organizations, we are going to see the data of different organizations on different dashboards.  
+Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If wmultiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
+If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
+
 The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
 
 ### Build fabricbeat
@@ -356,7 +361,7 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 ./fabricbeat -e -d "*"
 ```
-If we want to use the agent with one of the example networks from the `blockchain-analyzer/network` folder, we can start the agent using:
+If you want to use the agent with one of the example networks from the `blockchain-analyzer/network` folder, you can start the agent using:
 ```
 ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 ```
@@ -365,3 +370,7 @@ The variables passed are used in the configuration (`fabricbeat.yml`). To connec
 ### Stop fabricbeat
 
 To stop the agent, simply type `Ctrl+C`
+
+
+## License
+The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents.
