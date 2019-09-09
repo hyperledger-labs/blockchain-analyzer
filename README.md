@@ -1,15 +1,12 @@
-# Blockchain Analyzer: Analyzing Hyperledger Fabric Ledger, Transactions and Logs using Elasticsearch and Kibana
+# Blockchain Analyzer: Analyzing Hyperledger Fabric Ledger, Transactions
 
 Mentor: Salman Baset [salmanbaset](https://github.com/salmanbaset)
 Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
-Project Name: Blockchain Analyzer
-
-The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents!
 
 ## Contents
 1. [Description](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#description)
-2. [Expected Outcome](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#expected-outcome)
+2. [Background](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#background)
 3. [Overview](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#overview)
 4. [Prerequisites](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#prerequisites)
 5. [Getting Started](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#getting-started)
@@ -43,13 +40,13 @@ The Apache 2.0 License applies to the whole project, except from the [stack](htt
   10.3. [Build fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#build-fabricbeat)
   10.4. [Start fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#start-fabricbeat)
   10.5. [Stop fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#stop-fabricbeat)
-  
+11. [License](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#license)
 
 ## Description
 
 Each blockchain platform, including Hyperledger Fabric, provide a way to record information on blockchain in an immutable manner. In the case of Hyperledger Fabric, information is recorded as a `key-value` pair. All previous updates to a `key` are recorded in the ledger, but only the latest value of a `key` can be easily queried using CouchDB; the previous updates are only available in ledger files. This mechanism makes it challenging to perform analysis of updates to a `key`, a necessary requirement for information provenance.
 
-This project includes:
+Currently, the project includes:
 
 1. an Elastic beats module (in Go), that ships ledger data from a Hyperledger peer to an Elasticsearch instance. 
 
@@ -63,6 +60,13 @@ This project includes:
 
 6. [scripts](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) to start and stop Elasticsearch and Kibana.
 
+
+### Eventual goal
+The eventual goal of this project is to evaluate transactions of any blockchain using any document databases or search engines such as MongoDB, CouchDB, or Elastic stack.
+
+## Background
+
+This project was developed as part of [Hyperledger summer internship program](https://wiki.hyperledger.org/display/INTERN/Analyzing+Hyperledger+Fabric+Ledger%2C+Transactions%2C+and+Logs+using+Elasticsearch+and+Kibana). 
 
 ## Overview
 
@@ -339,7 +343,7 @@ To use the agent with another (custom) network, modify the configuration accordi
 
 ### About indices
 
-Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If wmultiple agents are run for peers in the same organization, they are goint to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
+Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If wmultiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
 If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
 
 The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
@@ -366,3 +370,7 @@ The variables passed are used in the configuration (`fabricbeat.yml`). To connec
 ### Stop fabricbeat
 
 To stop the agent, simply type `Ctrl+C`
+
+
+## License
+The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents.
