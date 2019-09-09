@@ -2,5 +2,5 @@
 	"comment": "",
 	"ignore": "",
 	"package": [],
-	"rootPath": "github.com/hyperledger-elastic/agent/fabricbeat"
+	"rootPath": "github.com/blockchain-analyzer/agent/fabricbeat"
 }

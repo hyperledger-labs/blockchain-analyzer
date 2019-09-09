@@ -3,7 +3,7 @@
 Welcome to Fabricbeat.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/src/github.com/balazsprehoda/fabricbeat`
+`${GOPATH}/src/github.com/hyperledger-labs/blockchain-analyzer/fabricbeat`
 Or run:
 ```
 export BEAT_PATH=$PWD
@@ -30,7 +30,7 @@ It will create a clean git history for each major step. Note that you can always
 To push Fabricbeat in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://github.com/balazsprehoda/fabricbeat
+git remote set-url origin https://github.com/hyperledger-labs/blockchain-analyzer/fabricbeat
 git push origin master
 ```
 
@@ -103,8 +103,8 @@ make clean
 To clone Fabricbeat from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH}/src/github.com/balazsprehoda/fabricbeat
-git clone https://github.com/balazsprehoda/fabricbeat ${GOPATH}/src/github.com/balazsprehoda/fabricbeat
+mkdir -p ${GOPATH}/src/github.com/hyperledger-labs/blockchain-analyzer/fabricbeat
+git clone https://github.com/hyperledger-labs/blockchain-analyzer/fabricbeat ${GOPATH}/src/github.com/hyperledger-labs/blockchain-analyzer/fabricbeat
 ```
 
 
@@ -162,7 +162,7 @@ To connect HL Explorer to `basic` network, you should make the following changes
 	"network-configs": {
 		"elastic-network": {
 			"name": "elasticnetwork",
-			"profile": "project-location/hyperledger-elastic/network/basic/connectionProfile.json",
+			"profile": "project-location/blockchain-analyzer/network/basic/connectionProfile.json",
 			"enableAuthentication": false
 		}
 	},
@@ -170,6 +170,6 @@ To connect HL Explorer to `basic` network, you should make the following changes
 }
 ```
 
-...where `project-location` is the absolute path to the `hyperledger-elastic` project location on disk.
+...where `project-location` is the absolute path to the `blockchain-analyzer` project location on disk.
 
 3. Also make sure that you have set up the database correctly! (Follow [these](https://github.com/hyperledger/blockchain-explorer#50-database-setup----) instructions.)
