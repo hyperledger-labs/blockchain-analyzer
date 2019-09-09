@@ -6,7 +6,7 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/balazsprehoda/fabricbeat/cmd"
+	"github.com/hyperledger-labs/blockchain-analyzer/fabricbeat/cmd"
 )
 
 var systemTest *bool
