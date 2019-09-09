@@ -6,44 +6,44 @@ Mentee: Balazs Prehoda [balazsprehoda](https://github.com/balazsprehoda)
 
 Project Name: Blockchain Analyzer
 
-The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/stack) directory and its contents!
+The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents!
 
 ## Contents
-1. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description)  
-2. [Expected Outcome](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#expected-outcome)  
-3. [Overview](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#overview)
-4. [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#prerequisites)  
-5. [Getting Started](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#getting-started)  
-6. [Fabric Network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#fabric-network)  
-  6.1. [Basic network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#basic-network)  
-  6.2. [Multichannel network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#multichannel-network)  
-  6.3. [Applechain network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#applechain-network)  
-  6.4. [(Optional) Generate makefile configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#optional-generate-makefile-configuration)  
-  6.5. [Start the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-the-network)   
-  6.6. [Stop the network](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-the-network)  
-7. [Dummyapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#dummyapp-application)  
-  7.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#installation)  
-  7.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configuration)  
-  7.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#user-enrollment-and-registration)  
-  7.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#invoke-transactions)  
-  7.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#query)  
-8. [Appleapp Application](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#appleapp-application)  
-  8.1. [Installation](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#installation-1)  
-  8.2. [Configuration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configuration-1)  
-  8.3. [User enrollment and registration](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#user-enrollment-and-registration-1)  
-  8.4. [Invoke transactions](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#invoke-transactions-1)  
-  8.5. [Query](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#query-1)  
-9. [Elastic Stack](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#elastic-stack)  
-  9.1. [Credit](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#credit)  
-  9.2. [Description](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#description-1)  
-  9.3. [Start](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start)  
-  9.4. [Stop and destroy](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-and-destroy)  
-10. [Beats Agent](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#beats-agent)  
-  10.1. [Environment setup](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#environment-setup)  
-  10.2. [Configure fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#configure-fabricbeat)  
-  10.3. [Build fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#build-fabricbeat)  
-  10.4. [Start fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#start-fabricbeat)   
-  10.5. [Stop fabricbeat](https://github.com/balazsprehoda/hyperledger-elastic/tree/master#stop-fabricbeat)  
+1. [Description](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#description)
+2. [Expected Outcome](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#expected-outcome)
+3. [Overview](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#overview)
+4. [Prerequisites](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#prerequisites)
+5. [Getting Started](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#getting-started)
+6. [Fabric Network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#fabric-network)
+  6.1. [Basic network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#basic-network)
+  6.2. [Multichannel network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#multichannel-network)
+  6.3. [Applechain network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#applechain-network)
+  6.4. [(Optional) Generate makefile configuration](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#optional-generate-makefile-configuration)
+  6.5. [Start the network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#start-the-network)
+  6.6. [Stop the network](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#stop-the-network)
+7. [Dummyapp Application](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#dummyapp-application)
+  7.1. [Installation](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#installation)
+  7.2. [Configuration](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#configuration)
+  7.3. [User enrollment and registration](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#user-enrollment-and-registration)
+  7.4. [Invoke transactions](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#invoke-transactions)
+  7.5. [Query](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#query)
+8. [Appleapp Application](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#appleapp-application)
+  8.1. [Installation](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#installation-1)
+  8.2. [Configuration](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#configuration-1)
+  8.3. [User enrollment and registration](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#user-enrollment-and-registration-1)
+  8.4. [Invoke transactions](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#invoke-transactions-1)
+  8.5. [Query](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#query-1)
+9. [Elastic Stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#elastic-stack)
+  9.1. [Credit](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#credit)
+  9.2. [Description](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#description-1)
+  9.3. [Start](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#start)
+  9.4. [Stop and destroy](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#stop-and-destroy)
+10. [Beats Agent](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#beats-agent)
+  10.1. [Environment setup](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#environment-setup)
+  10.2. [Configure fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#configure-fabricbeat)
+  10.3. [Build fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#build-fabricbeat)
+  10.4. [Start fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#start-fabricbeat)
+  10.5. [Stop fabricbeat](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master#stop-fabricbeat)
   
 
 ## Description
@@ -74,26 +74,26 @@ A open source implementation, eventually available as Hyperledger Labs, containi
 ## Overview
 
 Basic data flow: 
-![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
+![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Fabric%20Network%20And%20Fabricbeat.jpg "Fabric Network And Fabricbeat Basic Data Flow")
 
 Dashboard example:
-![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Overview_with_filter_multi.png "Dashboard with peer and channel selected")
+![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Overview_with_filter_multi.png "Dashboard with peer and channel selected")
 
 ## Prerequisites
 
-Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Prerequisites.md).   
+Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/Prerequisites.md).
 
 ## Getting Started
 
 To get started with the project, clone the git repository. It is important that you place it under `$GOPATH/src/github.com`  
 ```
 cd $GOPATH/src/github.com  
-git clone https://github.com/balazsprehoda/hyperledger-elastic.git  
+git clone https://github.com/hyperledger-labs/blockchain-analyzer.git
 ```
 
-This project provides an automated way to try the main features. For details, see [Basic Demo](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_demo.md) and [Multichannel Demo](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_demo.md).
+This project provides an automated way to try the main features. For details, see [Basic Demo](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Basic_demo.md) and [Multichannel Demo](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Multichannel_demo.md).
 
-For a manual setup, follow the instructions provided in [Basic_setup_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Basic_setup_example.md) or [Multichannel_setup_example.md](https://github.com/balazsprehoda/hyperledger-elastic/tree/master/docs/Multichannel_setup_example.md). For more customizable setup, please see the next sections on this page.
+For a manual setup, follow the instructions provided in [Basic_setup_example.md](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Basic_setup_example.md) or [Multichannel_setup_example.md](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Multichannel_setup_example.md). For more customizable setup, please see the next sections on this page.
 
 If you are working in a virtual machine, the fabricbeat agent might stop with an error saying "Kibana server is not ready". In this case, issue
 ```
@@ -131,7 +131,7 @@ make generate
 
 ### Start the network
 
-To generate crypto and setup the network, make sure that the `GOPATH` variable is set correctly. After that, set `ABSPATH` to point to the parent folder of `hyperledger-elastic` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When we are done with setting these environment variables, we can start the network. Issue the following command in the `network/basic` directory to start the basic network, in the `network/multichannel` directory to start the multichannel network, or in the `network/applechain` directory to start the applechain network:
+To generate crypto and setup the network, make sure that the `GOPATH` variable is set correctly. After that, set `ABSPATH` to point to the parent folder of `blockchain-analyzer` (e.g., `export ABSPATH=$GOPATH/src/github.com`). When we are done with setting these environment variables, we can start the network. Issue the following command in the `network/basic` directory to start the basic network, in the `network/multichannel` directory to start the multichannel network, or in the `network/applechain` directory to start the applechain network:
 
 ```
 make start  
@@ -153,8 +153,14 @@ make destroy
 ```
 
 ## Dummyapp Application  
-The dummyapp application is used to generate users and transactions. It can connect to both the basic and the multichannel networks.  
-The commands in this section should be issued from the `hyperledger-elastic/apps/dummyapp` directory.
+The dummyapp application is used to create users and generate transactions
+for different scenarios so that we can analyze the resulting transactions
+with the Elastic stack. Examples of scenarios include
+which channels to use, and which fabric ca users to invoke transactions.
+
+This application can connect to both the basic and the multichannel networks.  
+
+The commands in this section should be issued from the `blockchain-analyzer/apps/dummyapp` directory.
 
 ### Installation
 Before the first run, we have to install the necessary node modules:
@@ -163,7 +169,15 @@ npm install
 ```
 
 ### Configuration
-The `config.json` contains the configuration for the application. We can configure the channel and chaincode name that we want our application to use, the users we want to enroll and the transactions we want to initialize. Transactions have 4 fields:
+The `config.json` contains the following configuration sections:
+
+1. `channel`: Specify the name of the channel and chaincode name. For basic network, specify channel name as `mychannel`. For multichannel network, specify channel name as `fourchannel`.
+2. `connection_profile`: specify the relative path of connection profile being used. The underlying connection profile depends on the instantiated Fabric network (basic or multichannel).
+3. `organizations`: specifies different organizations in this network.
+4. `users`: specifies the user created in Fabric CA of each peer.
+5. `transactions`: is an array that contains a series of transactions generated for the network. The generated transactions result in a set of key/value pairs being written to the ledger. All transactions specified in the array are invoked in a serial manner.
+
+Transactions have four fields:
 1. `user`: This field is required. We have to specify which user to use when making the transaction.
 2. `txFunction`: This field is required. We have to specify here the chaincode function that should be called.
 3. `key`: This field is required. We have to specify here the key to be written to the ledger.
@@ -176,7 +190,7 @@ make users
 ```
 
 ###  Invoke transactions
-To add key-value pairs, run
+To add key-value pairs, run:
 ```
 make invoke
 ```
@@ -184,7 +198,7 @@ make invoke
 ### Query
 To query a specific key, run
 ```
-make query KEY=key1
+make query KEY=Key1
 ```
 To query all key-value pairs, run
 ```
@@ -193,10 +207,12 @@ make query-all
 
 ## Appleapp Application
 The appleapp application is used to generate users and transactions for a supply chain use-case.  
-The commands in this section should be issued from the `hyperledger-elastic/apps/appleapp` directory.
+The commands in this section should be issued from the `blockchain-analyzer/apps/appleapp` directory.
 
 ### Configuration
-The `config.json` contains the configuration for the application. We can configure the channel and chaincode name that we want our application to use, the users we want to enroll and the transactions we want to initialize. Transactions have 4 fields:
+The `config.json` contains the configuration for the application. The following
+fields can be set with an array entry of the `transaction` block in `config.json`:
+
 1. `user`: This field is required. We have to specify which user to use when making the transaction.
 2. `txFunction`: This field is required. We have to specify here the chaincode function that should be called.
 3. `key`: This field is required. We have to specify here the key to be written to the ledger.
@@ -231,7 +247,7 @@ make query KEY=key1
 
 ## Elastic Stack
 This project includes an Elasticsearch and Kibana setup to index and visualize blockchain data.  
-The commands in this section should be issued from the `hyperledger-elastic/stack` folder.
+The commands in this section should be issued from the `blockchain-analyzer/stack` folder.
 
 ### Credit
 This setup is borrowed from
@@ -241,7 +257,7 @@ https://github.com/maxyermayank/docker-compose-elasticsearch-kibana
 Kibana container and Elasticsearch cluster with nginx and 3 Elasticsearch containers. To view Kibana in browser, navigate to http://localhost:5601
 
 ### Start
-To start the containers, issue
+To start the containers, navigate to `blockchain-analyzer/stack` directory and issue:
 ```
 make start
 ```
@@ -259,7 +275,7 @@ make erase
 ## Beats Agent
 
 The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
-The commands in this section should be issued from the `hyperledger-elastic/agent/fabricbeat` directory.
+The commands in this section should be issued from the `blockchain-analyzer/agent/fabricbeat` directory.
 
 ### Environment setup
 
@@ -276,6 +292,9 @@ The agent uses the Go SDK for Fabric. To download the package, run
 ```
 go get github.com/hyperledger/fabric-sdk-go
 ```
+
+Setup python 2.7.0 using [`pyenv`](https://github.com/pyenv/pyenv). Python version
+> 2.7 gives errors when running `make update`. 
 
 ### Configure fabricbeat
 
@@ -337,7 +356,7 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 ./fabricbeat -e -d "*"
 ```
-If we want to use the agent with one of the example networks from the `hyperledger-elastic/network` folder, we can start the agent using:
+If we want to use the agent with one of the example networks from the `blockchain-analyzer/network` folder, we can start the agent using:
 ```
 ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 ```
