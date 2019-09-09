@@ -1,4 +1,4 @@
-module github.com/hyperledger-elastic
+module github.com/hyperledger-labs/blockchain-analyzer
 
 go 1.12
 

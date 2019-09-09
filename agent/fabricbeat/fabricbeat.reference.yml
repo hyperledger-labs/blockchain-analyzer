@@ -11,10 +11,10 @@ fabricbeat:
   # Defines the peer which fabricbeat should query
   peer: peer${PEER_NUMBER}.org${ORG_NUMBER}.el-network.com
   # Defines the location of the connection profile of the Fabric network
-  connectionProfile: ${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/connection-profile-${ORG_NUMBER}.yaml
+  connectionProfile: ${GOPATH}/src/github.com/blockchain-analyzer/network/${NETWORK}/connection-profile-${ORG_NUMBER}.yaml
   # Path to the admin certfile and keyfile
-  adminCertPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
-  adminKeyPath: "${GOPATH}/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
+  adminCertPath: "${GOPATH}/src/github.com/blockchain-analyzer/network/${NETWORK}/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/signcerts/Admin@org${ORG_NUMBER}.el-network.com-cert.pem"
+  adminKeyPath: "${GOPATH}/src/github.com/blockchain-analyzer/network/${NETWORK}/crypto-config/peerOrganizations/org${ORG_NUMBER}.el-network.com/users/Admin@org${ORG_NUMBER}.el-network.com/msp/keystore/adminKey${ORG_NUMBER}"
   # URL of Elasticsearch
   elasticURL: "http://localhost:9200"
   # URL of Kibana
@@ -27,9 +27,9 @@ fabricbeat:
   # Name of index to which the agent should send the key data
   keyIndexName: key
   # Folder which should contain the generated dashboards. Note: this directory is going to be erased.
-  dashboardDirectory: ${GOPATH}/src/github.com/hyperledger-elastic/dashboards/7/dashboard
+  dashboardDirectory: ${GOPATH}/src/github.com/blockchain-analyzer/dashboards/7/dashboard
   # Folder which contains the templates for Kibana objects (index patterns, dashboards, etc.)
-  templateDirectory: ${GOPATH}/src/github.com/hyperledger-elastic/agent/kibana_templates
+  templateDirectory: ${GOPATH}/src/github.com/blockchain-analyzer/agent/kibana_templates
 
   chaincodes:
     # This is the name of the key that links transactions together (e.g. previous_key, link_key, etc.).
@@ -49,7 +49,7 @@ output.elasticsearch.hosts: ["localhost:9200"]
 setup.template.name: fabricbeat-%{[agent.version]}
 setup.template.pattern: fabricbeat-%{[agent.version]}*
 
-setup.dashboards.directory: ${GOPATH}/src/github.com/hyperledger-elastic/dashboards
+setup.dashboards.directory: ${GOPATH}/src/github.com/blockchain-analyzer/dashboards
 
 #================================ General ======================================
 

@@ -6,6 +6,6 @@ REM
 REM After running this once you may invoke mage.exe directly.
 
 WHERE mage
-IF %ERRORLEVEL% NEQ 0 go install github.com/balazsprehoda/fabricbeat/vendor/github.com/magefile/mage
+IF %ERRORLEVEL% NEQ 0 go install github.com/hyperledger-labs/blockchain-analyzer/fabricbeat/vendor/github.com/magefile/mage
 
 mage %*

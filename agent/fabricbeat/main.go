@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/hyperledger-elastic/agent/fabricbeat/cmd"
+	"github.com/blockchain-analyzer/agent/fabricbeat/cmd"
 
-	_ "github.com/hyperledger-elastic/agent/fabricbeat/include"
+	_ "github.com/blockchain-analyzer/agent/fabricbeat/include"
 )
 
 func main() {
