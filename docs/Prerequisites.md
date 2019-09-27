@@ -90,9 +90,13 @@ $ docker-compose --version
 
 ### Install [`nodenv`](https://github.com/nodenv/nodenv) and Node.js
 
+(Node is not needed for building the fabricbeat agent)
+
 `nodenv` is used to install an appropriate Node.js version.
 
 ```
+# install gcc and make
+$ sudo apt-get install gcc make
 $ git clone https://github.com/nodenv/nodenv.git ~/.nodenv
 $ cd ~/.nodenv && src/configure && make -C src
 # For bash only
@@ -106,15 +110,11 @@ $ mkdir -p "$(nodenv root)"/plugins
 $ git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
 ```
 
-Update nodenv:
-```
-$ nodenv update
-```
-
 Install Nodejs and upgrade `npm`:
 ```
 $ nodenv install 8.16.1
 $ nodenv global 8.16.1
+$ sudo apt-get install npm
 $ sudo npm install npm@latest
 ```
 
