@@ -20,7 +20,6 @@ $ echo 'export PATH="$GOENV_ROOT/bin:$PATH"' >> ~/.bash_profile
 $ echo 'eval "$(goenv init -)"' >> ~/.bash_profile
 $ echo 'export PATH="$GOROOT/bin:$PATH"' >> ~/.bash_profile
 $ echo 'export PATH="$GOPATH/bin:$PATH"' >> ~/.bash_profile
-$ mkdir $GOPATH
 ```
 
 Install Go and set this version to be used globally:
@@ -33,6 +32,13 @@ To verify installation, run
 ```
 go version
 ```
+
+Restart the shell, create GOPATH
+```
+echo $GOPATH
+mkdir $GOPATH -p
+```
+
 
 ### Docker
 Use these commands to install the latest version of Docker:
