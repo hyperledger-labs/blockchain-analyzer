@@ -288,11 +288,6 @@ We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is
 export GO111MODULE=auto
 ```  
 
-The agent uses the Go SDK for Fabric. To download the package, run:
-```
-go get github.com/hyperledger/fabric-sdk-go
-```
-
 Setup python 2.7.0 using [`pyenv`](https://github.com/pyenv/pyenv). 
 Python version > 2.7 gives errors when running `make update`. 
 
