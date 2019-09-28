@@ -352,6 +352,14 @@ To build the agent, issue the following command:
 make
 ```
 
+While we have tried to bake in all go dependencies in the repo (good for building, not good for long term), if there are dependency errors, please install them. Specifically, errors for these two dependencies may arise:
+
+```
+$ go get golang.org/x/net/context
+$ go get golang.org/x/text/secure/bidirule
+
+```
+
 ### Start fabricbeat
 
 To start the agent, issue the following command from the `fabricbeat` directory:
