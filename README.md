@@ -85,19 +85,15 @@ Please make sure that you have set up the environment for the project. Follow th
 
 To get started with the project, clone the git repository. It is important that you place it under `$GOPATH/src/github.com`  
 ```
-cd $GOPATH/src/github.com  
-git clone https://github.com/hyperledger-labs/blockchain-analyzer.git
+$ mkdir $GOPATH/src/github.com -p
+$ cd $GOPATH/src/github.com  
+$ git clone https://github.com/hyperledger-labs/blockchain-analyzer.git
 ```
 
 This project provides an automated way to try the main features. For details, see [Basic Demo](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Basic_demo.md) and [Multichannel Demo](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Multichannel_demo.md).
 
 For a manual setup, follow the instructions provided in [Basic_setup_example.md](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Basic_setup_example.md) or [Multichannel_setup_example.md](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docs/Multichannel_setup_example.md). For more customizable setup, please see the next sections on this page.
 
-If you are working in a virtual machine, the fabricbeat agent might stop with an error saying "Kibana server is not ready". In this case, issue
-```
-sudo sysctl -w vm.max_map_count=262144
-```
-to set the vm.max_map_count kernel setting to 262144, then destroy and bring up the network again.
 
 ## Starting a Fabric Network
 
@@ -248,6 +244,12 @@ make query KEY=key1
 ## Elastic Stack
 This project includes an Elasticsearch and Kibana setup to index and visualize blockchain data.  
 The commands in this section should be issued from the `blockchain-analyzer/stack` folder.
+
+If you are working in a virtual machine, the Elasticsearch container may not start. In this case, issue the following command:
+```
+sudo sysctl -w vm.max_map_count=262144
+```
+to set the vm.max_map_count kernel setting to 262144, then destroy and bring up the Elastic Stack again.
 
 ### Credit
 This setup is borrowed from

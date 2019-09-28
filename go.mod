@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/blockchain-analyzer
+module github.com/blockchain-analyzer
 
 go 1.12
 
