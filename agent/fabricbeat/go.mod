@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/blockchain-analyzer/fabricbeat
+module github.com/blockchain-analyzer/agent/fabricbeat
 
 exclude github.com/Sirupsen/logrus v1.4.2
 
