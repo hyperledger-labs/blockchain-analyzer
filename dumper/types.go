@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricutils"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
 )
 
 // Struct for storing non-endorser (most likely config) transaction data
