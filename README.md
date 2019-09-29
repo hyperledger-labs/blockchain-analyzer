@@ -36,8 +36,9 @@ We recommend that you start with the instructions for [`basic`](docs/Basic_setup
 
 Once you have it up and running, you can try the [`multichannel`](docs/Multichannel_setup.md), and `appledemo`.
 
-
 If you want to learn more about `fabricbeat` configuration or connect it to your own blockchain network, click [here](docs/Fabricbeat_config.md).
+
+If you want to understand dataflow involving `fabricbeat`, click [here](docs/Fabricbeat_architecture.md).
 
 ## License
 The Apache 2.0 License applies to the whole project, except for the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents.
