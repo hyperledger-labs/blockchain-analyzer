@@ -1,14 +1,15 @@
-# Example Setup With Basic Network
+# Getting Started Basic Network
 
-This is an example to setup the project with `basic` network on a new Ubuntu 18.04 virtual machine from scratch.
+This is an example to setup the project with `basic` network on a new Ubuntu 18.04 / 16.04 virtual machine from scratch. The instructions should also work on Mac OS.
 
-1. Install prequisites
-2. Clone the repository
-3. Start / stop a Hyperledger Fabric network using `basic` configuration. See `multichannel` page for multi-channel configuration.
-4. Create users and transactions using dummy application
-5. Start Elastic stack
-6. Build fabricbeat agent
-7. Start the fabricbeat agent and connect to peer in `basic` network
+1. [Install Prequisites](#install-prerequisites)
+2. [Clone the repository](#clone-the-repository)
+3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start-/-stop-the-basic-network). See `multichannel` page for multi-channel configuration.
+4. [Create users and transactions using dummy application](#create-users-and-transactions-using-dummy-application)
+5. [Start Elastic stack](#start-elastic-stack)
+6. [Build fabricbeat agent](#build-fabricbeat-agent)
+7. [Start the fabricbeat agent](#start-fabricbeat) and connect to peer in `basic` network
+8. [About indices](#about-indices) that store data
 
 ## Install Prerequisites
 
@@ -22,7 +23,7 @@ $ cd $GOPATH/src/github.com
 $ git clone https://github.com/hyperledger-labs/blockchain-analyzer.git
 ```
 
-## Starting the `basic` network
+## Start / stop the `basic` network
 We will use the `basic` Hyperpedger Fabric network. It is a simple test 
 network with four organizations, one peer per organization, a solo orderer 
 communicating over TLS and a sample chaincode called `dummycc`. It writes 
@@ -62,7 +63,7 @@ This application can connect to both the basic and the multichannel networks.
 
 The commands in this section should be issued from the `blockchain-analyzer/apps/dummyapp` directory.
 
-### Installation
+### Install dummy application dependencies
 Before the first run, we have to install the necessary node modules:
 ```
 npm install
@@ -95,7 +96,7 @@ make query-all
 
 
 
-## Starting Elastic stack
+## Start Elastic stack
 
 This project includes an Elasticsearch and Kibana setup to index and 
 visualize blockchain data.  
@@ -131,7 +132,7 @@ make erase
 ```
 
 
-## Fabricbeat Agent
+## Build Fabricbeat Agent
 
 The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
 The commands in this section should be issued from the `blockchain-analyzer/agent/fabricbeat` directory.
@@ -147,32 +148,11 @@ We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is
 export GO111MODULE=auto
 ```  
 
-Ensure that you are using Python 2.7.*. Python version > 2.7.* gives errors when running `make update`.
-
-
-The paths and peer/org names contain environment variables that can be passed when starting the agent:
-
-* `GOPATH` is the value of the gopath environment variable
-* `ORG_NUMBER` is the number of the organization (1 for Org1, ..., 4 for Org4)
-* `NETWORK` is the name of the network (basic or multichannel)
-* `PEER_NUMBER` is the number of the peer (in basic network, it can be only 0, in multichannel, it can be 0 or 1)
-
-
-Thanks to these variables, it is possible to run multiple instances at the same time with different configurations without rebuilding the agent.
-
-To use the agent with another (custom) network, modify the configuration according to that network's specifications. 
-
-### About indices
-
-Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If multiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
-If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
-
-The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
-
-### Build fabricbeat
+Ensure that Python version is 2.7.*. 
 
 To build the agent, issue the following command:
 ```
+make update
 make
 ```
 
@@ -184,7 +164,7 @@ $ go get golang.org/x/text/secure/bidirule
 
 ```
 
-### Start fabricbeat
+## Start fabricbeat
 
 To start the agent, issue the following command from the `fabricbeat` directory:
 ```
@@ -199,6 +179,8 @@ The variables passed are used in the configuration (`fabricbeat.yml`). To connec
 ### Stop fabricbeat
 
 To stop the agent, simply type `Ctrl+C`
+
+
 
 
 Next, we can navigate to http://localhost:5601.
@@ -216,3 +198,14 @@ After that, we can click the dashboards and see the overview of our data on the 
 **If the dashboards are empty, set the time range wider!**
 
 We can go on discovering the dashboards by scrolling and clicking the link fields, or by selecting another dashboards from the Dashboards menu.
+
+
+
+
+
+## About indices
+
+Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If multiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
+If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
+
+The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).

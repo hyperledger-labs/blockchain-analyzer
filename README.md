@@ -39,7 +39,7 @@ Once you have it up and running, you can try the `multichannel`, and `appledemo`
 If you want to learn more about `fabricbeat` configuration, click here.
 
 ## License
-The Apache 2.0 License applies to the whole project, except from the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents.
+The Apache 2.0 License applies to the whole project, except for the [stack](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/stack) directory and its contents.
 
 ## Maintainers:
 
