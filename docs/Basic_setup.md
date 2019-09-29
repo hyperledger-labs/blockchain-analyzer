@@ -4,7 +4,7 @@ This is an example to setup the project with `basic` network on a new Ubuntu 18.
 
 1. [Install Prequisites](#install-prerequisites)
 2. [Clone the repository](#clone-the-repository)
-3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start-/-stop-the-basic-network). See `multichannel` page for multi-channel configuration.
+3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start--stop-the-basic-network). See `multichannel` page for multi-channel configuration.
 4. [Create users and transactions using dummy application](#create-users-and-transactions-using-dummy-application)
 5. [Start Elastic stack](#start-elastic-stack)
 6. [Build fabricbeat agent](#build-fabricbeat-agent)
