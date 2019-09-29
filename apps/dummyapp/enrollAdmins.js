@@ -8,17 +8,26 @@ const FabricCAServices = require('fabric-ca-client');
 const { FileSystemWallet, X509WalletMixin } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
 
 const configPath = path.resolve(__dirname, 'config.json');
 const configJSON = fs.readFileSync(configPath, 'utf8');
 const config = JSON.parse(configJSON);
 
-const ccpPath = path.resolve(__dirname, config.connection_profile);
-const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
-const ccp = JSON.parse(ccpJSON);
+let ccpPath;
+let ccpJSON;
+let ccp;
 
 async function main() {
     try {
+        dotenv.config();
+        if ( process.env.NETWORK != undefined) {
+            config.connection_profile = config.connection_profile.replace("basic", process.env.NETWORK);
+        }
+
+        ccpPath = path.resolve(__dirname, config.connection_profile);
+        ccpJSON = fs.readFileSync(ccpPath, 'utf8');
+        ccp = JSON.parse(ccpJSON);
 
         // Create a new file system based wallet for managing identities.
         const walletPath = path.join(process.cwd(), 'wallet');
@@ -29,7 +38,7 @@ async function main() {
         const orgs = Object.keys(config.organizations);
         for (let i = 0; i < orgs.length; i++) {
             // Check if organization is present in connection profile and if it contains at least one CA.
-            if(ccp.organizations[orgs[i]].certificateAuthorities && ccp.organizations[orgs[i]].certificateAuthorities.length != 0) {
+            if (ccp.organizations[orgs[i]].certificateAuthorities && ccp.organizations[orgs[i]].certificateAuthorities.length != 0) {
                 // Create a new CA client for interacting with the CA.
                 const caURL = ccp.certificateAuthorities[ccp.organizations[orgs[i]].certificateAuthorities[0]].url;
                 const ca = new FabricCAServices(caURL);

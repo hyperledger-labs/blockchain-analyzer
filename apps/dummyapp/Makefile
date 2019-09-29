@@ -1,21 +1,27 @@
 
 #set +x
 
+NETWORK ?= basic
+CHANNEL ?= mychannel
+
 install:
 	npm install
 
+network:
+	echo ${NETWORK}
+
 users:
-	node enrollAdmins.js
-	node registerUsers.js
+	NETWORK=${NETWORK} node enrollAdmins.js
+	NETWORK=${NETWORK} node registerUsers.js
 
 invoke:
-	node invoke.js
+	NETWORK=${NETWORK} CHANNEL=${CHANNEL} node invoke.js
 
 query:
-	node query.js ${KEY}
+	NETWORK=${NETWORK} CHANNEL=${CHANNEL} node query.js ${KEY}
 
 query-all:
-	node queryAll.js 
+	NETWORK=${NETWORK} node queryAll.js
 
 clean:
 	rm -rf ./wallet
