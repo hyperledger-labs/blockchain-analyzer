@@ -1,4 +1,4 @@
-# Getting Started Basic Network
+# Getting Started with Basic Network
 
 This is an example to setup the project with `basic` network on a new Ubuntu 18.04 / 16.04 virtual machine from scratch. The instructions should also work on Mac OS.
 
