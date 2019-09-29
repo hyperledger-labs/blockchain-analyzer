@@ -9,7 +9,8 @@ This is an example to setup the project with `basic` network on a new Ubuntu 18.
 5. [Start Elastic stack](#start-elastic-stack)
 6. [Build fabricbeat agent](#build-fabricbeat-agent)
 7. [Start the fabricbeat agent](#start-fabricbeat) and connect to peer in `basic` network
-8. [About indices](#about-indices) that store data
+8. [Configuring Indices for the first time in Kibana](#configuring-indices for-the-first-time-in-Kibana)
+9. [Viewing dashboards](#viewing-dashboards) that store data
 
 ## Install Prerequisites
 
@@ -181,31 +182,30 @@ The variables passed are used in the configuration (`fabricbeat.yml`). To connec
 To stop the agent, simply type `Ctrl+C`
 
 
+## Configuring Indices for the first time in Kibana
 
+Next, we navigate to http://localhost:5601.
 
-Next, we can navigate to http://localhost:5601.
-
-### Configuring Indices for the first time in Kibana
-
+Click the dashboards icon on the left:
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Starting_page.png "Kibana starting page")
-Click the dashboards icon on the left. Kibana is taking us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner:
+
+
+Kibana takes us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner:
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Index_pattern_selection_basic.png "Setting default index pattern")
 
-### Viewing dashboards
+
+### About indices
+
+Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If multiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
+If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
+
+The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
+
+
+## Viewing dashboards
 
 After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org1):
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Org1_overview_basic.png "Org1 overview")
 **If the dashboards are empty, set the time range wider!**
 
 We can go on discovering the dashboards by scrolling and clicking the link fields, or by selecting another dashboards from the Dashboards menu.
-
-
-
-
-
-## About indices
-
-Three different Elasticsearch indices per Fabric organization are setup. One for blocks, one for transactions and one for single writes.  If multiple agents are run for peers in the same organization, they are going to send their data to the same indices. You can then select the peer on the dashboards to view its data only.  
-If multiple instances are run for peers in different organizations, you will see the data of different organizations on different dashboards.  
-
-The name of the indices can be customized in the fabricbeat configuration file (\_meta/beat.yml and `make update` or directly in fabricbeat.yml).
