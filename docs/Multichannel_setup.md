@@ -84,30 +84,29 @@ Take a look at the `config.json` file. This file contains the transactions that 
 ###  User enrollment and registration
 To enroll admins, register and enroll users, run the following command:
 ```
-make users
+NETWORK=multichannel CHANNEL=fourchannel make users
 ```
 
 ###  Invoke transactions
 To add key-value pairs, run:
 ```
-make invoke
+NETWORK=multichannel CHANNEL=fourchannel make invoke
 ```
 
 ### Query
 To query a specific key, run
 ```
-make query KEY=Key1
+NETWORK=multichannel CHANNEL=fourchannel make query KEY=Key1
 ```
 To query all key-value pairs, run
 ```
-make query-all
+NETWORK=multichannel CHANNEL=fourchannel make query-all
 ```
 
 
 ## Start Elastic stack
 
-This project includes an Elasticsearch and Kibana setup to index and 
-visualize blockchain data.  
+This project includes an Elasticsearch and Kibana setup to index and visualize blockchain data.  
 The commands in this section should be issued from the `blockchain-analyzer/stack` folder.
 
 If you are working in a machine with low memory, the Elasticsearch container may not start. In this case, issue the following command:
@@ -120,14 +119,14 @@ to set the vm.max_map_count kernel setting to 262144, then destroy and bring up 
 This setup is borrowed from
 https://github.com/maxyermayank/docker-compose-elasticsearch-kibana
 
-### Description
-Kibana container and Elasticsearch cluster with nginx and 3 Elasticsearch containers. To view Kibana in browser, navigate to http://localhost:5601
-
 ### Start
 To start the containers, navigate to `blockchain-analyzer/stack` directory and issue:
 ```
 make start
 ```
+
+### View Kibana
+To view Kibana in browser, navigate to http://localhost:5601 . It can take some time (2-5 minutes) for Kibana to start depending on your machine configuration.
 
 ### Stop and destroy
 To stop the containers, issue
@@ -178,9 +177,9 @@ To start the agent, issue the following command from the `fabricbeat` directory:
 ```
 ./fabricbeat -e -d "*"
 ```
-To use the agent with the `basic` network from the `blockchain-analyzer/network` folder, you can start the agent using:
+To use the agent with the `multichannel` network from the `blockchain-analyzer/network` folder, you can start the agent using:
 ```
-ORG_NUMBER=1 PEER_NUMBER=1 NETWORK=multichannel ./fabricbeat -e -d "*"
+ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=multichannel ./fabricbeat -e -d "*"
 ```
 The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
@@ -212,7 +211,7 @@ The name of the indices can be customized in the fabricbeat configuration file (
 ## Viewing dashboards
 
 After that, we can click the dashboards and see the overview of our data on the Overview Dashboard (org1):
-![alt text](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/images/Overview_with_filter_multi.png "Overview with filter")
+![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Overview_with_filter_multi.png "Overview with filter")
 **If the dashboards are empty, set the time range wider!**
 
 We can go on discovering the dashboards by scrolling and clicking the link fields, or by selecting another dashboards from the Dashboards menu.

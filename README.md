@@ -34,7 +34,7 @@ This project was developed as part of [Hyperledger summer internship program](ht
 
 We recommend that you start with the instructions for [`basic`](docs/Basic_setup.md) network.
 
-Once you have it up and running, you can try the `multichannel`, and `appledemo`.
+Once you have it up and running, you can try the [`multichannel`](docs/Multichannel_setup.md), and `appledemo`.
 
 If you want to learn more about `fabricbeat` configuration, click here.
 
