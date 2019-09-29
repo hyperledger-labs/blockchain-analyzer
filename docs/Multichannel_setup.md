@@ -1,10 +1,10 @@
 # Getting Started with Multichannel Network
 
-This is an example to setup the project with `basic` network on a new Ubuntu 18.04 / 16.04 virtual machine from scratch. The instructions should also work on Mac OS.
+This is an example to setup the project with `multichannel` network on a new Ubuntu 18.04 / 16.04 virtual machine from scratch. The instructions should also work on Mac OS.
 
 1. [Install Prequisites](#install-prerequisites)
 2. [Clone the repository](#clone-the-repository)
-3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start--stop-the-basic-network). See `multichannel` page for multi-channel configuration.
+3. [Start / stop a Hyperledger Fabric network using `multichannel` configuration](#start--stop-the-multichannel-network). See `multichannel` page for multi-channel configuration.
 4. [Create users and transactions using dummy application](#create-users-and-transactions-using-dummy-application)
 5. [Start Elastic stack](#start-elastic-stack)
 6. [Build fabricbeat agent](#build-fabricbeat-agent)
@@ -25,15 +25,22 @@ $ cd $GOPATH/src/github.com
 $ git clone https://github.com/hyperledger-labs/blockchain-analyzer.git
 ```
 
-## Start / stop the `basic` network
-We will use the `basic` Hyperpedger Fabric network. It is a simple test 
-network with four organizations, one peer per organization, a solo orderer 
-communicating over TLS and a sample chaincode called `dummycc`. It writes 
-deterministically generated hashes and (optionally) previous keys as value 
-to the ledger.  
+## Start / stop the `multichannel` network
+It is a test network setup with four organizations, two peers per organization, a solo orderer communicating over TLS and two channels:
+
+1. `fourchannel`:
+  * members: all four organizations
+  * chaincode: `dummycc`: It writes deterministically generated hashes and (optionally) previous keys as value to the ledger.
+2. `twochannel`:
+  * members: only `Org1` and `Org3`
+  * chaincode: `fabcar`: The classic fabcar example chaincode extended with a `getHistoryForCar()` chaincode function.
 
 
-Issue the following command in the `network/basic` directory
+The sample chaincode called `dummycc` (used in basic) also works with multichannel. It writes 
+deterministically generated hashes and (optionally) previous keys as value to the ledger.  
+
+
+Issue the following command in the `network/multichannel` directory
 ```
 make start
 ```
