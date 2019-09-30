@@ -16,6 +16,9 @@ destroy:
 	rm -rf *-e
 	rm -rf ../../apps/dummyapp/wallet
 
+rmchaincode:
+	docker images | grep dummy | awk '{print $1}' | xargs docker rmi
+
 generate:
 	cp docker-compose-TEMPLATE.yaml docker-compose.yaml
 	sed -i -e "s/HLNETWORK/${HLNETWORK}/g" docker-compose.yaml
