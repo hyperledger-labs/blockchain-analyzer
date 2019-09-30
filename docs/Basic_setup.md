@@ -53,6 +53,14 @@ and dummyapp wallet), run:
 make destroy
 ```
 
+### Remove chaincode images
+
+If you make changes to `dummycc` chain code, you will need to remove the old images:
+
+```
+make rmchaincode
+```
+
 ## Create users and transactions using dummy application
 
 The dummyapp application is used to create users and generate transactions
