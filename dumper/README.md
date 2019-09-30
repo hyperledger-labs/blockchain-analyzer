@@ -4,5 +4,6 @@ This is a simple go program that queries a specified peer for ledger data, and d
 
 This program uses the modules `fabricbeatsetup`, `fabricutils` and `ledgerutils` of the fabricbeat agent.
 
+
 ## Custom persistence
 The program uses `Persistent` interface for persistence, which means we can define our custom persistence methods for any databases. All we have to do is to implement the `Persistent` interface, create an instance of our implementation and replace `DefaultConfig` with our own instance.

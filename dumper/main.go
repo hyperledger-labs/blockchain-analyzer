@@ -10,9 +10,9 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
-	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
-	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricutils"
-	"github.com/hyperledger-elastic/agent/fabricbeat/modules/ledgerutils"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
 )
 
 func main() {
@@ -20,10 +20,10 @@ func main() {
 
 	fbSetup := &fabricbeatsetup.FabricbeatSetup{
 		OrgName:       "org1",
-		ConfigFile:    "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/connection-profile-1.yaml",
+		ConfigFile:    "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/connection-profile-1.yaml",
 		Peer:          "peer0.org1.el-network.com",
-		AdminCertPath: "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
-		AdminKeyPath:  "/home/prehi/go/src/github.com/hyperledger-elastic/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
+		AdminCertPath: "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
+		AdminKeyPath:  "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
 	}
 
 	err := fbSetup.Initialize()

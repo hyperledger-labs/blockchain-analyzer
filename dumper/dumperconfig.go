@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/hyperledger-elastic/agent/fabricbeat/modules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 )
 
