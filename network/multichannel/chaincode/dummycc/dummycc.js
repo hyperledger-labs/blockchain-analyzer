@@ -6,7 +6,7 @@
 
 const { Contract } = require('fabric-contract-api');
 const crypto = require('crypto');
-var counter = 1;
+var counter = {}
 var lastKey;
 
 class DummyCC extends Contract {
@@ -22,14 +22,19 @@ class DummyCC extends Contract {
     }
 
     async setValue(ctx, key, previousKey) {
-        var hash = crypto.createHash('sha256').update(Buffer.from(counter.toString())).digest('hex');
+        if ( !(key in counter) ) {
+            counter[key] = 1;
+        }
+        const keyval = counter[key].toString();
+        var hash = crypto.createHash('sha256').update(Buffer.from(counter[key].toString())).digest('hex');
         const data = {
             hash,
+            keyval,
             previousKey
         }
         await ctx.stub.putState(key, Buffer.from(JSON.stringify(data)));
         console.info('Added <--> ', key.toString() + ': ' + JSON.stringify(data));
-        counter++;
+        counter[key]++;
     }
 
     async queryAllValues(ctx) {

@@ -17,6 +17,9 @@ destroy:
 	rm -rf ../../apps/dummyapp/wallet
 	rm -rf connection-profile-[0-9].yaml
 
+rmchaincode:
+	docker images | grep dummy | awk '{print $1}' | xargs docker rmi
+
 generate:
 	cp docker-compose-TEMPLATE.yaml docker-compose.yaml
 	sed -i -e "s/HLNETWORK/${HLNETWORK}/g" docker-compose.yaml
