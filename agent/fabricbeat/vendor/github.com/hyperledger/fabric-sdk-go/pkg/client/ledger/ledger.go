@@ -29,9 +29,9 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/chconfig"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 
 	contextImpl "github.com/hyperledger/fabric-sdk-go/pkg/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/channel"
@@ -328,6 +328,19 @@ func (c *Client) QueryConfig(options ...RequestOption) (fab.ChannelCfg, error) {
 	}
 
 	return channelConfig.Query(reqCtx)
+}
+
+// QueryConfigBlock returns the current configuration block for the specified channel.
+func (c *Client) QueryConfigBlock(options ...RequestOption) (*common.Block, error) {
+	targets, opts, err := c.prepareRequestParams(options...)
+	if err != nil {
+		return nil, errors.WithMessage(err, "QueryConfigBlock failed to prepare request parameters")
+	}
+
+	reqCtx, cancel := c.createRequestContext(opts)
+	defer cancel()
+
+	return c.ledger.QueryConfigBlock(reqCtx, peersToTxnProcessors(targets), c.verifier)
 }
 
 //prepareRequestOpts Reads Opts from Option array

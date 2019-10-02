@@ -12,6 +12,9 @@ import (
 	"regexp"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	mb "github.com/hyperledger/fabric-protos-go/msp"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	channelConfig "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/channelconfig"
 	imsp "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
@@ -22,9 +25,6 @@ import (
 	contextImpl "github.com/hyperledger/fabric-sdk-go/pkg/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/resource"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	mb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 	"github.com/pkg/errors"
 )
 
@@ -138,6 +138,16 @@ func New(channelID string, options ...Option) (*ChannelConfig, error) {
 	return &ChannelConfig{channelID: channelID, opts: opts}, nil
 }
 
+// QueryBlock returns channel configuration
+func (c *ChannelConfig) QueryBlock(reqCtx reqContext.Context) (*common.Block, error) {
+
+	if c.opts.Orderer != nil {
+		return c.queryBlockFromOrderer(reqCtx)
+	}
+
+	return c.queryBlockFromPeers(reqCtx)
+}
+
 // Query returns channel configuration
 func (c *ChannelConfig) Query(reqCtx reqContext.Context) (fab.ChannelCfg, error) {
 
@@ -149,6 +159,16 @@ func (c *ChannelConfig) Query(reqCtx reqContext.Context) (fab.ChannelCfg, error)
 }
 
 func (c *ChannelConfig) queryPeers(reqCtx reqContext.Context) (*ChannelCfg, error) {
+	block, err := c.queryBlockFromPeers(reqCtx)
+
+	if err != nil {
+		return nil, errors.WithMessage(err, "QueryBlockConfig failed")
+	}
+	return extractConfig(c.channelID, block)
+
+}
+
+func (c *ChannelConfig) queryBlockFromPeers(reqCtx reqContext.Context) (*common.Block, error) {
 	ctx, ok := contextImpl.RequestClientContext(reqCtx)
 	if !ok {
 		return nil, errors.New("failed get client context from reqContext for signPayload")
@@ -188,7 +208,7 @@ func (c *ChannelConfig) queryPeers(reqCtx reqContext.Context) (*ChannelCfg, erro
 	if err != nil {
 		return nil, errors.WithMessage(err, "QueryBlockConfig failed")
 	}
-	return extractConfig(c.channelID, block.(*common.Block))
+	return block.(*common.Block), nil
 
 }
 
@@ -217,12 +237,17 @@ func (c *ChannelConfig) calculateTargetsFromConfig(ctx context.Client) ([]fab.Pr
 
 func (c *ChannelConfig) queryOrderer(reqCtx reqContext.Context) (*ChannelCfg, error) {
 
-	block, err := resource.LastConfigFromOrderer(reqCtx, c.channelID, c.opts.Orderer, resource.WithRetry(c.opts.RetryOpts))
+	block, err := c.queryBlockFromOrderer(reqCtx)
 	if err != nil {
 		return nil, errors.WithMessage(err, "LastConfigFromOrderer failed")
 	}
 
 	return extractConfig(c.channelID, block)
+}
+
+func (c *ChannelConfig) queryBlockFromOrderer(reqCtx reqContext.Context) (*common.Block, error) {
+
+	return resource.LastConfigFromOrderer(reqCtx, c.channelID, c.opts.Orderer, resource.WithRetry(c.opts.RetryOpts))
 }
 
 //resolveOptsFromConfig loads opts from config if not loaded/initialized
@@ -380,6 +405,9 @@ func loadConfig(configItems *ChannelCfg, versionsGroup *common.ConfigGroup, grou
 	if group == nil {
 		return nil
 	}
+
+	versionsGroup.Version = group.Version
+	versionsGroup.ModPolicy = group.ModPolicy
 
 	groups := group.GetGroups()
 	if groups != nil {

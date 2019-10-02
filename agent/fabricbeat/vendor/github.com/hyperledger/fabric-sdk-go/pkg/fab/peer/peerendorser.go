@@ -20,6 +20,8 @@ import (
 	"google.golang.org/grpc/keepalive"
 	grpcstatus "google.golang.org/grpc/status"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
@@ -27,8 +29,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 )
 
 const (
@@ -294,12 +294,12 @@ func extractChaincodeNameNotFoundError(grpcstat *grpcstatus.Status) (int32, stri
 // getChaincodeResponseStatus gets the actual response status from response.Payload.extension.Response.status, as fabric always returns actual 200
 func getChaincodeResponseStatus(response *pb.ProposalResponse) (int32, error) {
 	if response.Payload != nil {
-		payload, err := protoutil.GetProposalResponsePayload(response.Payload)
+		payload, err := protoutil.UnmarshalProposalResponsePayload(response.Payload)
 		if err != nil {
 			return 0, errors.Wrap(err, "unmarshal of proposal response payload failed")
 		}
 
-		extension, err := protoutil.GetChaincodeAction(payload.Extension)
+		extension, err := protoutil.UnmarshalChaincodeAction(payload.Extension)
 		if err != nil {
 			return 0, errors.Wrap(err, "unmarshal of chaincode action failed")
 		}

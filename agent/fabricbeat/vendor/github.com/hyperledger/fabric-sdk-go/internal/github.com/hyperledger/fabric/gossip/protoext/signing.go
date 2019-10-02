@@ -15,7 +15,7 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/gossip"
+	"github.com/hyperledger/fabric-protos-go/gossip"
 )
 
 // Signer signs a message, and returns (signature, nil)
@@ -76,6 +76,9 @@ func EnvelopeToGossipMessage(e *gossip.Envelope) (*SignedGossipMessage, error) {
 // InternalEndpoint returns the internal endpoint in the secret envelope, or an
 // empty string if a failure occurs.
 func InternalEndpoint(s *gossip.SecretEnvelope) string {
+	if s == nil {
+		return ""
+	}
 	secret := &gossip.Secret{}
 	if err := proto.Unmarshal(s.Payload, secret); err != nil {
 		return ""

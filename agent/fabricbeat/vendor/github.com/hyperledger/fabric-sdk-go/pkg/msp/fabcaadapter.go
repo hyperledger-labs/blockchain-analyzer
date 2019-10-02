@@ -28,9 +28,9 @@ type fabricCAAdapter struct {
 	caClient    *calib.Client
 }
 
-func newFabricCAAdapter(orgName string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*fabricCAAdapter, error) {
+func newFabricCAAdapter(caID string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*fabricCAAdapter, error) {
 
-	caClient, err := createFabricCAClient(orgName, cryptoSuite, config)
+	caClient, err := createFabricCAClient(caID, cryptoSuite, config)
 	if err != nil {
 		return nil, err
 	}
@@ -577,16 +577,16 @@ func getIdentityResponses(ca string, responses []caapi.IdentityInfo) []*api.Iden
 	return ret
 }
 
-func createFabricCAClient(org string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*calib.Client, error) {
+func createFabricCAClient(caID string, cryptoSuite core.CryptoSuite, config msp.IdentityConfig) (*calib.Client, error) {
 
 	// Create new Fabric-ca client without configs
 	c := &calib.Client{
 		Config: &calib.ClientConfig{},
 	}
 
-	conf, ok := config.CAConfig(org)
+	conf, ok := config.CAConfig(caID)
 	if !ok {
-		return nil, errors.Errorf("Organization [%s] have no corresponding CA in the configs", org)
+		return nil, errors.Errorf("No CA '%s' in the configs", caID)
 	}
 
 	//set server CAName
@@ -596,20 +596,20 @@ func createFabricCAClient(org string, cryptoSuite core.CryptoSuite, config msp.I
 	//set server name
 	c.Config.ServerName, _ = conf.GRPCOptions["ssl-target-name-override"].(string)
 	//certs file list
-	c.Config.TLS.CertFiles, ok = config.CAServerCerts(org)
+	c.Config.TLS.CertFiles, ok = config.CAServerCerts(caID)
 	if !ok {
-		return nil, errors.Errorf("Organization [%s] have no corresponding server certs in the configs", org)
+		return nil, errors.Errorf("CA '%s' has no corresponding server certs in the configs", caID)
 	}
 
 	// set key file and cert file
-	c.Config.TLS.Client.CertFile, ok = config.CAClientCert(org)
+	c.Config.TLS.Client.CertFile, ok = config.CAClientCert(caID)
 	if !ok {
-		return nil, errors.Errorf("Organization [%s] have no corresponding client certs in the configs", org)
+		return nil, errors.Errorf("CA '%s' has no corresponding client certs in the configs", caID)
 	}
 
-	c.Config.TLS.Client.KeyFile, ok = config.CAClientKey(org)
+	c.Config.TLS.Client.KeyFile, ok = config.CAClientKey(caID)
 	if !ok {
-		return nil, errors.Errorf("Organization [%s] have no corresponding client keys in the configs", org)
+		return nil, errors.Errorf("CA '%s' has no corresponding client keys in the configs", caID)
 	}
 
 	//TLS flag enabled/disabled

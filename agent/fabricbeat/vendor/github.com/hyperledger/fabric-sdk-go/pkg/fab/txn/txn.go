@@ -14,13 +14,13 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
 	"github.com/pkg/errors"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	ctxprovider "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/context"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")
@@ -43,21 +43,15 @@ func New(request fab.TransactionRequest) (*fab.Transaction, error) {
 	proposal := request.Proposal
 
 	// the original header
-	hdr, err := protoutil.GetHeader(proposal.Header)
+	hdr, err := protoutil.UnmarshalHeader(proposal.Header)
 	if err != nil {
 		return nil, errors.Wrap(err, "unmarshal proposal header failed")
 	}
 
 	// the original payload
-	pPayl, err := protoutil.GetChaincodeProposalPayload(proposal.Payload)
+	pPayl, err := protoutil.UnmarshalChaincodeProposalPayload(proposal.Payload)
 	if err != nil {
 		return nil, errors.Wrap(err, "unmarshal proposal payload failed")
-	}
-
-	// get header extensions so we have the visibility field
-	hdrExt, err := protoutil.GetChaincodeHeaderExtension(hdr)
-	if err != nil {
-		return nil, err
 	}
 
 	responsePayload := request.ProposalResponses[0].ProposalResponse.Payload
@@ -75,7 +69,7 @@ func New(request fab.TransactionRequest) (*fab.Transaction, error) {
 	cea := &pb.ChaincodeEndorsedAction{ProposalResponsePayload: responsePayload, Endorsements: endorsements}
 
 	// obtain the bytes of the proposal payload that will go to the transaction
-	propPayloadBytes, err := protoutil.GetBytesProposalPayloadForTx(pPayl, hdrExt.PayloadVisibility)
+	propPayloadBytes, err := protoutil.GetBytesProposalPayloadForTx(pPayl)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +114,7 @@ func Send(reqCtx reqContext.Context, tx *fab.Transaction, orderers []fab.Orderer
 	}
 
 	// the original header
-	hdr, err := protoutil.GetHeader(tx.Proposal.Proposal.Header)
+	hdr, err := protoutil.UnmarshalHeader(tx.Proposal.Proposal.Header)
 	if err != nil {
 		return nil, errors.Wrap(err, "unmarshal proposal header failed")
 	}

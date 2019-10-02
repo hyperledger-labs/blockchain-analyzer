@@ -14,7 +14,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
+	"github.com/hyperledger/fabric-protos-go/msp"
 )
 
 type MSPPrincipal struct{ *msp.MSPPrincipal }
@@ -37,7 +37,7 @@ func (mp *MSPPrincipal) VariablyOpaqueFieldProto(name string) (proto.Message, er
 	case msp.MSPPrincipal_ORGANIZATION_UNIT:
 		return &msp.OrganizationUnit{}, nil
 	case msp.MSPPrincipal_IDENTITY:
-		return nil, fmt.Errorf("unable to decode MSP type IDENTITY until the protos are fixed to include the IDENTITY proto in protos/msp")
+		return &msp.SerializedIdentity{}, nil
 	default:
 		return nil, fmt.Errorf("unable to decode MSP type: %v", mp.PrincipalClassification)
 	}

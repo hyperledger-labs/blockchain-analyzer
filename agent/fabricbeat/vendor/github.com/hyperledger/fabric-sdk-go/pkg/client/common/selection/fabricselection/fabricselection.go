@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hyperledger/fabric-protos-go/discovery"
 	discclient "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/random"
 	soptions "github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/options"
@@ -27,7 +28,6 @@ import (
 	fabdiscovery "github.com/hyperledger/fabric-sdk-go/pkg/fab/discovery"
 	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazycache"
 	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazyref"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/discovery"
 	"github.com/pkg/errors"
 	grpcCodes "google.golang.org/grpc/codes"
 )
@@ -60,7 +60,7 @@ var defaultRetryOpts = retry.Opts{
 
 // DiscoveryClient is the client to the discovery service
 type DiscoveryClient interface {
-	Send(ctx context.Context, req *discclient.Request, targets ...fab.PeerConfig) ([]fabdiscovery.Response, error)
+	Send(ctx context.Context, req *fabdiscovery.Request, targets ...fab.PeerConfig) ([]fabdiscovery.Response, error)
 }
 
 // clientProvider is overridden by unit tests
@@ -79,6 +79,7 @@ type Service struct {
 	chResponseCache *lazycache.Cache
 	retryOpts       retry.Opts
 	errHandler      fab.ErrorHandler
+	peerSorter      soptions.PeerSorter
 }
 
 // New creates a new dynamic selection service using Fabric's Discovery Service
@@ -111,6 +112,7 @@ func New(ctx contextAPI.Client, channelID string, discovery fab.DiscoveryService
 		discClient:      discoveryClient,
 		retryOpts:       options.retryOpts,
 		errHandler:      options.errHandler,
+		peerSorter:      resolvePeerSorter(channelID, ctx),
 	}
 
 	s.chResponseCache = lazycache.NewWithData(
@@ -158,6 +160,10 @@ func (s *Service) GetEndorsersForChaincode(chaincodes []*fab.ChaincodeCall, opts
 	params := soptions.Params{RetryOpts: s.retryOpts}
 	coptions.Apply(&params, opts)
 
+	if params.PeerSorter == nil {
+		params.PeerSorter = s.peerSorter
+	}
+
 	chResponse, err := s.getChannelResponse(chaincodes, params.RetryOpts)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting channel response for channel [%s]", s.channelID)
@@ -190,7 +196,7 @@ func (s *Service) getEndorsers(chaincodes []*fab.ChaincodeCall, chResponse discc
 		return nil, errors.Wrapf(err, "error getting peers from discovery service for channel [%s]", s.channelID)
 	}
 
-	endpoints, err := chResponse.Endorsers(asInvocationChain(chaincodes), newFilter(s.channelID, s.ctx, peers, peerFilter, sorter))
+	endpoints, err := chResponse.Endorsers(asInvocationChain(chaincodes), newFilter(s.ctx, peers, peerFilter, sorter))
 	if err != nil && newDiscoveryError(err).isTransient() {
 		return nil, status.New(status.DiscoveryServerStatus, int32(status.QueryEndorsers), fmt.Sprintf("error getting endorsers: %s", err), []interface{}{})
 	}
@@ -218,7 +224,7 @@ func (s *Service) queryEndorsers(chaincodes []*fab.ChaincodeCall, retryOpts retr
 		return nil, errors.Errorf("no peers configured for channel [%s]", s.channelID)
 	}
 
-	req, err := discclient.NewRequest().OfChannel(s.channelID).AddEndorsersQuery(asChaincodeInterests(chaincodes))
+	req, err := fabdiscovery.NewRequest().OfChannel(s.channelID).AddEndorsersQuery(asChaincodeInterests(chaincodes))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error creating endorser query request")
 	}
@@ -236,7 +242,7 @@ func (s *Service) queryEndorsers(chaincodes []*fab.ChaincodeCall, retryOpts retr
 	return chResponse.(discclient.ChannelResponse), nil
 }
 
-func (s *Service) query(req *discclient.Request, chaincodes []*fab.ChaincodeCall, targets []fab.PeerConfig) (discclient.ChannelResponse, error) {
+func (s *Service) query(req *fabdiscovery.Request, chaincodes []*fab.ChaincodeCall, targets []fab.PeerConfig) (discclient.ChannelResponse, error) {
 	logger.Debugf("Querying Discovery Service for endorsers for chaincodes: %#v on channel [%s]", chaincodes, s.channelID)
 	reqCtx, cancel := reqContext.NewRequest(s.ctx, reqContext.WithTimeout(s.responseTimeout))
 	defer cancel()

@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package headertypefilter
 
 import (
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	cb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 )
 
 var logger = logging.NewLogger("eventservice/blockfilter")
@@ -30,7 +30,7 @@ func hasType(block *cb.Block, headerTypes ...cb.HeaderType) bool {
 			logger.Errorf("error extracting envelope from block: %s", err)
 			continue
 		}
-		payload, err := protoutil.ExtractPayload(env)
+		payload, err := protoutil.UnmarshalPayload(env.Payload)
 		if err != nil {
 			logger.Errorf("error extracting payload from block: %s", err)
 			continue

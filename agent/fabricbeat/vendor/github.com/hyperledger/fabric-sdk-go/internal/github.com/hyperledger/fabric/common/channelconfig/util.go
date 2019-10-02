@@ -16,13 +16,14 @@ import (
 	"math"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
+	"github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
-	bccsp "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
-	cb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
-	mspprotos "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
-	ab "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/orderer"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/orderer/etcdraft"
-	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/pkg/errors"
 )
 
@@ -197,6 +198,17 @@ func CapabilitiesValue(capabilities map[string]bool) *StandardConfigValue {
 	}
 }
 
+// EndpointsValue returns the config definition for the orderer addresses at an org scoped level.
+// It is a value for the /Channel/Orderer/<OrgName> group.
+func EndpointsValue(addresses []string) *StandardConfigValue {
+	return &StandardConfigValue{
+		key: EndpointsKey,
+		value: &cb.OrdererAddresses{
+			Addresses: addresses,
+		},
+	}
+}
+
 // AnchorPeersValue returns the config definition for an org's anchor peers.
 // It is a value for the /Channel/Application/*.
 func AnchorPeersValue(anchorPeers []*pb.AnchorPeer) *StandardConfigValue {
@@ -233,7 +245,7 @@ func ACLValues(acls map[string]string) *StandardConfigValue {
 }
 
 // ValidateCapabilities validates whether the peer can meet the capabilities requirement in the given config block
-func ValidateCapabilities(block *cb.Block) error {
+func ValidateCapabilities(block *cb.Block, bccsp core.CryptoSuite) error {
 	envelopeConfig, err := protoutil.ExtractEnvelope(block, 0)
 	if err != nil {
 		return errors.Errorf("failed to %s", err)
@@ -263,7 +275,7 @@ func ValidateCapabilities(block *cb.Block) error {
 			"configuration group", ApplicationGroupKey)
 	}
 
-	cc, err := NewChannelConfig(configEnv.Config.ChannelGroup)
+	cc, err := NewChannelConfig(configEnv.Config.ChannelGroup, bccsp)
 	if err != nil {
 		return errors.Errorf("no valid channel configuration found due to %s", err)
 	}

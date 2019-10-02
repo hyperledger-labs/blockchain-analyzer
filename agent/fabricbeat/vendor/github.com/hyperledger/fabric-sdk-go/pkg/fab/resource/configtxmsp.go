@@ -14,18 +14,15 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
+	"github.com/hyperledger/fabric-protos-go/msp"
 	mspcfg "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/msp"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
 )
 
 const (
 	cacerts              = "cacerts"
 	admincerts           = "admincerts"
-	signcerts            = "signcerts"
-	keystore             = "keystore"
 	intermediatecerts    = "intermediatecerts"
 	crlsfolder           = "crls"
-	configfilename       = "config.yaml"
 	tlscacerts           = "tlscacerts"
 	tlsintermediatecerts = "tlsintermediatecerts"
 )
@@ -58,9 +55,9 @@ func GenerateMspDir(mspDir string, config *msp.MSPConfig) error {
 		{crlsfolder, cfg.RevocationList},
 	}
 	for _, d := range defs {
-		err := generateCertDir(filepath.Join(mspDir, d.dir), d.certs)
-		if err != nil {
-			return err
+		errGen := generateCertDir(filepath.Join(mspDir, d.dir), d.certs)
+		if errGen != nil {
+			return errGen
 		}
 	}
 
@@ -68,7 +65,7 @@ func GenerateMspDir(mspDir string, config *msp.MSPConfig) error {
 }
 
 func generateCertDir(certDir string, certs [][]byte) error {
-	err := os.MkdirAll(certDir, 0755)
+	err := os.MkdirAll(certDir, 0750)
 	if err != nil {
 		return err
 	}
@@ -77,7 +74,7 @@ func generateCertDir(certDir string, certs [][]byte) error {
 	}
 	for counter, certBytes := range certs {
 		fileName := filepath.Join(certDir, "cert"+fmt.Sprintf("%d", counter)+".pem")
-		err = ioutil.WriteFile(fileName, certBytes, 0644)
+		err = ioutil.WriteFile(fileName, certBytes, 0640)
 		if err != nil {
 			return err
 		}

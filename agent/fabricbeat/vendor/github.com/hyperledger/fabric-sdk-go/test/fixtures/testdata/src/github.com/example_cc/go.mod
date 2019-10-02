@@ -10,6 +10,7 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0 // indirect
 	github.com/hyperledger/fabric v1.4.0
+	github.com/hyperledger/fabric-amcl v0.0.0-20181230093703-5ccba6eab8d6 // indirect
 	github.com/miekg/pkcs11 v0.0.0-20190401114359-553cfdd26aaa // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
@@ -21,3 +22,5 @@ require (
 	golang.org/x/sys v0.0.0-20190403152447-81d4e9dc473e // indirect
 	google.golang.org/grpc v1.19.1 // indirect
 )
+
+go 1.13

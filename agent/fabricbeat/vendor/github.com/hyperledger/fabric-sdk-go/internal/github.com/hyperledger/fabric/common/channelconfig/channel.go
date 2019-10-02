@@ -14,11 +14,12 @@ import (
 	"fmt"
 	"math"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/capabilities"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/msp"
-	cb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/pkg/errors"
 )
 
@@ -81,7 +82,7 @@ type ChannelConfig struct {
 }
 
 // NewChannelConfig creates a new ChannelConfig
-func NewChannelConfig(channelGroup *cb.ConfigGroup) (*ChannelConfig, error) {
+func NewChannelConfig(channelGroup *cb.ConfigGroup, bccsp core.CryptoSuite) (*ChannelConfig, error) {
 	cc := &ChannelConfig{
 		protos: &ChannelProtos{},
 	}
@@ -90,12 +91,13 @@ func NewChannelConfig(channelGroup *cb.ConfigGroup) (*ChannelConfig, error) {
 		return nil, errors.Wrap(err, "failed to deserialize values")
 	}
 
-	if err := cc.Validate(); err != nil {
+	capabilities := cc.Capabilities()
+
+	if err := cc.Validate(capabilities); err != nil {
 		return nil, err
 	}
 
-	capabilities := cc.Capabilities()
-	mspConfigHandler := NewMSPConfigHandler(capabilities.MSPVersion())
+	mspConfigHandler := NewMSPConfigHandler(capabilities.MSPVersion(), bccsp)
 
 	var err error
 	for groupName, group := range channelGroup.Groups {
@@ -103,7 +105,7 @@ func NewChannelConfig(channelGroup *cb.ConfigGroup) (*ChannelConfig, error) {
 		case ApplicationGroupKey:
 			cc.appConfig, err = NewApplicationConfig(group, mspConfigHandler)
 		case OrdererGroupKey:
-			cc.ordererConfig, err = NewOrdererConfig(group, mspConfigHandler)
+			cc.ordererConfig, err = NewOrdererConfig(group, mspConfigHandler, capabilities)
 		case ConsortiumsGroupKey:
 			cc.consortiumsConfig, err = NewConsortiumsConfig(group, mspConfigHandler)
 		default:
@@ -163,19 +165,25 @@ func (cc *ChannelConfig) ConsortiumName() string {
 
 // Capabilities returns information about the available capabilities for this channel
 func (cc *ChannelConfig) Capabilities() ChannelCapabilities {
+	_ = cc.protos
+	_ = cc.protos.Capabilities
+	_ = cc.protos.Capabilities.Capabilities
 	return capabilities.NewChannelProvider(cc.protos.Capabilities.Capabilities)
 }
 
 // Validate inspects the generated configuration protos and ensures that the values are correct
-func (cc *ChannelConfig) Validate() error {
+func (cc *ChannelConfig) Validate(channelCapabilities ChannelCapabilities) error {
 	for _, validator := range []func() error{
 		cc.validateHashingAlgorithm,
 		cc.validateBlockDataHashingStructure,
-		cc.validateOrdererAddresses,
 	} {
 		if err := validator(); err != nil {
 			return err
 		}
+	}
+
+	if !channelCapabilities.OrgSpecificOrdererEndpoints() {
+		return cc.validateOrdererAddresses()
 	}
 
 	return nil
