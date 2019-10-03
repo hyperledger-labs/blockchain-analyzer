@@ -13,7 +13,7 @@ package localconfig
 import (
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/orderer/etcdraft"
+	"github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
 )
 
 const (
@@ -133,7 +133,8 @@ type Organization struct {
 	// Note: Viper deserialization does not seem to care for
 	// embedding of types, so we use one organization struct
 	// for both orderers and applications.
-	AnchorPeers []*AnchorPeer `yaml:"AnchorPeers"`
+	AnchorPeers      []*AnchorPeer `yaml:"AnchorPeers"`
+	OrdererEndpoints []string      `yaml:"OrdererEndpoints"`
 
 	// AdminPrincipal is deprecated and may be removed in a future release
 	// it was used for modifying the default policy generation, but policies

@@ -8,7 +8,7 @@ require (
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
-	github.com/hyperledger/fabric-sdk-go v1.0.0-alpha5
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/spf13/cast v1.3.0 // indirect

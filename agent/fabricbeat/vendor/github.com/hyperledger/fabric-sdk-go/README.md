@@ -16,6 +16,12 @@ go get github.com/hyperledger/fabric-sdk-go
 
 You're good to go, happy coding! Check out the examples for usage demonstrations.
 
+### Documentation
+
+SDK documentation can be viewed at [GoDoc](https://godoc.org/github.com/hyperledger/fabric-sdk-go).
+
+The packages intended for end developer usage are within the pkg/client folder along with the main SDK package (pkg/fabsdk).
+
 ### Examples
 
 - [E2E Test](test/integration/e2e/end_to_end.go): Basic example that uses SDK to query and execute transaction
@@ -37,7 +43,7 @@ You're good to go, happy coding! Check out the examples for usage demonstrations
 ### Current Compatibility
 The SDK's integration tests run against three tagged Fabric versions:
 - prev (currently v1.3.0)
-- stable (currently v1.4.0)
+- stable (currently v1.4.2)
 - prerelease (currently disabled)
 
 Additionally for development purposes integration tests also run against the devstable Fabric version as needed.
@@ -94,7 +100,7 @@ If you want to contribute to the Go SDK, please run the test suite and submit pa
 
 You need:
 
-- Go 1.11
+- Go 1.13
 - Make
 - Docker
 - Docker Compose
@@ -104,7 +110,7 @@ You need:
 
 Notes:
 
-- Dep is deprecated and replaced with Go modules.
+- Dependencies are handled using [Go modules](https://github.com/golang/go/wiki/Modules).
 
 
 ### Gerrit Git repository

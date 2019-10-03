@@ -13,12 +13,12 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	mb "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	mb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/msp"
 	"github.com/pkg/errors"
 )
 
@@ -164,8 +164,13 @@ func loadMSPs(mspConfigs []*mb.MSPConfig, cs core.CryptoSuite) ([]msp.MSP, error
 		}
 
 		// TODO: Do something with orgs
-		// TODO: Configure MSP version (rather than MSP 1.0)
-		newMSP, err := msp.NewBccspMsp(msp.MSPv1_0, cs)
+		// TODO: Configure MSP version
+		mspOpts := msp.BCCSPNewOpts{
+			NewBaseOpts: msp.NewBaseOpts{
+				Version: msp.MSPv1_1,
+			},
+		}
+		newMSP, err := msp.New(&mspOpts, cs)
 		if err != nil {
 			return nil, errors.Wrap(err, "instantiate MSP failed")
 		}
