@@ -150,25 +150,17 @@ Before configuring and building the fabricbeat agent, please make sure that the 
 ```
 export PATH=$PATH:$GOPATH/bin
 ```
-We use vendoring instead of go modules, so we have to make sure `GO111MODULE` is set to `auto` (it is the default):  
-```
-export GO111MODULE=auto
-```  
-
 Ensure that Python version is 2.7.*. 
 
-To build the agent, issue the following command:
+Get module dependencies:
+```
+make get-go
+```
+
+Build the agent:
 ```
 make update
 make
-```
-
-While we have tried to bake in all go dependencies in the repo (good for building, not good for long term), if there are dependency errors, please install them. Specifically, errors for these two dependencies may arise:
-
-```
-$ go get golang.org/x/net/context
-$ go get golang.org/x/text/secure/bidirule
-
 ```
 
 ## Start fabricbeat
