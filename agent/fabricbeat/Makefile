@@ -40,5 +40,16 @@ git-add:
 	git commit -m "Add generated fabricbeat files"
 
 .PHONY: clean
+go-get:
+	go get github.com/go-kit/kit/sd
+	cd ../../../go-kit/kit/; git checkout tags/v0.8.0 -b v0.8.0
+	go get github.com/cloudflare/cfssl/csr
+	cd ../../../cloudflare/cfssl; git checkout tags/1.3.3 -b 1.3.3
+	go get
+	# this package is include twice. also present in github.com/golang.org/x/net/trace
+	rm -rf ../../../hyperledger/fabric/vendor/golang.org/x/net/trace
+go-branch-del:
+	cd ../../../go-kit/kit/; git checkout master; git branch -d v0.8.0
+	cd ../../../cloudflare/cfssl; git checkout master; git branch -d 1.3.3
 clean::
 	rm -rf build/

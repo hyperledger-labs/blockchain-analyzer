@@ -24,7 +24,7 @@ require (
 	github.com/Shopify/sarama v1.23.1 // indirect
 	github.com/Sirupsen/logrus v1.0.6 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
-	github.com/cloudflare/cfssl v0.0.0-20190726000631-633726f6bcb7 // indirect
+	github.com/cloudflare/cfssl 1.3.3 // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/fsouza/go-dockerclient v1.4.2 // indirect
 	github.com/garyburd/redigo v1.6.0 // indirect
-	github.com/go-kit/kit v0.9.0 // indirect
+	github.com/go-kit/kit vv0.8.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.2.1
 	github.com/google/certificate-transparency-go v1.0.21 // indirect

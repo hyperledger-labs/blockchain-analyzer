@@ -3,7 +3,7 @@ module github.com/blockchain-analyzer
 go 1.12
 
 require (
-	github.com/cloudflare/cfssl v0.0.0-20190808011637-b1ec8c586c2a // indirect
+	github.com/cloudflare/cfssl v1.3.3 // indirect
 	github.com/elastic/beats v7.3.1+incompatible
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
