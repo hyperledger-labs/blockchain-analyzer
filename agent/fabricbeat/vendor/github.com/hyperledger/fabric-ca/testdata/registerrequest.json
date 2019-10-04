@@ -1,6 +1,0 @@
-{
-  "id": "test_user",
-  "type": "client",
-  "affiliation": "bank_a",
-  "attrs": [{"name":"test","value":"testValue"}]
-}
