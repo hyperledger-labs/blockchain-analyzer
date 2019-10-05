@@ -1,4 +1,4 @@
-package fabricbeatsetup
+package fabricsetup
 
 import (
 	"io/ioutil"
@@ -12,11 +12,16 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/pkg/errors"
 
-	fabricConfig "github.com/blockchain-analyzer/agent/fabricbeat/config"
 )
 
+type Chaincode struct {
+	Name       string   //`chaincode:"name"`
+	Linkingkey string   //`chaincode:"linkingKey"`
+	Values     []string //`chaincode:"values"`
+}
+
 // Fabric, Elasticsearch and Kibana specific setup
-type FabricbeatSetup struct {
+type FabricSetup struct {
 	ConfigFile           string
 	initialized          bool
 	OrgName              string
@@ -29,7 +34,7 @@ type FabricbeatSetup struct {
 	LedgerClients        []*ledger.Client
 	Channels             map[*ledger.Client]string
 	SDK                  *fabsdk.FabricSDK
-	Chaincodes           []fabricConfig.Chaincode
+	Chaincodes           []Chaincode
 	ElasticURL           string
 	KibanaURL            string
 	DashboardDirectory   string
@@ -40,7 +45,7 @@ type FabricbeatSetup struct {
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
-func (setup *FabricbeatSetup) Initialize() error {
+func (setup *FabricSetup) Initialize() error {
 
 	log.Print("Initializing SDK")
 	// Add parameters for the initialization
@@ -130,6 +135,6 @@ func (setup *FabricbeatSetup) Initialize() error {
 }
 
 // Closes SDK
-func (setup *FabricbeatSetup) CloseSDK() {
+func (setup *FabricSetup) CloseSDK() {
 	setup.SDK.Close()
 }

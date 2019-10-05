@@ -11,7 +11,7 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
-	"github.com/blockchain-analyzer/agent/agentmodules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
 	"github.com/blockchain-analyzer/agent/agentmodules/ledgerutils"
 )
@@ -31,7 +31,7 @@ func main() {
 	AdminCertPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
 	AdminKeyPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
 
-	fbSetup := &fabricbeatsetup.FabricbeatSetup{
+	fbSetup := &fabricsetup.FabricSetup{
 		OrgName:       "org1",
 		ConfigFile:    ConfigFile,
 		Peer:          Peer,
