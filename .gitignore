@@ -50,6 +50,12 @@ fabricbeat
 dumper
 !dumper/
 
+dumper/Block
+dumper/EndorserTx
+dumper/NonEndorserTx
+dumper/Write
+
+
 *.pyc
 
 *.log

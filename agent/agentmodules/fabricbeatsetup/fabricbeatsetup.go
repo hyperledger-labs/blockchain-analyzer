@@ -21,8 +21,6 @@ type FabricbeatSetup struct {
 	initialized          bool
 	OrgName              string
 	Peer                 string
-	ElasticURL           string
-	KibanaURL            string
 	MspClient            *msp.Client
 	AdminCertPath        string
 	AdminKeyPath         string
@@ -31,12 +29,14 @@ type FabricbeatSetup struct {
 	LedgerClients        []*ledger.Client
 	Channels             map[*ledger.Client]string
 	SDK                  *fabsdk.FabricSDK
+	Chaincodes           []fabricConfig.Chaincode
+	ElasticURL           string
+	KibanaURL            string
+	DashboardDirectory   string
+	TemplateDirectory    string
 	BlockIndexName       string
 	TransactionIndexName string
 	KeyIndexName         string
-	DashboardDirectory   string
-	TemplateDirectory    string
-	Chaincodes           []fabricConfig.Chaincode
 }
 
 // Initialize reads the configuration file and sets up FabricSetup
@@ -121,7 +121,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 		return err
 	}
 	for _, chaincode := range chaincodeResponse.Chaincodes {
-		log.Print("Installed chaincode name: %s", chaincode.Name)
+		log.Print("Installed chaincode name: " + chaincode.Name)
 	}
 
 	log.Print("Initialization Successful")

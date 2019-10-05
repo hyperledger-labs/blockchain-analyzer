@@ -11,9 +11,9 @@ import (
 	"github.com/hyperledger/fabric/protos/peer"
 	"github.com/hyperledger/fabric/protos/utils"
 
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"log"
 )
 
 func GetBlockHash(blockNumber uint64, ledgerClient *ledger.Client) (string, error) {
@@ -21,7 +21,7 @@ func GetBlockHash(blockNumber uint64, ledgerClient *ledger.Client) (string, erro
 	if blockError != nil {
 		return "", blockError
 	}
-	logp.Info("Querying last known block from ledger successful")
+	log.Print("Querying last known block from ledger successful")
 
 	blockHash := fabricutils.GenerateBlockHash(blockResponse.Header.PreviousHash, blockResponse.Header.DataHash, blockResponse.Header.Number)
 	return blockHash, nil

@@ -17,9 +17,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/elastic"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/agentmodules/ledgerutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricbeatsetup"
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/templates"
 )
 

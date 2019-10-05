@@ -11,9 +11,9 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/ledgerutils"
 )
 
 func main() {
