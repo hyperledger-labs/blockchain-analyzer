@@ -3,7 +3,7 @@ package fabricbeatsetup
 import (
 	"io/ioutil"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"log"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
@@ -42,7 +42,7 @@ type FabricbeatSetup struct {
 // Initialize reads the configuration file and sets up FabricSetup
 func (setup *FabricbeatSetup) Initialize() error {
 
-	logp.Info("Initializing SDK")
+	log.Print("Initializing SDK")
 	// Add parameters for the initialization
 	if setup.initialized {
 		return errors.New("SDK already initialized")
@@ -51,15 +51,15 @@ func (setup *FabricbeatSetup) Initialize() error {
 	// Initialize the SDK with the configuration file
 	sdk, err := fabsdk.New(config.FromFile(setup.ConfigFile))
 	if err != nil {
-		logp.Warn("SDK initialization failed!")
+		log.Print("SDK initialization failed!")
 		return errors.WithMessage(err, "failed to create SDK")
 	}
 	setup.SDK = sdk
-	logp.Info("SDK created")
+	log.Print("SDK created")
 
 	mspContext := setup.SDK.Context(fabsdk.WithOrg(setup.OrgName))
 	if mspContext == nil {
-		logp.Warn("setup.sdk.Context() returned nil")
+		log.Print("setup.sdk.Context() returned nil")
 	}
 
 	// Retrieving admin identity (key + cert)
@@ -90,7 +90,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 	if err != nil {
 		return errors.WithMessage(err, "failed to create new resmgmt client")
 	}
-	logp.Info("Resmgmt client created")
+	log.Print("Resmgmt client created")
 
 	// Get all channels the peer is part of
 	channelsResponse, err := setup.ResClient.QueryChannels(resmgmt.WithTargetEndpoints(setup.Peer))
@@ -103,7 +103,7 @@ func (setup *FabricbeatSetup) Initialize() error {
 	for _, channel := range channelsResponse.Channels {
 		channelContext := setup.SDK.ChannelContext(channel.ChannelId, fabsdk.WithIdentity(setup.AdminIdentity))
 		if channelContext == nil {
-			logp.Warn("Channel context creation failed, ChannelContext() returned nil for channel " + channel.ChannelId)
+			log.Print("Channel context creation failed, ChannelContext() returned nil for channel " + channel.ChannelId)
 		}
 		ledgerClient, err := ledger.New(channelContext)
 		if err != nil {
@@ -111,9 +111,9 @@ func (setup *FabricbeatSetup) Initialize() error {
 		}
 		setup.LedgerClients = append(setup.LedgerClients, ledgerClient)
 		setup.Channels[ledgerClient] = channel.ChannelId
-		logp.Info("Ledger client initialized for channel " + channel.ChannelId)
+		log.Print("Ledger client initialized for channel " + channel.ChannelId)
 	}
-	logp.Info("Channel clients initialized")
+	log.Print("Channel clients initialized")
 
 	// Get installed chaincodes of the peer
 	chaincodeResponse, err := setup.ResClient.QueryInstalledChaincodes(resmgmt.WithTargetEndpoints(setup.Peer))
@@ -121,10 +121,10 @@ func (setup *FabricbeatSetup) Initialize() error {
 		return err
 	}
 	for _, chaincode := range chaincodeResponse.Chaincodes {
-		logp.Info("Installed chaincode name: %s", chaincode.Name)
+		log.Print("Installed chaincode name: %s", chaincode.Name)
 	}
 
-	logp.Info("Initialization Successful")
+	log.Print("Initialization Successful")
 	setup.initialized = true
 	return nil
 }

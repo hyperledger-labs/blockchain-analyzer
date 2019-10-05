@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/blockchain-analyzer/agent/fabricbeat/config"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
 
 	"github.com/elastic/beats/libbeat/beat"
 	libbeatCommon "github.com/elastic/beats/libbeat/common"
@@ -18,8 +17,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/elastic"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/templates"
 )
 
