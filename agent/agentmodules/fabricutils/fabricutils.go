@@ -5,7 +5,7 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"github.com/blockchain-analyzer/agent/fabricbeat/config"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/hyperledger/fabric/protos/common"
@@ -87,7 +87,7 @@ func ReturnCreatorOrgString(bytes []byte) string {
 	return sId.Mspid
 }
 
-func IndexOfChaincode(array []config.Chaincode, name string) int {
+func IndexOfChaincode(array []fabricsetup.Chaincode, name string) int {
 	for i, v := range array {
 		if v.Name == name {
 			return i

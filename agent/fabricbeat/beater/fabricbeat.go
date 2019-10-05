@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/blockchain-analyzer/agent/fabricbeat/config"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
 
 	"github.com/elastic/beats/libbeat/beat"
 	libbeatCommon "github.com/elastic/beats/libbeat/common"
@@ -18,9 +17,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/elastic"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/ledgerutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 	"github.com/blockchain-analyzer/agent/fabricbeat/modules/templates"
+	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
 )
 
 // Fabricbeat configuration.
@@ -28,7 +29,7 @@ type Fabricbeat struct {
 	done          chan struct{}
 	config        config.Config
 	client        beat.Client
-	Fsetup        *fabricbeatsetup.FabricbeatSetup
+	Fsetup        *fabricsetup.FabricSetup
 	lastBlockNums map[*ledger.Client]uint64
 }
 
@@ -45,7 +46,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		lastBlockNums: make(map[*ledger.Client]uint64),
 	}
 
-	fSetup := &fabricbeatsetup.FabricbeatSetup{
+	fSetup := &fabricsetup.FabricSetup{
 		OrgName:              bt.config.Organization,
 		ConfigFile:           bt.config.ConnectionProfile,
 		Peer:                 bt.config.Peer,
@@ -61,6 +62,18 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 		Chaincodes:           bt.config.Chaincodes,
 	}
 
+
+	fbeatSetup := &fabricbeatsetup.FabricbeatSetup{
+		OrgName:              bt.config.Organization,
+		ElasticURL:           bt.config.ElasticURL,
+		KibanaURL:            bt.config.KibanaURL,
+		BlockIndexName:       bt.config.BlockIndexName,
+		TransactionIndexName: bt.config.TransactionIndexName,
+		KeyIndexName:         bt.config.KeyIndexName,
+		DashboardDirectory:   bt.config.DashboardDirectory,
+		TemplateDirectory:    bt.config.TemplateDirectory,
+	}
+
 	fmt.Println(fmt.Sprintf("len(fSetup.Chaincodes) = %d", len(fSetup.Chaincodes)))
 
 	// Initialization of the Fabric SDK from the previously set properties
@@ -74,7 +87,7 @@ func New(b *beat.Beat, cfg *libbeatCommon.Config) (beat.Beater, error) {
 	fmt.Println(fmt.Sprintf("len(fSetup.Chaincodes) = %d", len(fSetup.Chaincodes)))
 
 	// Generate the index patterns and dashboards for the connected peer from templates in the kibana_templates folder
-	err := templates.GenerateDashboards(fSetup)
+	err := templates.GenerateDashboards(fbeatSetup)
 	if err != nil {
 		return nil, err
 	}

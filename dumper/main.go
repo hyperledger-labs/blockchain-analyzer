@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"encoding/json"
+	"path/filepath"
 	"os"
 	"time"
 
@@ -10,20 +11,32 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricbeatsetup"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/fabricutils"
-	"github.com/blockchain-analyzer/agent/fabricbeat/modules/ledgerutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
+	"github.com/blockchain-analyzer/agent/agentmodules/ledgerutils"
 )
 
 func main() {
 	fmt.Println("Standalone dumper program started running")
 
-	fbSetup := &fabricbeatsetup.FabricbeatSetup{
+	network := os.Getenv("NETWORK")
+	if (network == "") {
+		network = "basic"
+	}
+	dirpath, _ := filepath.Abs("../network")
+	fullpath := dirpath + "/" + network + "/"
+
+	ConfigFile := fullpath + "connection-profile-1.yaml"
+	Peer := "peer0.org1.el-network.com"
+	AdminCertPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
+	AdminKeyPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+
+	fbSetup := &fabricsetup.FabricSetup{
 		OrgName:       "org1",
-		ConfigFile:    "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/connection-profile-1.yaml",
-		Peer:          "peer0.org1.el-network.com",
-		AdminCertPath: "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
-		AdminKeyPath:  "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
+		ConfigFile:    ConfigFile,
+		Peer:          Peer,
+		AdminCertPath: AdminCertPath,
+		AdminKeyPath:  AdminKeyPath,
 	}
 
 	err := fbSetup.Initialize()

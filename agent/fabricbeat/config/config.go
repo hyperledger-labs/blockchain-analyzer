@@ -3,7 +3,10 @@
 
 package config
 
-import "time"
+import (
+	"time"
+	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
+)
 
 type Config struct {
 	Period               time.Duration `config:"period"`
@@ -19,13 +22,7 @@ type Config struct {
 	KeyIndexName         string        `config:"keyIndexName"`
 	DashboardDirectory   string        `config:"dashboardDirectory"`
 	TemplateDirectory    string        `config:"templateDirectory"`
-	Chaincodes           []Chaincode   `config:"chaincodes"`
-}
-
-type Chaincode struct {
-	Name       string   //`chaincode:"name"`
-	Linkingkey string   //`chaincode:"linkingKey"`
-	Values     []string //`chaincode:"values"`
+	Chaincodes           []fabricsetup.Chaincode   `config:"chaincodes"`
 }
 
 var DefaultConfig = Config{
@@ -42,8 +39,8 @@ var DefaultConfig = Config{
 	KeyIndexName:         "key",
 	DashboardDirectory:   "/home/prehi/internship/testNetwork/blockchain-analyzer/dashboards",
 	TemplateDirectory:    "/home/prehi/internship/testNetwork/blockchain-analyzer/agent/kibana_templates",
-	Chaincodes: []Chaincode{
-		Chaincode{
+	Chaincodes: []fabricsetup.Chaincode{
+		fabricsetup.Chaincode{
 			Name:       "mycc",
 			Linkingkey: "linking_key",
 			Values:     []string{"myvalue"},
