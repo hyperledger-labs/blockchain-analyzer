@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"encoding/json"
+	"path/filepath"
 	"os"
 	"time"
 
@@ -18,12 +19,24 @@ import (
 func main() {
 	fmt.Println("Standalone dumper program started running")
 
+	network := os.Getenv("NETWORK")
+	if (network == "") {
+		network = "basic"
+	}
+	dirpath, _ := filepath.Abs("../network")
+	fullpath := dirpath + "/" + network + "/"
+
+	ConfigFile := fullpath + "connection-profile-1.yaml"
+	Peer := "peer0.org1.el-network.com"
+	AdminCertPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem"
+	AdminKeyPath := fullpath + "crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1"
+
 	fbSetup := &fabricbeatsetup.FabricbeatSetup{
 		OrgName:       "org1",
-		ConfigFile:    "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/connection-profile-1.yaml",
-		Peer:          "peer0.org1.el-network.com",
-		AdminCertPath: "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/signcerts/Admin@org1.el-network.com-cert.pem",
-		AdminKeyPath:  "/home/prehi/go/src/github.com/blockchain-analyzer/network/multichannel/crypto-config/peerOrganizations/org1.el-network.com/users/Admin@org1.el-network.com/msp/keystore/adminKey1",
+		ConfigFile:    ConfigFile,
+		Peer:          Peer,
+		AdminCertPath: AdminCertPath,
+		AdminKeyPath:  AdminKeyPath,
 	}
 
 	err := fbSetup.Initialize()
