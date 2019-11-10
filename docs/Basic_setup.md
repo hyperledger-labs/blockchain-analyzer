@@ -157,7 +157,7 @@ Ensure that Python version is 2.7.*.
 
 Get module dependencies:
 ```
-make get-go
+make go-get
 ```
 
 Build the agent:
