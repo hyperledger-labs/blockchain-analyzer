@@ -3,9 +3,10 @@
 
 ## Description
 
-Each blockchain platform, including Hyperledger Fabric, provides a way to record information on blockchain in an immutable manner. In the case of Hyperledger Fabric, information is recorded as a `key ]/value` pair. All previous updates to a `key` are recorded in the ledger of a Hyperledger Fabric peer, but only the latest value of a `key` can be easily queried. This mechanism makes it challenging to perform analysis of updates to a `key`, a necessary requirement for information provenance.
+Each blockchain platform, including Hyperledger Fabric, provides a way to record information on blockchain in an immutable manner. In the case of Hyperledger Fabric, information is recorded as a `key/value` pair. All previous updates to a `key` are recorded in the ledger of a Hyperledger Fabric peer, but only the latest value of a `key` can be easily queried (see [documentation](https://godoc.org/github.com/hyperledger/fabric/core/chaincode/shim#ChaincodeStub.GetHistoryForKey)). This mechanism makes it challenging to perform analysis of updates to a `key`. Further, if an application groups together certain keys for application-level functions, it is challenging to analyze them together. In order to perform information provenance, it is necessary to 
+analyze all updates to a single `key` or group of keys that together comprise an information unit.
 
-To address this problem, we have created a project which can be used to analyze ledger data stored within a Hyperledger Fabric peer. This project can also be used to analyze operational data, such as number of blocks and transactions.
+To address this issue, we have created a project which can be used to analyze ledger data stored within a Hyperledger Fabric peer. This project can also be used to analyze operational data, such as number of blocks and transactions.
 
 Currently, the project includes:
 

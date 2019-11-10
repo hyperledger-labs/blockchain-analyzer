@@ -40,7 +40,7 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/fsouza/go-dockerclient v1.4.2 // indirect
 	github.com/garyburd/redigo v1.6.0 // indirect
-	github.com/go-kit/kit vv0.8.0 // indirect
+	github.com/go-kit/kit v0.8.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.2.1
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
@@ -61,12 +61,14 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v1.0.0 // indirect
+	github.com/prometheus/procfs v0.0.5 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
 	github.com/spf13/cobra v0.0.5 // indirect
 	github.com/spf13/viper v1.4.0 // indirect
 	github.com/sykesm/zap-logfmt v0.0.2 // indirect
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a // indirect
 	github.com/zmap/zlint v0.0.0-20190726132956-d9a29c3ddfb5 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
