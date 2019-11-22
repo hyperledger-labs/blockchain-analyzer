@@ -41,11 +41,20 @@ git-add:
 
 .PHONY: clean
 go-get:
+	go get -v github.com/hyperledger/fabric/core/ledger
+	go get -v github.com/hyperledger/fabric/common/util
+	go get -v github.com/hyperledger/fabric/protoutil
+	# these packages are included twice
+	# also present in github.com/golang.org/x/net/trace
+	rm -rf ../../../hyperledger/fabric/vendor/golang.org/x/net/trace
+	# also present outside vendor, need to delete vendored package to avoid type def collision
+	rm -rf ../../../hyperledger/fabric/vendor/github.com/hyperledger/fabric-protos-go
+	rm -rf ../../../hyperledger/fabric/vendor/github.com/golang/protobuf
 	go get github.com/go-kit/kit/sd
 	cd ../../../go-kit/kit/; git checkout tags/v0.8.0 -b v0.8.0
 	go get github.com/cloudflare/cfssl/csr
 	cd ../../../cloudflare/cfssl; git checkout tags/1.3.3 -b 1.3.3
-	go get
+	go get -v
 	# this package is include twice. also present in github.com/golang.org/x/net/trace
 	rm -rf ../../../hyperledger/fabric/vendor/golang.org/x/net/trace
 go-branch-del:

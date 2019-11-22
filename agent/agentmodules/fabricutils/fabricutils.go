@@ -1,16 +1,26 @@
 package fabricutils
 
 import (
+	"encoding/asn1"
 	"encoding/hex"
 	"encoding/pem"
 	"strings"
+	"fmt"
+	"math"
 
 	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/hyperledger/fabric/protos/common"
-	"github.com/hyperledger/fabric/protos/msp"
+	"github.com/hyperledger/fabric/common/util"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/msp"
 )
+
+type asn1Header struct {
+	Number       int64
+	PreviousHash []byte
+	DataHash     []byte
+}
 
 // Generates block hash from previous hash, data hash and block number.
 func GenerateBlockHash(previousHash, dataHash []byte, blockNumber uint64) string {
@@ -20,7 +30,24 @@ func GenerateBlockHash(previousHash, dataHash []byte, blockNumber uint64) string
 		PreviousHash: previousHash,
 		DataHash:     dataHash}
 
-	return hex.EncodeToString(h.Hash())
+	asn1Header := asn1Header{
+		PreviousHash: h.PreviousHash,
+		DataHash:     h.DataHash,
+	}
+	if h.Number > uint64(math.MaxInt64) {
+		panic(fmt.Errorf("Golang does not currently support encoding uint64 to asn1"))
+	} else {
+		asn1Header.Number = int64(h.Number)
+	}
+	asn1Bytes, err := asn1.Marshal(asn1Header)
+	if err != nil {
+		// Errors should only arise for types which cannot be encoded, since the
+		// BlockHeader type is known a-priori to contain only encodable types, an
+		// error here is fatal and should not be propogated
+		panic(err)
+	}
+
+	return hex.EncodeToString(util.ComputeSHA256(asn1Bytes))
 }
 
 // Decodes the type of the transaction into string

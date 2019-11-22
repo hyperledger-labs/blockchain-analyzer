@@ -45,6 +45,7 @@ build
 fabricbeat/_meta/dashboards.yml
 fabricbeat
 !fabricbeat/
+agent/fabricbeat/fields.yml
 
 # Dumper application
 dumper
