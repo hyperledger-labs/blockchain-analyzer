@@ -7,10 +7,9 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/core/ledger/util"
-	"github.com/hyperledger/fabric/protos/common"
-	"github.com/hyperledger/fabric/protos/peer"
-	"github.com/hyperledger/fabric/protos/utils"
-
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric/protoutil"
 	"github.com/blockchain-analyzer/agent/agentmodules/fabricutils"
 
 	"log"
@@ -44,12 +43,12 @@ func ProcessBlock(blockNumber uint64, ledgerClient *ledger.Client) (blockRespons
 	}
 
 	// Getting block creation timestamp
-	env, err := utils.GetEnvelopeFromBlock(blockResponse.Data.Data[0])
+	env, err := protoutil.GetEnvelopeFromBlock(blockResponse.Data.Data[0])
 	if err != nil {
 		return nil, "", time.Now(), nil, err
 	}
 
-	channelHeader, err := utils.ChannelHeader(env)
+	channelHeader, err := protoutil.ChannelHeader(env)
 	if err != nil {
 		return nil, "", time.Now(), nil, err
 	}
@@ -63,26 +62,27 @@ func ProcessBlock(blockNumber uint64, ledgerClient *ledger.Client) (blockRespons
 }
 
 func ProcessTx(txData []byte) (txId, channelId, creator, creatorOrg string, tx *peer.Transaction, err error) {
-	env, err := utils.GetEnvelopeFromBlock(txData)
+	env, err := protoutil.GetEnvelopeFromBlock(txData)
 	if err != nil {
 		return "", "", "", "", nil, err
 	}
 
-	payload, err := utils.GetPayload(env)
-	if err != nil {
-		return "", "", "", "", nil, err
-	}
-	chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
+	payload, err := protoutil.UnmarshalPayload(env.GetPayload())
 	if err != nil {
 		return "", "", "", "", nil, err
 	}
 
-	shdr, err := utils.GetSignatureHeader(payload.Header.SignatureHeader)
+	chdr, err := protoutil.UnmarshalChannelHeader(payload.Header.ChannelHeader)
 	if err != nil {
 		return "", "", "", "", nil, err
 	}
 
-	tx, err = utils.GetTransaction(payload.Data)
+	shdr, err := protoutil.UnmarshalSignatureHeader(payload.Header.SignatureHeader)
+	if err != nil {
+		return "", "", "", "", nil, err
+	}
+
+	tx, err = protoutil.UnmarshalTransaction(payload.Data)
 	if err != nil {
 		return "", "", "", "", nil, err
 	}
@@ -97,7 +97,7 @@ func ProcessEndorserTx(txData []byte) (txId, channelId, creator, creatorOrg stri
 		return "", "", "", "", nil, "", "", err
 	}
 
-	_, respPayload, payloadErr := utils.GetPayloads(tx.Actions[0])
+	_, respPayload, payloadErr := protoutil.GetPayloads(tx.Actions[0])
 	if payloadErr != nil {
 		return "", "", "", "", nil, "", "", err
 	}
