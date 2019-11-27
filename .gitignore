@@ -43,7 +43,7 @@ build
 .DS_Store
 
 fabricbeat/_meta/dashboards.yml
-fabricbeat
+agent/fabricbeat/fabricbeat
 !fabricbeat/
 agent/fabricbeat/fields.yml
 
