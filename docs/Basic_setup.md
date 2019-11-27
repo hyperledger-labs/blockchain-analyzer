@@ -146,6 +146,8 @@ make erase
 The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
 The commands in this section should be issued from the `blockchain-analyzer/agent/fabricbeat` directory.
 
+You can build the agent yourself, or you can use a pre-built one from the `blockchain-analyzer/agent/fabricbeat/prebuilt` directory. To use an executable from the `prebuilt` dir, choose the appropriate for your system and copy it into the `blockchain-analyzer/agent/fabricbeat` folder.
+
 ### Environment setup
 
 Before configuring and building the fabricbeat agent, please make sure that the `GOPATH` variable is set correctly. Then, add `$GOPATH/bin` to the `PATH`:
