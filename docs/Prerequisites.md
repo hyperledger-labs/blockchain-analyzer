@@ -1,10 +1,14 @@
 ## Prerequisites
-* Go (v1.12.7+)  
+
 * Docker  (v19.03.0+)
 * docker-compose (v1.24.1+)  
 * Node.js (v8.10+)  
+
+The following are necessary only if you want to build Fabricbeat yourself. If you intend to use the Docker image ([balazsprehoda/fabricbeat](https://hub.docker.com/repository/docker/balazsprehoda/fabricbeat/general)) or the pre-compiled executable, you can skip them.
+
 * python (2.7) 
 * virtualenv (16.7.0+)  
+* Go (v1.12.7+)  
 
 The instructions below have been tested on a Ubuntu 16.04 machine in AWS:
 
