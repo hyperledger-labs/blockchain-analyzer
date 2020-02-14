@@ -1,9 +1,12 @@
 package fabricutils
 
 import (
+	"encoding/asn1"
 	"encoding/hex"
 	"encoding/pem"
 	"strings"
+	"fmt"
+	"math"
 
 	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 
@@ -13,7 +16,6 @@ import (
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/msp"
 )
-
 
 // Generates block hash from previous hash, data hash and block number.
 func GenerateBlockHash(previousHash, dataHash []byte, blockNumber uint64) string {
