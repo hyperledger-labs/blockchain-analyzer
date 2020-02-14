@@ -7,7 +7,7 @@ This is an example to setup the project with applechain network on a new Ubuntu 
 Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Prerequisites.md).   
 
 ## Cloning the repository
-To get started with the project, we have to clone the repository first. It is important that we put it under `$GOPATH/src/github.com`. 
+To get started with the project, clone the git repository. If you want to build Fabricbeat yourself, it is important that you place the project under `$GOPATH/src/github.com`. Otherwise, you can clone the repository anywhere you want (you do not need to install Go to use the pre-compiled executable or the Docker image).
 ```
 mkdir -p $GOPATH/src/github.com
 cd $GOPATH/src/github.com
@@ -68,8 +68,10 @@ make start
 
 If you see *"Cannot connect to the Elasticsearch cluster"*, try refreshing the page, or opening the page in another tab.
 
-## Building and running the agent
-We use the agent to periodically query ledger data and ship it to Elasticsearch. To get started with the agent, run
+## Running the agent
+We use the agent to periodically query ledger data and ship it to Elasticsearch. To run the agent on your local machine, you can build it yourself or use a pre-compiled version the same way as described in `Basic_setup` and `Multichannel_setup`. To run it inside a Docker container, you can pull the image [balazsprehoda/fabricbeat](https://hub.docker.com/r/balazsprehoda/fabricbeat), or build the image using the Dockerfile in the project root directory. For reference on using the image, please see [`blockchain-analyzer/docker-agent`](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docker-agent).
+
+Building locally:  
 ```
 cd ../agent/fabricbeat
 export PATH=$PATH:$GOPATH/bin
