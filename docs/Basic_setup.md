@@ -7,10 +7,9 @@ This is an example to setup the project with `basic` network on a new Ubuntu 18.
 3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start--stop-the-basic-network). See `multichannel` page for multi-channel configuration.
 4. [Create users and transactions using dummy application](#create-users-and-transactions-using-dummy-application)
 5. [Start Elastic stack](#start-elastic-stack)
-6. [Build fabricbeat agent](#build-fabricbeat-agent)
-7. [Start the fabricbeat agent](#start-fabricbeat) and connect to peer in `basic` network
-8. [Configuring Indices for the first time in Kibana](#configuring-indices-for-the-first-time-in-Kibana)
-9. [Viewing dashboards](#viewing-dashboards) that store data
+6. [Fabricbeat agent](#fabricbeat-agent)
+7. [Configuring Indices for the first time in Kibana](#configuring-indices-for-the-first-time-in-Kibana)
+8. [Viewing dashboards](#viewing-dashboards) that store data
 
 ## Install Prerequisites
 
