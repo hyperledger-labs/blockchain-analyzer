@@ -150,11 +150,12 @@ $ docker build -t <IMAGE NAME> .
 ```  
 from the project root directory.
 
-To start the agent, you have to mount two configuration files and the necessary crypto materials:
+To start the agent, you have to mount two configuration files, the necessary crypto materials and the folders that contain kibana dashboards and templates:
 
 - `fabricbeat.yml`: configuration file for the agent (see `blockchain-analyzer/agent/fabricbeat/fabricbeat.yml` for reference)
 - connection profile yaml file referenced from `fabricbeat.yml`
 - crypto materials referenced from the connection profile and `fabricbeat.yml`
+- Kibana dashboard and template directories referenced as `dashboardDirectory` and `templateDirectory` in the configuration file.
 
 If you use environment variables in the configuration file, do not forget to set these variables in the container!
 
