@@ -69,7 +69,7 @@ make start
 If you see *"Cannot connect to the Elasticsearch cluster"*, try refreshing the page, or opening the page in another tab.
 
 ## Running the agent
-We use the agent to periodically query ledger data and ship it to Elasticsearch. To run the agent on your local machine, you can build it yourself or use a pre-compiled version the same way as described in `Basic_setup` and `Multichannel_setup`. To run it inside a Docker container, you can pull the image [balazsprehoda/fabricbeat](https://hub.docker.com/r/balazsprehoda/fabricbeat), or build the image using the Dockerfile in the project root directory. For reference on using the image, please see [`blockchain-analyzer/docker-agent`](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docker-agent).
+We use the agent to periodically query ledger data and ship it to Elasticsearch. To run the agent on your local machine, you can build it yourself or use a pre-compiled version the same way as described in [`Basic setup`](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/Basic_setup.md) and [`Multichannel setup`](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/Multichannel_setup.md). To run it inside a Docker container, you can pull the image [balazsprehoda/fabricbeat](https://hub.docker.com/r/balazsprehoda/fabricbeat), or build the image using the Dockerfile in the project root directory. For reference on using the image, please see [`blockchain-analyzer/docker-agent`](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docker-agent).
 
 Building locally:  
 ```
@@ -78,7 +78,7 @@ export PATH=$PATH:$GOPATH/bin
 make update
 ```
 
-Afte updating, build the agent:
+After updating, build the agent:
 
 ```
 make
