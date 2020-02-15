@@ -1,20 +1,17 @@
 package fabricutils
 
 import (
-	"encoding/asn1"
 	"encoding/hex"
 	"encoding/pem"
 	"strings"
-	"fmt"
-	"math"
 
 	"github.com/blockchain-analyzer/agent/agentmodules/fabricsetup"
 
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/hyperledger/fabric/protoutil"
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/hyperledger/fabric/protoutil"
 )
 
 // Generates block hash from previous hash, data hash and block number.
