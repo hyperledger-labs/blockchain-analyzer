@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+
+  fabricbeat:
+    container_name: fabricbeat-1
+    image: balazsprehoda/fabricbeat:v1-alpha
+    # To make resolution of peer container addresses simple (demo purposes!)
+    # In production, you probably want to deploy fabricbeat to the same network
+    # as the Hyperledger Fabric containers.
+    network_mode: host
+    environment:
+      - ORG_NUMBER=${ORG_NUMBER}
+      - PEER_NUMBER=${PEER_NUMBER}
+      - NETWORK=${NETWORK}
+    volumes:
+      # Configuration file - Remember to modify path variables (adminCertPath, adminKeyPath)
+      # to point to the mounted cryptographic artifacts! (in this case, this means replacing
+      # ${GOPATH} with the value of ${GOPATH} on the HOST machine)
+      - ./agent/fabricbeat/fabricbeat.yml:/go/src/github.com/blockchain-analyzer/agent/fabricbeat/fabricbeat.yml
+      # Connection profile ("connectionProfile" in configuration file)
+      - ${GOPATH}/src/github.com/blockchain-analyzer/network/${NETWORK}/connection-profile-${ORG_NUMBER}.yaml:/go/src/github.com/blockchain-analyzer/network/${NETWORK}/connection-profile-${ORG_NUMBER}.yaml
+      # Crypto-config
+      - ${GOPATH}/src/github.com/blockchain-analyzer/network/basic/crypto-config:${GOPATH}/src/github.com/blockchain-analyzer/network/basic/crypto-config
+      # Kibana dashboard directory ("dashboardDirectory" in configuration file)
+      - ${GOPATH}/src/github.com/blockchain-analyzer/dashboards/7/dashboard:/go/src/github.com/blockchain-analyzer/dashboards/7/dashboard
+      # Kibana template directory ("templateDirectory" in configuration file)
+      - ${GOPATH}/src/github.com/blockchain-analyzer/agent/kibana_templates:/go/src/github.com/blockchain-analyzer/agent/kibana_templates
+      # Note that if you change "dashboardDirectory", you have to change setup.dashboards.directory accordingly!
+

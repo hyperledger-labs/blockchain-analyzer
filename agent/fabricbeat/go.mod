@@ -18,13 +18,13 @@ exclude github.com/Sirupsen/logrus v1.1.1
 
 exclude github.com/Sirupsen/logrus v1.1.0
 
-go 1.12
+go 1.13
 
 require (
 	github.com/Shopify/sarama v1.23.1 // indirect
 	github.com/Sirupsen/logrus v1.0.6 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
-	github.com/cloudflare/cfssl 1.3.3 // indirect
+	github.com/cloudflare/cfssl v1.3.3 // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect

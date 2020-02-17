@@ -7,17 +7,16 @@ This is an example to setup the project with `basic` network on a new Ubuntu 18.
 3. [Start / stop a Hyperledger Fabric network using `basic` configuration](#start--stop-the-basic-network). See `multichannel` page for multi-channel configuration.
 4. [Create users and transactions using dummy application](#create-users-and-transactions-using-dummy-application)
 5. [Start Elastic stack](#start-elastic-stack)
-6. [Build fabricbeat agent](#build-fabricbeat-agent)
-7. [Start the fabricbeat agent](#start-fabricbeat) and connect to peer in `basic` network
-8. [Configuring Indices for the first time in Kibana](#configuring-indices-for-the-first-time-in-Kibana)
-9. [Viewing dashboards](#viewing-dashboards) that store data
+6. [Fabricbeat agent](#fabricbeat-agent)
+7. [Configuring Indices for the first time in Kibana](#configuring-indices-for-the-first-time-in-Kibana)
+8. [Viewing dashboards](#viewing-dashboards) that store data
 
 ## Install Prerequisites
 
 Please make sure that you have set up the environment for the project. Follow the steps listed in [Prerequisites](https://github.com/balazsprehoda/hyperledger-elastic/blob/master/docs/Prerequisites.md).   
 
 ## Clone the repository
-To get started with the project, clone the git repository. It is important that you place it under `$GOPATH/src/github.com`  
+To get started with the project, clone the git repository. If you want to build Fabricbeat yourself, it is important that you place the project under `$GOPATH/src/github.com`. Otherwise, you can clone the repository anywhere you want (you do not need to install Go to use the pre-compiled executable or the Docker image). 
 ```
 $ mkdir $GOPATH/src/github.com -p
 $ cd $GOPATH/src/github.com  
@@ -37,12 +36,12 @@ Issue the following command in the `network/basic` directory
 make start
 ```
 
-Enter the Fabric CLI Docker container by issuing the command:
+To enter the Fabric CLI Docker container, issue the command:
 ```
 docker exec -it cli bash  
 ```
 
-Inside the CLI, the `/scripts` folder contains the scripts that can be used to install, instantiate and invoke chaincode (though the `make start` command takes care of installation and instantiation).
+Inside CLI, the `/scripts` folder contains scripts that can be used to install, instantiate and invoke chaincode (though the `make start` command takes care of installation and instantiation).
 
 ### Stop the network
 
@@ -55,7 +54,7 @@ make destroy
 
 ### Remove chaincode images
 
-If you make changes to `dummycc` chain code, you will need to remove the old images:
+If you make changes to `dummycc` chaincode, you will need to remove the old images:
 
 ```
 make rmchaincode
@@ -141,12 +140,36 @@ make erase
 ```
 
 
-## Build Fabricbeat Agent
+## Fabricbeat Agent
 
-The fabricbeat beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
+The fabricbeat Beats agent is responsible for connecting to a specified peer, periodically querying its ledger, processing the data and shipping it to Elasticsearch. Multiple instances can be run at the same time, each querying a different peer and sending its data to the Elasticsearch cluster.  
+
+### Docker image
+
+Fabricbeat agent is also available as a Docker image ([balazsprehoda/fabricbeat](https://hub.docker.com/r/balazsprehoda/fabricbeat)). You can use this image, or build it using the command  
+```
+$ docker build -t <IMAGE NAME> .
+```  
+from the project root directory.
+
+To start the agent, you have to mount two configuration files, the necessary crypto materials and the folders that contain kibana dashboards and templates:
+
+- `fabricbeat.yml`: configuration file for the agent (see `blockchain-analyzer/agent/fabricbeat/fabricbeat.yml` for reference)
+- connection profile yaml file referenced from `fabricbeat.yml`
+- crypto materials referenced from the connection profile and `fabricbeat.yml`
+- Kibana dashboard and template directories referenced as `dashboardDirectory` and `templateDirectory` in the configuration file.
+
+If you use environment variables in the configuration file, do not forget to set these variables in the container!
+
+For a sample Docker setup, see [`/blockchain-analyzer/docker-agent/`](https://github.com/hyperledger-labs/blockchain-analyzer/tree/master/docker-agent).
+
+### Running the agent locally
+
 The commands in this section should be issued from the `blockchain-analyzer/agent/fabricbeat` directory.
 
-### Environment setup
+You can build the agent yourself, or you can use a pre-built one from the `blockchain-analyzer/agent/fabricbeat/prebuilt` directory. To use an executable from the `prebuilt` dir, choose the appropriate for your system and copy it into the `blockchain-analyzer/agent/fabricbeat` folder.
+
+#### Environment setup
 
 Before configuring and building the fabricbeat agent, please make sure that the `GOPATH` variable is set correctly. Then, add `$GOPATH/bin` to the `PATH`:
 ```
@@ -167,7 +190,7 @@ make
 ```
 
 
-## Start fabricbeat
+#### Start fabricbeat locally
 
 To start the agent, issue the following command from the `fabricbeat` directory:
 ```
@@ -179,12 +202,12 @@ ORG_NUMBER=1 PEER_NUMBER=0 NETWORK=basic ./fabricbeat -e -d "*"
 ```
 The variables passed are used in the configuration (`fabricbeat.yml`). To connect to another network or peer, change the configuration (and/or the passed variables) accordingly.
 
-### Stop fabricbeat
+#### Stop fabricbeat
 
 To stop the agent, simply type `Ctrl+C`
 
 
-## Configuring Indices for the first time in Kibana
+### Configuring Indices for the first time in Kibana
 
 Next, we navigate to http://localhost:5601.
 
@@ -192,7 +215,7 @@ Click the dashboards icon on the left:
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Starting_page.png "Kibana starting page")
 
 
-Kibana takes us to select a default index pattern. Click `fabricbeat-*`, then the star in the upper right corner:
+Kibana takes us to select a default index pattern. Click `fabricbeat-*`, then the star in the top right corner:
 ![alt text](https://github.com/hyperledger-labs/blockchain-analyzer/blob/master/docs/images/Index_pattern_selection_basic.png "Setting default index pattern")
 
 

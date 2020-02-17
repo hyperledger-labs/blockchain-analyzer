@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+
+  fabricbeat:
+    image: balazsprehoda/fabricbeat:v3-alpha
+    # To make resolution of peer container addresses simple (demo purposes!)
+    # In production, you probably want to deploy fabricbeat to the same network
+    # as the Hyperledger Fabric containers.
+    network_mode: host
+    environment:
+      - ORG_NUMBER=CONFIG_ORG_NUM
+      - PEER_NUMBER=CONFIG_PEER_NUM
+      - NETWORK=CONFIG_NETWORK_NAME
+    volumes:
+      # Fabricbeat configuration file
+      - ./fabricbeat.yml:/go/src/github.com/blockchain-analyzer/agent/fabricbeat/fabricbeat.yml
+      # Connection profile ("connectionProfile" in configuration file)
+      - ./connection-profile-CONFIG_ORG_NUM.yaml:/go/src/github.com/blockchain-analyzer/network/CONFIG_NETWORK_NAME/connection-profile-CONFIG_ORG_NUM.yaml
+      # Crypto-config
+      - ../network/CONFIG_NETWORK_NAME/crypto-config:/go/src/github.com/blockchain-analyzer/network/basic/crypto-config
+      # Kibana dashboard directory ("dashboardDirectory" in configuration file)
+      - ../dashboards/7/dashboard:/go/src/github.com/blockchain-analyzer/dashboards/7/dashboard
+      # Kibana template directory ("templateDirectory" in configuration file)
+      - ../agent/kibana_templates:/go/src/github.com/blockchain-analyzer/agent/kibana_templates
+      # Note that if you change "dashboardDirectory", you have to change setup.dashboards.directory accordingly!
+
